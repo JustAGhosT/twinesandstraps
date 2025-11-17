@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id              Int      @id @default(autoincrement())
+  name            String
+  sku             String   @unique
+  description     String
+  material        String?
+  diameter        Float?
+  length          Float?
+  strength_rating String?
+  price           Float
+  vat_applicable  Boolean  @default(true)
+  stock_status    String   @default("IN_STOCK") // Consider an enum here
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  category   Category @relation(fields: [category_id], references: [id])
+  category_id Int
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  slug      String    @unique
+  parent_id Int?
+  products  Product[]
+}
+
+model User {
+  id                Int      @id @default(autoincrement())
+  name              String
+  email             String   @unique
+  phone             String?
+  password_hash     String
+  role              String   @default("CUSTOMER") // Consider an enum here
+  marketing_consent Boolean  @default(false)
+  created_at        DateTime @default(now())
+  last_login        DateTime?
+}
