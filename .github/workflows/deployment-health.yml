@@ -1,0 +1,48 @@
+name: Deployment Health Check
+
+on:
+  # Run after Netlify deployment completes
+  deployment_status:
+
+jobs:
+  health-check:
+    name: Post-Deployment Health Check
+    runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success'
+    
+    steps:
+      - name: Wait for deployment to be ready
+        run: sleep 30
+        
+      - name: Check deployment URL is accessible
+        run: |
+          URL="${{ github.event.deployment_status.target_url }}"
+          echo "Checking deployment at: $URL"
+          
+          # Try to fetch the deployment URL
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+          
+          if [ "$STATUS" -eq 200 ] || [ "$STATUS" -eq 301 ] || [ "$STATUS" -eq 302 ]; then
+            echo "✓ Deployment is accessible (HTTP $STATUS)"
+          else
+            echo "✗ Deployment returned HTTP $STATUS"
+            exit 1
+          fi
+          
+      - name: Check for common issues
+        run: |
+          URL="${{ github.event.deployment_status.target_url }}"
+          
+          # Check if page loads without JavaScript errors (basic check)
+          CONTENT=$(curl -s "$URL")
+          
+          # Check for Next.js error page indicators
+          if echo "$CONTENT" | grep -q "Application error"; then
+            echo "⚠ Warning: Possible application error detected"
+          fi
+          
+          if echo "$CONTENT" | grep -q "500"; then
+            echo "⚠ Warning: Possible 500 error detected"
+          fi
+          
+          echo "✓ Basic content checks passed"

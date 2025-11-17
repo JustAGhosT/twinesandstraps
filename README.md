@@ -70,10 +70,35 @@ The following environment variables must be configured in your Netlify dashboard
 #### Deployment Configuration
 
 The project includes a `netlify.toml` file that configures:
-- Build command: `npm run build`
-- Publish directory: `.next`
-- Next.js runtime plugin: `@netlify/plugin-nextjs`
-- Node.js version: 18
+- **Build command**: `npm run lint && npm run build` (includes linting in CI/CD)
+- **Publish directory**: `.next`
+- **Next.js runtime plugin**: `@netlify/plugin-nextjs`
+- **Node.js version**: 18
+- **Security headers**: X-Frame-Options, X-Content-Type-Options, CSP, etc.
+- **Context-specific builds**: Different commands for production, preview, and branch deployments
+- **Static asset caching**: Optimized cache headers for `/_next/static/*` assets
+- **Redirect rules**: www to non-www redirects
+
+#### CI/CD Pipeline
+
+The repository includes GitHub Actions workflows for continuous integration:
+
+**Continuous Integration Workflow** (`.github/workflows/ci.yml`):
+- **Lint Check**: Runs ESLint on all code
+- **Type Check**: Validates TypeScript types
+- **Build Test**: Ensures the application builds successfully
+- **Config Validation**: Validates `netlify.toml` and `package.json` syntax
+
+**Deployment Health Check** (`.github/workflows/deployment-health.yml`):
+- Automatically runs after Netlify deployment completes
+- Verifies deployment URL is accessible
+- Checks for common deployment errors
+- Validates HTTP response codes
+
+These workflows run automatically on:
+- Push to `main` or `develop` branches
+- Pull requests to `main` or `develop` branches
+- After Netlify deployment completion
 
 #### Manual Deployment Steps
 
