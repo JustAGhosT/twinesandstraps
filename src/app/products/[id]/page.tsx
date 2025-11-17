@@ -9,9 +9,16 @@ interface ProductDetailPageProps {
 }
 
 async function getProduct(id: string) {
+  const productId = parseInt(id, 10);
+  
+  // Validate that the ID is a valid number
+  if (isNaN(productId)) {
+    return null;
+  }
+  
   const product = await prisma.product.findUnique({
     where: {
-      id: parseInt(id, 10),
+      id: productId,
     },
   });
   return product;
