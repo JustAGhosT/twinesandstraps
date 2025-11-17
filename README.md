@@ -39,3 +39,37 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Deployment
+
+### Netlify Deployment
+
+This project is configured for deployment on Netlify with the following setup:
+
+#### Prerequisites
+
+1. A Netlify account
+2. The repository connected to Netlify
+
+#### Environment Variables
+
+The following environment variables must be configured in your Netlify dashboard (Site settings → Build & deploy → Environment variables):
+
+- `DATABASE_URL`: Database connection string for Prisma (e.g., `file:./dev.db` for SQLite)
+
+#### Deployment Configuration
+
+The project includes a `netlify.toml` file that configures:
+- Build command: `npm run build`
+- Publish directory: `.next`
+- Next.js runtime plugin: `@netlify/plugin-nextjs`
+- Node.js version: 18
+
+#### Manual Deployment Steps
+
+1. Push your code to the connected Git repository
+2. Netlify will automatically detect changes and trigger a build
+3. Set the required environment variables in Netlify dashboard
+4. The site will be deployed automatically
+
+For more information on Netlify deployments, visit [Netlify Documentation](https://docs.netlify.com/).
