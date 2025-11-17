@@ -11,8 +11,8 @@ interface ProductDetailPageProps {
 async function getProduct(id: string) {
   const productId = parseInt(id, 10);
   
-  // Validate that the ID is a valid number
-  if (isNaN(productId)) {
+  // Validate that the ID is a valid positive number
+  if (isNaN(productId) || productId <= 0 || !Number.isFinite(productId)) {
     return null;
   }
   
@@ -28,7 +28,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const product = await getProduct(params.id);
 
   if (!product) {
-    return <div>Product not found</div>;
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-4">Product Not Found</h1>
+          <p className="text-gray-600 mb-8">The product you are looking for does not exist.</p>
+          <a href="/products" className="text-blue-600 hover:underline">
+            Browse all products
+          </a>
+        </div>
+      </div>
+    );
   }
 
   return (
