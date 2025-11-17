@@ -2,6 +2,9 @@ import Link from 'next/link';
 import prisma from '@/lib/prisma';
 import ProductCard from '@/components/ProductCard';
 
+// Force dynamic rendering - data is fetched at request time
+export const dynamic = 'force-dynamic';
+
 async function getFeaturedProducts() {
   const products = await prisma.product.findMany({
     take: 3,

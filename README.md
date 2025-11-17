@@ -39,3 +39,82 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Deployment
+
+### Netlify Deployment
+
+This project is configured for deployment on Netlify with the following setup:
+
+#### Prerequisites
+
+1. A Netlify account
+2. The repository connected to Netlify
+
+#### Environment Variables
+
+The following environment variables must be configured in your Netlify dashboard (Site settings → Build & deploy → Environment variables):
+
+- `DATABASE_URL`: Database connection string for Prisma
+
+**Important Note on Database:**
+- The current implementation uses SQLite, which is **not recommended for production deployments on Netlify** due to the ephemeral nature of serverless environments.
+- For production, consider migrating to a cloud-based database service such as:
+  - Neon (Postgres)
+  - PlanetScale (MySQL)
+  - MongoDB Atlas
+  - Supabase (Postgres)
+  - Turso (SQLite-compatible with global distribution)
+- Update the `DATABASE_URL` in Netlify environment variables to point to your chosen database service.
+
+#### Deployment Configuration
+
+The project includes a `netlify.toml` file that configures:
+- **Build command**: `npm run lint && npm run build` (includes linting in CI/CD)
+- **Publish directory**: `.next`
+- **Next.js runtime plugin**: `@netlify/plugin-nextjs`
+- **Node.js version**: 18
+- **Security headers**: X-Frame-Options, X-Content-Type-Options, CSP, etc.
+- **Context-specific builds**: Different commands for production, preview, and branch deployments
+- **Static asset caching**: Optimized cache headers for `/_next/static/*` assets
+- **Redirect rules**: www to non-www redirects
+
+#### CI/CD Pipeline
+
+The repository includes GitHub Actions workflows for continuous integration:
+
+**Continuous Integration Workflow** (`.github/workflows/ci.yml`):
+- **Lint Check**: Runs ESLint on all code
+- **Type Check**: Validates TypeScript types
+- **Build Test**: Ensures the application builds successfully
+- **Config Validation**: Validates `netlify.toml` and `package.json` syntax
+
+**Deployment Health Check** (`.github/workflows/deployment-health.yml`):
+- Automatically runs after Netlify deployment completes
+- Verifies deployment URL is accessible
+- Checks for common deployment errors
+- Validates HTTP response codes
+
+These workflows run automatically on:
+- Push to `main` or `develop` branches
+- Pull requests to `main` or `develop` branches
+- After Netlify deployment completion
+
+#### Rendering Strategy
+
+The application uses **dynamic rendering** for database-driven pages:
+- Pages fetch data at request time (not at build time)
+- Compatible with Netlify's serverless architecture
+- Ensures fresh data on every request
+- No database required during the build process
+
+This allows the build to succeed without a populated database, while still providing dynamic, database-driven content at runtime.
+
+#### Manual Deployment Steps
+
+1. Push your code to the connected Git repository
+2. Netlify will automatically detect changes and trigger a build
+3. Set the required environment variables in Netlify dashboard
+4. The site will be deployed automatically
+
+For more information on Netlify deployments, visit [Netlify Documentation](https://docs.netlify.com/).

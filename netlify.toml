@@ -1,0 +1,52 @@
+[build]
+  command = "npm run lint && npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Context-specific build commands
+[context.production]
+  command = "npm run lint && npm run build"
+  
+[context.deploy-preview]
+  command = "npm run lint && npm run build"
+
+[context.branch-deploy]
+  command = "npm run build"
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Cache static assets
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Redirect www to non-www
+[[redirects]]
+  from = "https://www.twinesandstraps.netlify.app/*"
+  to = "https://twinesandstraps.netlify.app/:splat"
+  status = 301
+  force = true
+
+# Note: This configuration assumes a persistent database connection.
+# SQLite is not recommended for production deployments on Netlify.
+# Consider using a cloud database service like:
+# - Neon (Postgres)
+# - PlanetScale (MySQL)
+# - MongoDB Atlas
+# - Supabase (Postgres)
+# - Turso (SQLite-compatible)
+
