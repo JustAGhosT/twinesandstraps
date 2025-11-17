@@ -69,7 +69,7 @@ export default async function ProductListPage() {
               <div className="mt-8 pt-6 border-t">
                 <h3 className="text-lg font-semibold mb-4">Need Help?</h3>
                 <p className="text-sm text-gray-600 mb-4">
-                  Can't find what you're looking for? Request a custom quote.
+                  Can&apos;t find what you&apos;re looking for? Request a custom quote.
                 </p>
                 <Link 
                   href="/quote"
