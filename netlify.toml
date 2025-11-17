@@ -8,3 +8,11 @@
 [build.environment]
   NODE_VERSION = "18"
 
+# Note: This configuration assumes a persistent database connection.
+# SQLite is not recommended for production deployments on Netlify.
+# Consider using a cloud database service like:
+# - Neon (Postgres)
+# - PlanetScale (MySQL)
+# - MongoDB Atlas
+# - Supabase (Postgres)
+

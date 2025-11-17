@@ -55,7 +55,17 @@ This project is configured for deployment on Netlify with the following setup:
 
 The following environment variables must be configured in your Netlify dashboard (Site settings → Build & deploy → Environment variables):
 
-- `DATABASE_URL`: Database connection string for Prisma (e.g., `file:./dev.db` for SQLite)
+- `DATABASE_URL`: Database connection string for Prisma
+
+**Important Note on Database:**
+- The current implementation uses SQLite, which is **not recommended for production deployments on Netlify** due to the ephemeral nature of serverless environments.
+- For production, consider migrating to a cloud-based database service such as:
+  - Neon (Postgres)
+  - PlanetScale (MySQL)
+  - MongoDB Atlas
+  - Supabase (Postgres)
+  - Turso (SQLite-compatible with global distribution)
+- Update the `DATABASE_URL` in Netlify environment variables to point to your chosen database service.
 
 #### Deployment Configuration
 
