@@ -4,11 +4,16 @@ on:
   # Run after Netlify deployment completes
   deployment_status:
 
+permissions:
+  contents: read
+
 jobs:
   health-check:
     name: Post-Deployment Health Check
     runs-on: ubuntu-latest
     if: github.event.deployment_status.state == 'success'
+    permissions:
+      contents: read
     
     steps:
       - name: Wait for deployment to be ready
