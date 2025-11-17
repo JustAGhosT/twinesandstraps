@@ -110,6 +110,22 @@ Required environment variables for deployment:
 
 - `DATABASE_URL`: Database connection string (configure in Netlify dashboard)
 
+## Rendering Strategy
+
+The application uses **dynamic rendering** for database-driven pages to ensure compatibility with Netlify's serverless architecture:
+
+- **Home page** (`/`): Dynamic rendering - fetches featured products and categories at request time
+- **Products page** (`/products`): Dynamic rendering - fetches all products at request time  
+- **Product detail page** (`/products/[id]`): Dynamic rendering - fetches specific product at request time
+
+This approach:
+- Eliminates build-time database requirements
+- Ensures fresh data on every request
+- Works seamlessly with Netlify's serverless functions
+- Avoids static generation errors when database is unavailable during build
+
+Pages are marked with `export const dynamic = 'force-dynamic'` to explicitly enable server-side rendering on demand.
+
 ## Deployment Flow
 
 ```

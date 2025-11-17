@@ -100,6 +100,16 @@ These workflows run automatically on:
 - Pull requests to `main` or `develop` branches
 - After Netlify deployment completion
 
+#### Rendering Strategy
+
+The application uses **dynamic rendering** for database-driven pages:
+- Pages fetch data at request time (not at build time)
+- Compatible with Netlify's serverless architecture
+- Ensures fresh data on every request
+- No database required during the build process
+
+This allows the build to succeed without a populated database, while still providing dynamic, database-driven content at runtime.
+
 #### Manual Deployment Steps
 
 1. Push your code to the connected Git repository

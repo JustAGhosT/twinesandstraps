@@ -3,6 +3,9 @@ import prisma from '@/lib/prisma';
 import ProductView from '@/components/ProductView';
 import Link from 'next/link';
 
+// Force dynamic rendering - data is fetched at request time
+export const dynamic = 'force-dynamic';
+
 interface ProductDetailPageProps {
   params: {
     id: string;
