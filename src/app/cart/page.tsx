@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
-import Image from 'next/image';
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
@@ -103,7 +102,12 @@ export default function CartPage() {
                         <input
                           type="number"
                           value={item.quantity}
-                          onChange={(e) => updateQuantity(item.product.id, parseInt(e.target.value) || 1)}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (!isNaN(value)) {
+                              updateQuantity(item.product.id, value);
+                            }
+                          }}
                           className="w-16 text-center border-x py-1"
                           min="1"
                         />
