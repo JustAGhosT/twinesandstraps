@@ -12,9 +12,20 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const totalPrice = product.price * quantity;
 
   const handleRequestQuote = () => {
+    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+    
+    // Validate WhatsApp number is configured
+    if (!whatsappNumber || whatsappNumber === '27XXXXXXXXX') {
+      alert('WhatsApp number not configured. Please contact us at info@twinesandstraps.co.za');
+      return;
+    }
+    
+    // Sanitize product details for URL encoding
+    const sanitizedName = String(product.name || 'Product');
+    const sanitizedSku = String(product.sku || 'N/A');
+    
     // Create WhatsApp message with quote details
-    const message = `Hi! I'd like to request a quote for:\n\nProduct: ${product.name}\nSKU: ${product.sku}\nQuantity: ${quantity}\nPrice per unit: ZAR ${product.price.toFixed(2)}\nTotal: ZAR ${totalPrice.toFixed(2)}\n\nPlease send me a quote. Thank you!`;
-    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '27XXXXXXXXX';
+    const message = `Hi! I'd like to request a quote for:\n\nProduct: ${sanitizedName}\nSKU: ${sanitizedSku}\nQuantity: ${quantity}\nPrice per unit: ZAR ${product.price.toFixed(2)}\nTotal: ZAR ${totalPrice.toFixed(2)}\n\nPlease send me a quote. Thank you!`;
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
