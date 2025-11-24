@@ -13,9 +13,9 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
 
   const handleRequestQuote = () => {
     // Create WhatsApp message with quote details
-    // TODO: Replace 27XXXXXXXXX with actual WhatsApp business number
     const message = `Hi! I'd like to request a quote for:\n\nProduct: ${product.name}\nSKU: ${product.sku}\nQuantity: ${quantity}\nPrice per unit: ZAR ${product.price.toFixed(2)}\nTotal: ZAR ${totalPrice.toFixed(2)}\n\nPlease send me a quote. Thank you!`;
-    const whatsappUrl = `https://wa.me/27XXXXXXXXX?text=${encodeURIComponent(message)}`;
+    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '27XXXXXXXXX';
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 

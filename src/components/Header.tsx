@@ -9,7 +9,7 @@ const Header: React.FC = () => {
           <Link href="/" className="text-2xl font-bold text-gray-900">
             Twines & Straps SA
           </Link>
-          <nav className="flex space-x-8">
+          <nav className="hidden md:flex space-x-8">
             <Link href="/" className="text-gray-700 hover:text-gray-900 transition-colors">
               Home
             </Link>
