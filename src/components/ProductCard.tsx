@@ -6,10 +6,6 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const vatRate = 0.15; // 15% VAT for South Africa
-  const priceExclVAT = product.vat_applicable ? product.price / (1 + vatRate) : product.price;
-  const vatAmount = product.vat_applicable ? product.price - priceExclVAT : 0;
-
   const getStockBadge = () => {
     switch (product.stock_status) {
       case 'IN_STOCK':
@@ -41,15 +37,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="mt-4">
         <div className="flex items-baseline gap-2">
           <span className="text-xl font-bold text-gray-900">ZAR {product.price.toFixed(2)}</span>
-          {product.vat_applicable && (
-            <span className="text-xs text-gray-500">incl. VAT</span>
-          )}
         </div>
-        {product.vat_applicable && (
-          <p className="text-xs text-gray-500 mt-1">
-            Excl. VAT: ZAR {priceExclVAT.toFixed(2)}
-          </p>
-        )}
       </div>
     </div>
   );

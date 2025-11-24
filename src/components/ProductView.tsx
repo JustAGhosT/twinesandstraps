@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import type { Product } from '@prisma/client';
+import { useCart } from '@/contexts/CartContext';
 
 interface ProductViewProps {
   product: Product;
@@ -10,16 +11,11 @@ interface ProductViewProps {
 const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const [showAddedToCart, setShowAddedToCart] = useState(false);
-
-  const vatRate = 0.15; // 15% VAT for South Africa
-  const priceExclVAT = product.vat_applicable ? product.price / (1 + vatRate) : product.price;
-  const vatAmount = product.vat_applicable ? product.price - priceExclVAT : 0;
+  const { addToCart } = useCart();
   const totalPrice = product.price * quantity;
-  const totalVAT = vatAmount * quantity;
 
   const handleAddToCart = () => {
-    // TODO: Implement cart functionality
-    console.log(`Added ${quantity} of ${product.name} to cart`);
+    addToCart(product, quantity);
     setShowAddedToCart(true);
     setTimeout(() => setShowAddedToCart(false), 3000);
   };
@@ -55,16 +51,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
         <div className="mb-6">
           <div className="flex items-baseline gap-3 mb-2">
             <span className="text-3xl font-bold text-gray-900">ZAR {product.price.toFixed(2)}</span>
-            {product.vat_applicable && (
-              <span className="text-sm text-gray-600">incl. VAT</span>
-            )}
           </div>
-          {product.vat_applicable && (
-            <div className="text-sm text-gray-600">
-              <p>Excl. VAT: ZAR {priceExclVAT.toFixed(2)}</p>
-              <p>VAT (15%): ZAR {vatAmount.toFixed(2)}</p>
-            </div>
-          )}
         </div>
         <p className="text-gray-600 mb-6 leading-relaxed">{product.description}</p>
         
@@ -98,7 +85,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
             </div>
             {quantity > 1 && (
               <div className="text-sm text-gray-600">
-                <p>Total: ZAR {totalPrice.toFixed(2)} {product.vat_applicable && 'incl. VAT'}</p>
+                <p>Total: ZAR {totalPrice.toFixed(2)}</p>
               </div>
             )}
           </div>

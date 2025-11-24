@@ -46,7 +46,7 @@ export default async function Home() {
                 href="/products" 
                 className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-center"
               >
-                Shop Products
+                Browse Products
               </Link>
               <Link 
                 href="/quote" 
@@ -103,7 +103,7 @@ export default async function Home() {
           <h2 className="text-3xl font-bold mb-4">Business Buyer?</h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
             Get competitive bulk pricing with our streamlined quote process. 
-            Receive detailed quotations with VAT compliance for your business needs.
+            Contact us directly via WhatsApp for personalized quotes and business support.
           </p>
           <Link 
             href="/quote" 
