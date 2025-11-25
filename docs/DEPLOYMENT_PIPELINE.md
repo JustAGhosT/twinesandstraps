@@ -106,9 +106,54 @@ Automatically applied to all responses:
 
 ## Environment Variables
 
-Required environment variables for deployment:
+### Required Environment Variables
 
-- `DATABASE_URL`: Database connection string (configure in Netlify dashboard)
+Configure these in your Netlify dashboard (Site settings → Build & deploy → Environment variables):
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | Database connection string for Prisma |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Yes | WhatsApp Business number for quote requests |
+
+### Optional Environment Variables (AI Image Generation)
+
+| Variable | Description |
+|----------|-------------|
+| `AZURE_AI_ENDPOINT` | Azure AI Foundry endpoint URL |
+| `AZURE_AI_API_KEY` | Azure AI Foundry API key |
+| `AZURE_AI_DEPLOYMENT_NAME` | Model deployment name (e.g., dall-e-3) |
+
+### GitHub Actions Secrets
+
+Configure these as GitHub repository secrets (Settings → Secrets and variables → Actions):
+
+| Secret | Description |
+|--------|-------------|
+| `NETLIFY_SITE_ID` | Your Netlify site ID (from Site Settings → General → Site ID) |
+| `NETLIFY_DEPLOY_TOKEN` | Personal access token (from User Settings → Applications → Personal access tokens) |
+
+### How to Obtain Credentials
+
+**Database Connection String:**
+1. Sign up for a cloud database provider (Neon, PlanetScale, Supabase, or Turso)
+2. Create a new database/project
+3. Copy the connection string from the provider's dashboard
+
+**WhatsApp Business Number:**
+- Format: Country code + number (e.g., 27821234567 for South Africa)
+- No spaces or + symbol
+
+**Azure AI Foundry (Optional):**
+1. Go to [Azure Portal](https://portal.azure.com/)
+2. Navigate to Azure AI Foundry or visit [ai.azure.com](https://ai.azure.com/)
+3. Create a new resource with your subscription
+4. Find credentials in "Keys and Endpoint" section
+5. Deploy DALL-E 3 model for image generation
+
+**Netlify Credentials:**
+1. Log in to [Netlify](https://app.netlify.com/)
+2. Site ID: Site dashboard → Site Settings → General → Site ID
+3. Deploy Token: User Settings → Applications → Personal access tokens → New access token
 
 ## Rendering Strategy
 
