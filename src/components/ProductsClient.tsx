@@ -151,8 +151,12 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                     min="0"
                     max={maxPrice}
                     value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value, 10)])}
                     className="w-full h-1.5 bg-accent-200 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                    aria-label="Maximum price filter"
+                    aria-valuemin={0}
+                    aria-valuemax={maxPrice}
+                    aria-valuenow={priceRange[1]}
                   />
                   <div className="flex items-center justify-between text-xs text-accent-600">
                     <span>R0</span>

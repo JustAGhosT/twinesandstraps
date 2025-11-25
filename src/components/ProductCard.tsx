@@ -61,13 +61,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showQuickAdd = true 
         <div className="absolute top-2 right-2">
           {getStockBadge()}
         </div>
-        {/* Quick Add Button - appears on hover */}
+        {/* Quick Add Button - visible on hover and focus-visible */}
         {showQuickAdd && product.stock_status !== 'OUT_OF_STOCK' && (
           <button
             onClick={handleAddToCart}
-            className="absolute bottom-2 left-2 right-2 bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg font-medium text-sm opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 flex items-center justify-center gap-1"
+            className="absolute bottom-2 left-2 right-2 bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg font-medium text-sm opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 translate-y-2 group-hover:translate-y-0 group-focus-within:translate-y-0 transition-all duration-300 flex items-center justify-center gap-1 focus:opacity-100 focus:translate-y-0"
+            aria-label={`Add ${product.name} to cart`}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             Add to Cart
