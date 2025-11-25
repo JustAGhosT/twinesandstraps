@@ -107,6 +107,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
+      - name: Validate Netlify secrets
+        run: |
+          if [ -z "${{ secrets.NETLIFY_AUTH_TOKEN }}" ]; then
+            echo "::error::NETLIFY_AUTH_TOKEN secret is not set. Please add it in GitHub repository Settings → Secrets and variables → Actions."
+            echo "To get a token: Log in to Netlify → User Settings → Applications → Personal access tokens → New access token"
+            exit 1
+          fi
+          if [ -z "${{ secrets.NETLIFY_SITE_ID }}" ]; then
+            echo "::error::NETLIFY_SITE_ID secret is not set. Please add it in GitHub repository Settings → Secrets and variables → Actions."
+            echo "To get your Site ID: Netlify dashboard → Site Settings → General → Site ID"
+            exit 1
+          fi
+          echo "✓ Netlify secrets are configured"
+        
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -125,7 +139,7 @@ jobs:
       - name: Deploy to Netlify
         run: netlify deploy --prod --build
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_DEPLOY_TOKEN }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
   
   validate-config:
