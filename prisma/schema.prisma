@@ -6,8 +6,22 @@ generator client {
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
+// Database Configuration
+// -----------------------
+// For production, use PostgreSQL with Neon or Supabase:
+//   DATABASE_URL="postgresql://user:password@host.neon.tech/dbname?sslmode=require"
+//   DATABASE_URL="postgresql://user:password@host.supabase.co:5432/postgres"
+//
+// For Turso (SQLite-compatible edge database):
+//   Use the @prisma/adapter-libsql adapter
+//   DATABASE_URL="libsql://your-db.turso.io?authToken=your-token"
+//
+// For local development with SQLite, change provider to "sqlite":
+//   provider = "sqlite"
+//   DATABASE_URL="file:./dev.db"
+
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -27,7 +41,7 @@ model Product {
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 
-  category   Category @relation(fields: [category_id], references: [id])
+  category    Category @relation(fields: [category_id], references: [id])
   category_id Int
 }
 
@@ -40,13 +54,13 @@ model Category {
 }
 
 model User {
-  id                Int      @id @default(autoincrement())
+  id                Int       @id @default(autoincrement())
   name              String
-  email             String   @unique
+  email             String    @unique
   phone             String?
   password_hash     String
-  role              String   @default("CUSTOMER") // Consider an enum here
-  marketing_consent Boolean  @default(false)
-  created_at        DateTime @default(now())
+  role              String    @default("CUSTOMER") // Consider an enum here
+  marketing_consent Boolean   @default(false)
+  created_at        DateTime  @default(now())
   last_login        DateTime?
 }

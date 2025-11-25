@@ -67,13 +67,13 @@ This project is configured for deployment on Netlify with the following setup:
 
 1. A Netlify account
 2. The repository connected to Netlify
-3. **A cloud database provider** (see critical note below)
+3. **A PostgreSQL database** from Neon (recommended) or Supabase
 
-> ⚠️ **CRITICAL: Database Configuration Required**
+> ℹ️ **Database Configuration**
 > 
-> SQLite file-based databases (`file:./dev.db`) **DO NOT work** in serverless environments like Netlify. The database file is not persisted between serverless function invocations, causing "Unable to open the database file" errors.
+> This project uses **PostgreSQL** by default, which is compatible with [Neon](https://neon.tech/) and [Supabase](https://supabase.com/) (both offer free tiers).
 > 
-> **You MUST configure a cloud database before deploying to production.**
+> You must configure a cloud database before deploying to production.
 
 #### Environment Variables
 
@@ -81,7 +81,7 @@ The following environment variables must be configured in your Netlify dashboard
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `DATABASE_URL` | **Yes** | Cloud database connection string (NOT SQLite file path) |
+| `DATABASE_URL` | **Yes** | PostgreSQL connection string from Neon or Supabase |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | Yes | WhatsApp Business number for quote requests (format: 27XXXXXXXXX) |
 | `AZURE_AI_ENDPOINT` | No | Azure AI Foundry endpoint URL |
 | `AZURE_AI_API_KEY` | No | Azure AI Foundry API key |
@@ -89,32 +89,28 @@ The following environment variables must be configured in your Netlify dashboard
 
 ##### How to Get Your Keys and Secrets
 
-**Database (Required for Production)**
+**Database (Required)**
 
-> ⚠️ **Important**: The local development setup uses SQLite (`file:./dev.db`), but this will NOT work in production on Netlify. You must set up a cloud database.
+The project uses PostgreSQL. Follow these steps to set up your database:
 
-1. Sign up for a cloud database provider:
-   - [Neon](https://neon.tech/) (Postgres) - **Recommended** - Free tier available
-   - [PlanetScale](https://planetscale.com/) (MySQL) - Free tier available
-   - [Supabase](https://supabase.com/) (Postgres) - Free tier available
-   - [Turso](https://turso.tech/) (SQLite-compatible) - Edge-ready, free tier available
+1. Sign up for a PostgreSQL provider:
+   - [Neon](https://neon.tech/) - **Recommended** - Free tier, serverless Postgres
+   - [Supabase](https://supabase.com/) - Free tier, Postgres with extras
+   - [Turso](https://turso.tech/) - Edge SQLite (requires schema change)
 2. Create a new database/project
 3. Copy the connection string from the dashboard
-4. **Update your Prisma schema** if switching database providers (e.g., from `sqlite` to `postgresql`)
-5. Add the `DATABASE_URL` to Netlify environment variables
+4. Add the `DATABASE_URL` to Netlify environment variables
+5. Run database migrations: `npx prisma db push`
 
 Example connection strings:
 ```
-# Neon (Postgres)
+# Neon (Postgres) - Recommended
 DATABASE_URL="postgresql://user:password@host.neon.tech/dbname?sslmode=require"
-
-# PlanetScale (MySQL)
-DATABASE_URL="mysql://user:password@host.planetscale.com/dbname?sslaccept=strict"
 
 # Supabase (Postgres)
 DATABASE_URL="postgresql://user:password@host.supabase.co:5432/postgres"
 
-# Turso (SQLite-compatible)
+# Turso (requires changing prisma/schema.prisma provider to "sqlite")
 DATABASE_URL="libsql://your-db.turso.io?authToken=your-token"
 ```
 

@@ -112,7 +112,7 @@ Configure these in your Netlify dashboard (Site settings → Build & deploy → 
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `DATABASE_URL` | Yes | Database connection string for Prisma |
+| `DATABASE_URL` | Yes | PostgreSQL connection string (from Neon or Supabase) |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | Yes | WhatsApp Business number for quote requests |
 
 ### Optional Environment Variables (AI Image Generation)
@@ -134,10 +134,20 @@ Configure these as GitHub repository secrets (Settings → Secrets and variables
 
 ### How to Obtain Credentials
 
-**Database Connection String:**
-1. Sign up for a cloud database provider (Neon, PlanetScale, Supabase, or Turso)
-2. Create a new database/project
-3. Copy the connection string from the provider's dashboard
+**Database Connection String (PostgreSQL):**
+
+The project uses PostgreSQL by default. Choose one of these providers:
+
+1. **Neon** (Recommended) - https://neon.tech/
+   - Sign up for a free account
+   - Create a new project
+   - Copy the connection string (format: `postgresql://user:password@host.neon.tech/dbname?sslmode=require`)
+
+2. **Supabase** - https://supabase.com/
+   - Sign up for a free account
+   - Create a new project
+   - Go to Settings → Database → Connection string
+   - Copy the URI (format: `postgresql://user:password@host.supabase.co:5432/postgres`)
 
 **WhatsApp Business Number:**
 - Format: Country code + number (e.g., 27821234567 for South Africa)
@@ -230,9 +240,9 @@ You must configure a cloud database for production. The CI/CD pipeline now valid
 
 1. **Choose a cloud database provider:**
    - [Neon](https://neon.tech/) (Postgres) - **Recommended**, free tier available
-   - [PlanetScale](https://planetscale.com/) (MySQL) - Free tier available
    - [Supabase](https://supabase.com/) (Postgres) - Free tier available
    - [Turso](https://turso.tech/) (SQLite-compatible) - Edge-ready, free tier available
+   - [PlanetScale](https://planetscale.com/) (MySQL) - Paid plans only
 
 2. **Create a database** and get your connection string
 

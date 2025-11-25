@@ -78,7 +78,7 @@ jobs:
         run: npm ci
         
       - name: Create .env file for build
-        run: echo "DATABASE_URL=file:./test.db" > .env
+        run: echo "DATABASE_URL=postgresql://user:password@localhost/dbname" > .env
         
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -86,7 +86,7 @@ jobs:
       - name: Build Next.js app
         run: npm run build
         env:
-          DATABASE_URL: file:./test.db
+          DATABASE_URL: postgresql://user:password@localhost/dbname
           
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -122,39 +122,42 @@ jobs:
           echo "✓ Netlify secrets are configured"
           
       - name: Validate DATABASE_URL for production
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           # Check if DATABASE_URL is set as a secret for production
-          if [ -z "${{ secrets.DATABASE_URL }}" ]; then
+          if [ -z "$DATABASE_URL" ]; then
             echo "::warning::DATABASE_URL secret is not set. Ensure DATABASE_URL is configured in Netlify environment variables."
             echo ""
-            echo "⚠️  IMPORTANT: SQLite file-based databases (file:./dev.db) do NOT work in serverless environments like Netlify."
-            echo ""
-            echo "You must use a cloud database provider for production:"
-            echo "  • Neon (Postgres): https://neon.tech/"
-            echo "  • PlanetScale (MySQL): https://planetscale.com/"
+            echo "This project uses PostgreSQL by default. Set up a database with:"
+            echo "  • Neon (Postgres): https://neon.tech/ - Recommended"
             echo "  • Supabase (Postgres): https://supabase.com/"
-            echo "  • Turso (SQLite-compatible): https://turso.tech/"
             echo ""
             echo "Configure DATABASE_URL in Netlify: Site Settings → Environment variables"
           else
             # Validate that DATABASE_URL is not using SQLite file path
-            DB_URL="${{ secrets.DATABASE_URL }}"
-            if echo "$DB_URL" | grep -qE "^file:|^sqlite:"; then
-              echo "::error::DATABASE_URL appears to be using SQLite file-based storage (file:./dev.db or sqlite:)"
-              echo ""
-              echo "❌ SQLite file-based databases do NOT work in serverless environments like Netlify!"
-              echo "   The database file is not persisted between serverless function invocations."
-              echo ""
-              echo "Please use a cloud database provider for production:"
-              echo "  • Neon (Postgres): https://neon.tech/"
-              echo "  • PlanetScale (MySQL): https://planetscale.com/"
-              echo "  • Supabase (Postgres): https://supabase.com/"
-              echo "  • Turso (SQLite-compatible): https://turso.tech/"
-              echo ""
-              echo "Update DATABASE_URL in Netlify: Site Settings → Environment variables"
-              exit 1
-            fi
-            echo "✓ DATABASE_URL is configured and appears to be a valid cloud database connection"
+            # Using case pattern matching to avoid exposing the URL
+            case "$DATABASE_URL" in
+              file:*|sqlite:*)
+                echo "::error::DATABASE_URL appears to be using SQLite file-based storage"
+                echo ""
+                echo "❌ SQLite file-based databases do NOT work in serverless environments like Netlify!"
+                echo "   The database file is not persisted between serverless function invocations."
+                echo ""
+                echo "This project uses PostgreSQL by default. Please configure:"
+                echo "  • Neon (Postgres): https://neon.tech/ - Recommended"
+                echo "  • Supabase (Postgres): https://supabase.com/"
+                echo ""
+                echo "Update DATABASE_URL in Netlify: Site Settings → Environment variables"
+                exit 1
+                ;;
+              postgresql:*|postgres:*)
+                echo "✓ DATABASE_URL is configured with PostgreSQL"
+                ;;
+              *)
+                echo "✓ DATABASE_URL is configured"
+                ;;
+            esac
           fi
         
       - name: Setup Node.js
@@ -167,7 +170,7 @@ jobs:
         run: npm ci
         
       - name: Create .env file for build
-        run: echo "DATABASE_URL=file:./test.db" > .env
+        run: echo "DATABASE_URL=postgresql://user:password@localhost/dbname" > .env
           
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
