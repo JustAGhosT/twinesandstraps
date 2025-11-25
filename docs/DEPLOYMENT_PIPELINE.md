@@ -130,7 +130,7 @@ Configure these as GitHub repository secrets (Settings → Secrets and variables
 | Secret | Description |
 |--------|-------------|
 | `NETLIFY_SITE_ID` | Your Netlify site ID (from Site Settings → General → Site ID) |
-| `NETLIFY_DEPLOY_TOKEN` | Personal access token (from User Settings → Applications → Personal access tokens) |
+| `NETLIFY_AUTH_TOKEN` | Personal access token (from User Settings → Applications → Personal access tokens) |
 
 ### How to Obtain Credentials
 
@@ -205,6 +205,35 @@ Pages are marked with `export const dynamic = 'force-dynamic'` to explicitly ena
 - Netlify provides deployment notifications
 - Failed deployments trigger notifications
 - Health check failures are logged in GitHub Actions
+
+## Troubleshooting
+
+### "Unauthorized: could not retrieve project" Error
+
+This error occurs when the Netlify deployment fails due to authentication issues. Common causes and solutions:
+
+1. **Missing GitHub Secrets**
+   - Ensure both `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` are set in your GitHub repository secrets
+   - Go to: Repository → Settings → Secrets and variables → Actions
+   - Add/verify the secrets are present
+
+2. **Invalid or Expired Token**
+   - Netlify personal access tokens can expire or be revoked
+   - Generate a new token: Netlify → User Settings → Applications → Personal access tokens
+   - Update the `NETLIFY_AUTH_TOKEN` secret in GitHub
+
+3. **Incorrect Site ID**
+   - Verify the Site ID matches your Netlify site
+   - Find it: Netlify dashboard → Site Settings → General → Site ID
+   - Update the `NETLIFY_SITE_ID` secret if incorrect
+
+4. **Token Lacks Site Access**
+   - The token must belong to a user with access to the Netlify site
+   - Ensure the token owner is a team member with deploy permissions
+
+### Verifying Secrets Are Set
+
+The CI/CD pipeline includes a validation step that checks if secrets are configured before attempting deployment. If secrets are missing, the workflow will fail early with a clear error message explaining which secret is missing and how to obtain it.
 
 ## Future Improvements
 
