@@ -208,6 +208,61 @@ Pages are marked with `export const dynamic = 'force-dynamic'` to explicitly ena
 
 ## Troubleshooting
 
+### "Unable to open the database file" Error (Error code 14)
+
+This error occurs when the application tries to use SQLite file-based storage in a serverless environment.
+
+**Error message:**
+```
+PrismaClientInitializationError: 
+Invalid `prisma.product.findMany()` invocation:
+Error querying the database: Error code 14: Unable to open the database file
+```
+
+**Cause:**
+SQLite file-based databases (`file:./dev.db`) do not work in serverless environments like Netlify because:
+- Serverless functions are ephemeral (they shut down between requests)
+- Local files are not persisted between function invocations
+- Each function invocation starts with a fresh filesystem
+
+**Solution:**
+You must configure a cloud database for production. The CI/CD pipeline now validates this automatically.
+
+1. **Choose a cloud database provider:**
+   - [Neon](https://neon.tech/) (Postgres) - **Recommended**, free tier available
+   - [PlanetScale](https://planetscale.com/) (MySQL) - Free tier available
+   - [Supabase](https://supabase.com/) (Postgres) - Free tier available
+   - [Turso](https://turso.tech/) (SQLite-compatible) - Edge-ready, free tier available
+
+2. **Create a database** and get your connection string
+
+3. **Update Prisma schema** if changing database providers:
+   ```prisma
+   // For Postgres (Neon, Supabase)
+   datasource db {
+     provider = "postgresql"
+     url      = env("DATABASE_URL")
+   }
+   
+   // For MySQL (PlanetScale)
+   datasource db {
+     provider = "mysql"
+     url      = env("DATABASE_URL")
+   }
+   ```
+
+4. **Configure environment variable in Netlify:**
+   - Go to Netlify dashboard → Site Settings → Environment variables
+   - Add `DATABASE_URL` with your cloud database connection string
+   - Redeploy the application
+
+5. **Run migrations** on your production database:
+   ```bash
+   npx prisma db push
+   # or
+   npx prisma migrate deploy
+   ```
+
 ### "Unauthorized: could not retrieve project" Error
 
 This error occurs when the Netlify deployment fails due to authentication issues. Common causes and solutions:

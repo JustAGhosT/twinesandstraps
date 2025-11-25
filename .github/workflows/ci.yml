@@ -120,6 +120,42 @@ jobs:
             exit 1
           fi
           echo "✓ Netlify secrets are configured"
+          
+      - name: Validate DATABASE_URL for production
+        run: |
+          # Check if DATABASE_URL is set as a secret for production
+          if [ -z "${{ secrets.DATABASE_URL }}" ]; then
+            echo "::warning::DATABASE_URL secret is not set. Ensure DATABASE_URL is configured in Netlify environment variables."
+            echo ""
+            echo "⚠️  IMPORTANT: SQLite file-based databases (file:./dev.db) do NOT work in serverless environments like Netlify."
+            echo ""
+            echo "You must use a cloud database provider for production:"
+            echo "  • Neon (Postgres): https://neon.tech/"
+            echo "  • PlanetScale (MySQL): https://planetscale.com/"
+            echo "  • Supabase (Postgres): https://supabase.com/"
+            echo "  • Turso (SQLite-compatible): https://turso.tech/"
+            echo ""
+            echo "Configure DATABASE_URL in Netlify: Site Settings → Environment variables"
+          else
+            # Validate that DATABASE_URL is not using SQLite file path
+            DB_URL="${{ secrets.DATABASE_URL }}"
+            if echo "$DB_URL" | grep -qE "^file:|^sqlite:"; then
+              echo "::error::DATABASE_URL appears to be using SQLite file-based storage (file:./dev.db or sqlite:)"
+              echo ""
+              echo "❌ SQLite file-based databases do NOT work in serverless environments like Netlify!"
+              echo "   The database file is not persisted between serverless function invocations."
+              echo ""
+              echo "Please use a cloud database provider for production:"
+              echo "  • Neon (Postgres): https://neon.tech/"
+              echo "  • PlanetScale (MySQL): https://planetscale.com/"
+              echo "  • Supabase (Postgres): https://supabase.com/"
+              echo "  • Turso (SQLite-compatible): https://turso.tech/"
+              echo ""
+              echo "Update DATABASE_URL in Netlify: Site Settings → Environment variables"
+              exit 1
+            fi
+            echo "✓ DATABASE_URL is configured and appears to be a valid cloud database connection"
+          fi
         
       - name: Setup Node.js
         uses: actions/setup-node@v4

@@ -50,3 +50,18 @@
 # - Supabase (Postgres)
 # - Turso (SQLite-compatible)
 
+# =============================================================================
+# ⚠️  REQUIRED ENVIRONMENT VARIABLES
+# =============================================================================
+# You MUST configure these in Netlify dashboard (Site Settings → Environment Variables):
+#
+# DATABASE_URL (REQUIRED)
+#   - Must be a cloud database connection string
+#   - SQLite file paths (file:./dev.db) DO NOT work in serverless environments
+#   - Example: postgresql://user:password@host.neon.tech/dbname?sslmode=require
+#
+# NEXT_PUBLIC_WHATSAPP_NUMBER (REQUIRED)
+#   - WhatsApp Business number for quote requests
+#   - Format: country code + number (e.g., 27821234567)
+# =============================================================================
+
