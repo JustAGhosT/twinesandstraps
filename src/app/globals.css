@@ -3,22 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 39, 34, 32;
-  --background-start-rgb: 246, 245, 244;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 39, 34, 32;
-    --background-end-rgb: 39, 34, 32;
-  }
+  --foreground-rgb: 17, 24, 39;
+  --background-rgb: 255, 255, 255;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background-color: rgb(var(--background-start-rgb));
+  background-color: rgb(var(--background-rgb));
 }
 
 @layer utilities {
@@ -28,10 +19,12 @@ body {
 }
 
 @layer components {
-  .rope-icon {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%23d1ccc5' stroke-width='8' stroke-dasharray='12 8'/%3E%3Ccircle cx='50' cy='50' r='20' fill='none' stroke='%23b5ada2' stroke-width='6' stroke-dasharray='8 6'/%3E%3C/svg%3E");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+  .no-image-placeholder {
+    background-color: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+    font-size: 0.875rem;
   }
 }
