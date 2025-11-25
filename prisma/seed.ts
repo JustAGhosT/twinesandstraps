@@ -38,112 +38,105 @@ async function main() {
 
   const syntheticRopesCategory = await prisma.category.create({
     data: {
-      name: 'Synthetic Ropes',
-      slug: 'synthetic-ropes',
+      name: 'Ropes',
+      slug: 'ropes',
     },
   })
 
-  const naturalRopesCategory = await prisma.category.create({
-    data: {
-      name: 'Natural Fiber Ropes',
-      slug: 'natural-fiber-ropes',
-    },
-  })
-
-  // TWINES from reference image
+  // TWINES from reference image - exact specifications from brochure
   const twineProducts = [
     {
       name: 'Twine T310',
       sku: 'TWINE-T310',
-      description: 'High-quality white twine with 3.1 g/m weight. Length 320m per kg, breaking strain 100kg. Available in 5kg and 10kg packaging.',
+      description: 'Premium white twine with 3.1 g/m weight. Length 320m per kg, breaking strain 100kg. Ideal for general bundling and tying applications. Available in 5kg and 10kg packaging. UV stabilized for outdoor use.',
       price: 89.99,
       material: 'Polypropylene',
       diameter: 2,
       length: 320,
-      strength_rating: '100kg',
+      strength_rating: '100kg breaking strain',
       category_id: twinesCategory.id,
       image_url: productImages['Twine T310'],
     },
     {
       name: 'Twine T120',
       sku: 'TWINE-T120',
-      description: 'Lightweight twine with 1.2 g/m weight. Length 830m per kg, breaking strain 40kg. Perfect for light bundling. Available in 5kg and 10kg packaging.',
+      description: 'Lightweight twine with 1.2 g/m weight. Exceptional length of 830m per kg, breaking strain 40kg. Perfect for light bundling and agricultural use. Available in 5kg and 10kg packaging.',
       price: 69.99,
       material: 'Polypropylene',
       diameter: 1.5,
       length: 830,
-      strength_rating: '40kg',
+      strength_rating: '40kg breaking strain',
       category_id: twinesCategory.id,
       image_url: productImages['Twine T120'],
     },
     {
       name: 'Twine R120',
       sku: 'TWINE-R120',
-      description: 'Versatile twine with 1.2 g/m weight. Length 830m per kg, breaking strain 45kg. Ideal for agricultural use. Available in 5kg and 10kg packaging.',
+      description: 'Versatile twine with 1.2 g/m weight. Length 830m per kg, breaking strain 45kg. Ideal for agricultural and industrial use. Available in 5kg and 10kg packaging. UV resistant.',
       price: 74.99,
       material: 'Polypropylene',
       diameter: 1.5,
       length: 830,
-      strength_rating: '45kg',
+      strength_rating: '45kg breaking strain',
       category_id: twinesCategory.id,
       image_url: productImages['Twine R120'],
     },
     {
       name: 'Big Pack Black Twine',
       sku: 'BP-BLACK-TWINE',
-      description: 'Heavy-duty black twine with 8 g/m weight. Length 125m per kg, breaking strain 220kg. UV resistant. 10kg packaging.',
+      description: 'Heavy-duty black twine with 8 g/m weight. Length 125m per kg, breaking strain 220kg. UV resistant and ideal for outdoor applications. 10kg packaging. Perfect for securing heavy loads.',
       price: 159.99,
       material: 'Polypropylene',
       diameter: 3,
       length: 125,
-      strength_rating: '220kg',
+      strength_rating: '220kg breaking strain',
       category_id: twinesCategory.id,
       image_url: productImages['Big Pack Black Twine'],
     },
     {
       name: 'Big Pack Blue Twine',
       sku: 'BP-BLUE-TWINE',
-      description: 'Heavy-duty blue twine with 8 g/m weight. Length 125m per kg, breaking strain 280kg. UV resistant. 10kg packaging.',
+      description: 'Heavy-duty blue twine with 8 g/m weight. Length 125m per kg, exceptional breaking strain of 280kg. UV resistant and highly visible. 10kg packaging. Industrial grade quality.',
       price: 169.99,
       material: 'Polypropylene',
       diameter: 3,
       length: 125,
-      strength_rating: '280kg',
+      strength_rating: '280kg breaking strain',
       category_id: twinesCategory.id,
       image_url: productImages['Big Pack Blue Twine'],
     },
     {
       name: 'Jumbo Blue Twine',
       sku: 'JUMBO-BLUE-TWINE',
-      description: 'Extra heavy-duty blue twine with 10 g/m weight. Length 100m per kg, breaking strain 320kg. Industrial grade. 10kg packaging.',
+      description: 'Extra heavy-duty blue twine with 10 g/m weight. Length 100m per kg, superior breaking strain of 320kg. Industrial grade for demanding applications. 10kg packaging.',
       price: 189.99,
       material: 'Polypropylene',
       diameter: 4,
       length: 100,
-      strength_rating: '320kg',
+      strength_rating: '320kg breaking strain',
       category_id: twinesCategory.id,
       image_url: productImages['Jumbo Blue Twine'],
     },
     {
-      name: 'Jumbo Recycling Baler Twine',
+      name: 'Modern Logistics Jumbo Recycling Baler Twine',
       sku: 'JUMBO-BALER-TWINE',
-      description: 'Modern Logistics Jumbo Recycling Baler Twine. 10.5 g/m weight, 95m per kg, breaking strain 300kg. Available in 10kg and 20kg packaging.',
+      description: 'Premium recycling baler twine with 10.5 g/m weight. Length 95m per kg, breaking strain 300kg. Designed for modern recycling facilities and baling operations. Available in 10kg and 20kg packaging.',
       price: 199.99,
       material: 'Recycled Polypropylene',
       diameter: 4,
       length: 95,
-      strength_rating: '300kg',
+      strength_rating: '300kg breaking strain',
       category_id: twinesCategory.id,
       image_url: productImages['Jumbo Recycling Baler Twine'],
     },
   ];
 
-  // SYNTHETIC ROPES from reference image
-  const syntheticRopeProducts = [
+  // ROPES from reference image - Polypropylene and Poly Steel Ropes
+  const ropeProducts = [
     {
       name: 'Polypropylene Rope 4mm Blue',
       sku: 'PP-ROPE-4MM-BLUE',
-      description: 'Polypropylene rope 4mm diameter in blue. Lightweight and floatable. Ideal for marine and outdoor use. Rolls available up to 25kg without splices.',
+      description: 'Polypropylene rope 4mm diameter in blue. Lightweight and floatable. Ideal for borehole use, marine and boating, agriculture and farming. Rolls available up to 25kg without splices, can be made up to 100kg with splices.',
       price: 24.99,
       material: 'Polypropylene',
       diameter: 4,
@@ -155,7 +148,7 @@ async function main() {
     {
       name: 'Polypropylene Rope 6mm Blue',
       sku: 'PP-ROPE-6MM-BLUE',
-      description: 'Polypropylene rope 6mm diameter in blue. Great for borehole use, marine and boating, agriculture and farming.',
+      description: 'Polypropylene rope 6mm diameter in blue. Great for borehole use, marine and boating, agriculture and farming, transport and logistics. UV stabilized.',
       price: 34.99,
       material: 'Polypropylene',
       diameter: 6,
@@ -167,7 +160,7 @@ async function main() {
     {
       name: 'Polypropylene Rope 8mm Orange',
       sku: 'PP-ROPE-8MM-ORANGE',
-      description: 'High-visibility orange polypropylene rope 8mm. Perfect for transport and logistics, construction and scaffolding.',
+      description: 'High-visibility orange polypropylene rope 8mm. Perfect for transport and logistics, construction and scaffolding, rigging and hoisting. UV resistant for outdoor use.',
       price: 44.99,
       material: 'Polypropylene',
       diameter: 8,
@@ -179,7 +172,7 @@ async function main() {
     {
       name: 'Polypropylene Rope 10mm Black',
       sku: 'PP-ROPE-10MM-BLACK',
-      description: 'Heavy-duty black polypropylene rope 10mm. Ideal for rigging and hoisting, temporary fencing and barriers.',
+      description: 'Heavy-duty black polypropylene rope 10mm. Ideal for rigging and hoisting, temporary fencing and barriers, tying, pulling, lifting, and securing loads.',
       price: 54.99,
       material: 'Polypropylene',
       diameter: 10,
@@ -189,9 +182,21 @@ async function main() {
       image_url: productImages['Polypropylene Rope Black'],
     },
     {
+      name: 'Poly Steel Rope 6mm',
+      sku: 'POLYSTEEL-6MM',
+      description: 'Poly Steel rope combining strength and flexibility. 6mm diameter. Superior strength-to-weight ratio. Ideal for heavy-duty applications.',
+      price: 54.99,
+      material: 'Poly Steel',
+      diameter: 6,
+      length: 100,
+      strength_rating: '900kg',
+      category_id: syntheticRopesCategory.id,
+      image_url: productImages['Poly Steel Rope'],
+    },
+    {
       name: 'Poly Steel Rope 8mm',
       sku: 'POLYSTEEL-8MM',
-      description: 'Poly Steel rope combining strength and flexibility. 8mm diameter. Ideal for heavy-duty tying, pulling, lifting, and securing loads.',
+      description: 'Poly Steel rope combining strength and flexibility. 8mm diameter. Ideal for heavy-duty tying, pulling, lifting, and securing loads. Available in various colors.',
       price: 64.99,
       material: 'Poly Steel',
       diameter: 8,
@@ -200,62 +205,22 @@ async function main() {
       category_id: syntheticRopesCategory.id,
       image_url: productImages['Poly Steel Rope'],
     },
-  ];
-
-  // NATURAL FIBER ROPES
-  const naturalRopeProducts = [
     {
-      name: 'Manila Rope 10mm',
-      sku: 'MANILA-ROPE-10MM',
-      description: 'A strong, durable, and flexible rope made from natural manila fibers. Perfect for marine, agricultural, and decorative applications.',
-      price: 5.99,
-      material: 'Manila',
+      name: 'Poly Steel Rope 10mm',
+      sku: 'POLYSTEEL-10MM',
+      description: 'Heavy-duty Poly Steel rope 10mm diameter. Maximum strength for demanding industrial applications. Ideal for construction and marine use.',
+      price: 74.99,
+      material: 'Poly Steel',
       diameter: 10,
-      length: 50,
-      strength_rating: '500kg',
-      category_id: naturalRopesCategory.id,
-      image_url: productImages['Manila Rope'],
-    },
-    {
-      name: 'Sisal Rope 8mm',
-      sku: 'SISAL-ROPE-8MM',
-      description: 'A tough, biodegradable rope ideal for agricultural and decorative uses. Eco-friendly and naturally resistant to UV damage.',
-      price: 4.50,
-      material: 'Sisal',
-      diameter: 8,
       length: 100,
-      strength_rating: '350kg',
-      category_id: naturalRopesCategory.id,
-      image_url: productImages['Sisal Rope'],
-    },
-    {
-      name: 'Jute Rope 6mm',
-      sku: 'JUTE-ROPE-6MM',
-      description: 'Natural jute rope for gardening, packaging, and crafts. Biodegradable and environmentally friendly.',
-      price: 3.49,
-      material: 'Jute',
-      diameter: 6,
-      length: 100,
-      strength_rating: '200kg',
-      category_id: naturalRopesCategory.id,
-      image_url: productImages['Jute Rope'],
-    },
-    {
-      name: 'Cotton Rope 6mm',
-      sku: 'COTTON-ROPE-6MM',
-      description: 'Soft, natural cotton rope perfect for crafts, macrame, and decorative projects. Gentle on hands.',
-      price: 3.99,
-      material: 'Cotton',
-      diameter: 6,
-      length: 50,
-      strength_rating: '150kg',
-      category_id: naturalRopesCategory.id,
-      image_url: productImages['Cotton Rope'],
+      strength_rating: '1800kg',
+      category_id: syntheticRopesCategory.id,
+      image_url: productImages['Poly Steel Rope'],
     },
   ];
 
   // Create all products
-  const allProducts = [...twineProducts, ...syntheticRopeProducts, ...naturalRopeProducts];
+  const allProducts = [...twineProducts, ...ropeProducts];
   
   for (const productData of allProducts) {
     await prisma.product.create({
@@ -265,6 +230,12 @@ async function main() {
   }
 
   console.log(`\nSeeding completed! Created ${allProducts.length} products.`);
+  console.log('\nProduct Notes:');
+  console.log('- Twine rolls available in 2kg, 5kg, 10kg, and 20kg sizes');
+  console.log('- Rope rolls available up to 25kg without splices, up to 100kg with splices');
+  console.log('- Anti-static options available');
+  console.log('- Approximate measurements apply');
+  console.log('- Terms & Conditions Apply. Prices are subject to change and exclude VAT.');
 }
 
 main()
