@@ -41,12 +41,27 @@
   status = 301
   force = true
 
-# Note: This configuration assumes a persistent database connection.
-# SQLite is not recommended for production deployments on Netlify.
-# Consider using a cloud database service like:
-# - Neon (Postgres)
-# - PlanetScale (MySQL)
-# - MongoDB Atlas
-# - Supabase (Postgres)
-# - Turso (SQLite-compatible)
+# =============================================================================
+# DATABASE CONFIGURATION
+# =============================================================================
+# This project uses PostgreSQL by default (compatible with Neon and Supabase).
+#
+# Recommended providers (all have free tiers):
+# - Neon (Postgres): https://neon.tech/ - Recommended
+# - Supabase (Postgres): https://supabase.com/
+# - Turso (SQLite-compatible): https://turso.tech/ - requires schema change
+
+# =============================================================================
+# REQUIRED ENVIRONMENT VARIABLES
+# =============================================================================
+# You MUST configure these in Netlify dashboard (Site Settings → Environment Variables):
+#
+# DATABASE_URL (REQUIRED)
+#   - PostgreSQL connection string from Neon or Supabase
+#   - Example: postgresql://user:password@host.neon.tech/dbname?sslmode=require
+#
+# NEXT_PUBLIC_WHATSAPP_NUMBER (REQUIRED)
+#   - WhatsApp Business number for quote requests
+#   - Format: country code + number (e.g., 27821234567)
+# =============================================================================
 
