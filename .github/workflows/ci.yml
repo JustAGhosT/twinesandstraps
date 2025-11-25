@@ -78,7 +78,8 @@ jobs:
         run: npm ci
         
       - name: Create .env file for build
-        run: echo "DATABASE_URL=postgresql://user:password@localhost/dbname" > .env
+        # Placeholder URL for Prisma client generation (no actual DB connection needed at build time)
+        run: echo "DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder" > .env
         
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -86,7 +87,8 @@ jobs:
       - name: Build Next.js app
         run: npm run build
         env:
-          DATABASE_URL: postgresql://user:password@localhost/dbname
+          # Placeholder URL for build (dynamic rendering doesn't require DB at build time)
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
           
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -170,7 +172,8 @@ jobs:
         run: npm ci
         
       - name: Create .env file for build
-        run: echo "DATABASE_URL=postgresql://user:password@localhost/dbname" > .env
+        # Placeholder URL for Prisma client generation during Netlify build
+        run: echo "DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder" > .env
           
       - name: Install Netlify CLI
         run: npm install -g netlify-cli

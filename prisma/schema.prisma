@@ -53,13 +53,15 @@ model Category {
   products  Product[]
 }
 
+// Note: autoincrement() works across database providers in Prisma
+// For PostgreSQL, it maps to SERIAL type
 model User {
   id                Int       @id @default(autoincrement())
   name              String
   email             String    @unique
   phone             String?
   password_hash     String
-  role              String    @default("CUSTOMER") // Consider an enum here
+  role              String    @default("CUSTOMER")
   marketing_consent Boolean   @default(false)
   created_at        DateTime  @default(now())
   last_login        DateTime?
