@@ -12,12 +12,16 @@ For full details, please see the [Product Requirements Document](./docs/PRD.md).
 
 ### AI-Generated Product Images
 
-When products don't have images, the platform can automatically generate professional product photos using OpenAI's DALL-E AI model. This feature:
+Products can have AI-generated images automatically created during the database seeding process using OpenAI's DALL-E AI model. This feature:
 
-- Appears on product cards and product detail pages when no image is available
-- Generates contextually appropriate images based on product name, description, material, and category
-- Saves generated images to the database for future use
+- Automatically generates professional product photos during `npm run seed`
+- Creates contextually appropriate images based on product name, description, material, and category
+- Saves generated image URLs to the database
 - Requires an OpenAI API key (configured via `OPENAI_API_KEY` environment variable)
+
+To generate images for products:
+1. Set the `OPENAI_API_KEY` environment variable
+2. Run `npm run seed` to create products with AI-generated images
 
 ## Getting Started
 
