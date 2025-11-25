@@ -146,16 +146,16 @@ const TassaMoodboard = () => {
           <h2 className="text-xl font-bold text-gray-800 mb-3">Product Range</h2>
           <div className="flex gap-3 items-end justify-center">
             {[
-              { color: '#6B6B6B', height: 'h-24', label: 'Steel Cable' },
-              { color: '#E87722', height: 'h-18', label: 'Safety Rope' },
-              { color: '#2B5C9E', height: 'h-14', label: 'Marine Twine' },
-              { color: '#C4B8A5', height: 'h-20', label: 'Natural Rope' },
-              { color: '#1A1A1A', height: 'h-12', label: 'Heavy Duty' },
+              { color: '#6B6B6B', height: 96, label: 'Steel Cable' },
+              { color: '#E87722', height: 72, label: 'Safety Rope' },
+              { color: '#2B5C9E', height: 56, label: 'Marine Twine' },
+              { color: '#C4B8A5', height: 80, label: 'Natural Rope' },
+              { color: '#1A1A1A', height: 48, label: 'Heavy Duty' },
             ].map((product, i) => (
               <div key={i} className="text-center group">
                 <div
                   className="w-12 rounded-t-full transition-transform hover:scale-110"
-                  style={{ backgroundColor: product.color, height: parseInt(product.height.split('-')[1]) * 4 }}
+                  style={{ backgroundColor: product.color, height: product.height }}
                 />
                 <p className="text-xs text-gray-600 mt-1">{product.label}</p>
               </div>
