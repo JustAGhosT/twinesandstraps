@@ -10,18 +10,20 @@ For full details, please see the [Product Requirements Document](./docs/PRD.md).
 
 ## Features
 
-### AI-Generated Product Images
+### AI-Generated Product Images (Optional)
 
-Products can have AI-generated images automatically created during the database seeding process using OpenAI's DALL-E AI model. This feature:
+Products can have AI-generated images automatically created during the database seeding process using Azure AI Foundry's DALL-E model. This feature:
 
 - Automatically generates professional product photos during `npm run seed`
 - Creates contextually appropriate images based on product name, description, material, and category
 - Saves generated image URLs to the database
-- Requires an OpenAI API key (configured via `OPENAI_API_KEY` environment variable)
+- Requires Azure AI Foundry credentials (configured via environment variables)
 
 To generate images for products:
-1. Set the `OPENAI_API_KEY` environment variable
+1. Set up Azure AI Foundry credentials (see [Environment Variables](#environment-variables) section below)
 2. Run `npm run seed` to create products with AI-generated images
+
+**Note:** If Azure AI credentials are not configured, the seed script will use placeholder images from Unsplash.
 
 ## Getting Started
 
@@ -70,8 +72,43 @@ This project is configured for deployment on Netlify with the following setup:
 
 The following environment variables must be configured in your Netlify dashboard (Site settings → Build & deploy → Environment variables):
 
-- `DATABASE_URL`: Database connection string for Prisma
-- `OPENAI_API_KEY`: (Optional) OpenAI API key for AI-generated product images. Get your key from [OpenAI Platform](https://platform.openai.com/api-keys)
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | Database connection string for Prisma |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Yes | WhatsApp Business number for quote requests (format: 27XXXXXXXXX) |
+| `AZURE_AI_ENDPOINT` | No | Azure AI Foundry endpoint URL |
+| `AZURE_AI_API_KEY` | No | Azure AI Foundry API key |
+| `AZURE_AI_DEPLOYMENT_NAME` | No | Azure AI model deployment name (e.g., dall-e-3) |
+
+##### How to Get Your Keys and Secrets
+
+**Database (Required)**
+1. Sign up for a cloud database provider:
+   - [Neon](https://neon.tech/) (Postgres) - Recommended
+   - [PlanetScale](https://planetscale.com/) (MySQL)
+   - [Supabase](https://supabase.com/) (Postgres)
+   - [Turso](https://turso.tech/) (SQLite-compatible)
+2. Create a new database/project
+3. Copy the connection string from the dashboard
+
+**WhatsApp Business (Required)**
+1. Download WhatsApp Business from your app store
+2. Register with your business phone number
+3. Use format: country code + number (e.g., 27821234567 for South Africa)
+
+**Azure AI Foundry (Optional - for AI-generated images)**
+1. Go to [Azure Portal](https://portal.azure.com/)
+2. Search for "Azure AI Foundry" or visit [ai.azure.com](https://ai.azure.com/)
+3. Create a new resource:
+   - Select your subscription
+   - Create or select a resource group
+   - Choose a region (e.g., East US, West Europe)
+4. Go to "Keys and Endpoint" in your resource:
+   - Copy "KEY 1" for `AZURE_AI_API_KEY`
+   - Copy "Endpoint" for `AZURE_AI_ENDPOINT`
+5. Deploy DALL-E 3 model and copy deployment name for `AZURE_AI_DEPLOYMENT_NAME`
+
+For detailed Azure AI setup, see: [Azure AI Foundry Quickstart](https://learn.microsoft.com/en-us/azure/ai-services/openai/quickstart)
 
 **Important Note on Database:**
 - The current implementation uses SQLite, which is **not recommended for production deployments on Netlify** due to the ephemeral nature of serverless environments.
