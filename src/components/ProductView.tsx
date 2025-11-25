@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import type { Product } from '@prisma/client';
 import { useCart } from '@/contexts/CartContext';
+import Image from 'next/image';
 
 interface ProductViewProps {
   product: Product;
@@ -11,6 +12,9 @@ interface ProductViewProps {
 const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const [showAddedToCart, setShowAddedToCart] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(product.image_url);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const { addToCart } = useCart();
   const totalPrice = product.price * quantity;
 
@@ -18,6 +22,27 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
     addToCart(product, quantity);
     setShowAddedToCart(true);
     setTimeout(() => setShowAddedToCart(false), 3000);
+  };
+
+  const handleGenerateImage = async () => {
+    if (isGenerating) return;
+    
+    setIsGenerating(true);
+    try {
+      const response = await fetch(`/api/products/${product.id}/generate-image`, {
+        method: 'POST',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setImageUrl(data.image_url);
+        setImageError(false);
+      }
+    } catch (error) {
+      console.error('Failed to generate image:', error);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const getStockBadge = () => {
@@ -38,9 +63,37 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div>
-        <div className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
-          {/* Placeholder for a larger image */}
-          <span className="text-gray-500 text-lg">Image Gallery</span>
+        <div className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center relative overflow-hidden">
+          {imageUrl && !imageError ? (
+            <Image
+              src={imageUrl}
+              alt={product.name}
+              fill
+              className="object-cover"
+              onError={() => setImageError(true)}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center">
+              {isGenerating ? (
+                <>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                  <span className="text-gray-500 text-lg">Generating image...</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-gray-500 text-lg mb-4">No Image Available</span>
+                  <button
+                    onClick={handleGenerateImage}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                  >
+                    Generate with AI
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <div>
