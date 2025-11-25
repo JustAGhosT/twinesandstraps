@@ -8,6 +8,21 @@ The goal of this project is to create a modern, reliable, and user-friendly onli
 
 For full details, please see the [Product Requirements Document](./docs/PRD.md).
 
+## Features
+
+### AI-Generated Product Images
+
+Products can have AI-generated images automatically created during the database seeding process using OpenAI's DALL-E AI model. This feature:
+
+- Automatically generates professional product photos during `npm run seed`
+- Creates contextually appropriate images based on product name, description, material, and category
+- Saves generated image URLs to the database
+- Requires an OpenAI API key (configured via `OPENAI_API_KEY` environment variable)
+
+To generate images for products:
+1. Set the `OPENAI_API_KEY` environment variable
+2. Run `npm run seed` to create products with AI-generated images
+
 ## Getting Started
 
 ### Prerequisites
@@ -56,6 +71,7 @@ This project is configured for deployment on Netlify with the following setup:
 The following environment variables must be configured in your Netlify dashboard (Site settings → Build & deploy → Environment variables):
 
 - `DATABASE_URL`: Database connection string for Prisma
+- `OPENAI_API_KEY`: (Optional) OpenAI API key for AI-generated product images. Get your key from [OpenAI Platform](https://platform.openai.com/api-keys)
 
 **Important Note on Database:**
 - The current implementation uses SQLite, which is **not recommended for production deployments on Netlify** due to the ephemeral nature of serverless environments.

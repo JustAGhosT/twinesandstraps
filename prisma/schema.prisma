@@ -22,6 +22,7 @@ model Product {
   price           Float
   vat_applicable  Boolean  @default(true)
   stock_status    String   @default("IN_STOCK") // Consider an enum here
+  image_url       String?
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 

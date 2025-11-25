@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import type { Product } from '@prisma/client';
 import { useCart } from '@/contexts/CartContext';
+import Image from 'next/image';
 
 interface ProductViewProps {
   product: Product;
@@ -38,9 +39,19 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div>
-        <div className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center">
-          {/* Placeholder for a larger image */}
-          <span className="text-gray-500 text-lg">Image Gallery</span>
+        <div className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center relative overflow-hidden">
+          {product.image_url ? (
+            <Image
+              src={product.image_url}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              priority
+            />
+          ) : (
+            <span className="text-gray-500 text-lg">No Image Available</span>
+          )}
         </div>
       </div>
       <div>
