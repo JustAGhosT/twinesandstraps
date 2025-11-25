@@ -117,7 +117,7 @@ export default async function Home() {
             </div>
             <div className="bg-gray-50 p-6 rounded-xl border-l-4 border-primary-600 hover:shadow-lg transition-shadow">
               <div className="text-primary-600 text-2xl mb-3">✓</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Climate &amp; UV Resistant</h3>
+              <h3 className="font-bold text-secondary-900 mb-2">Climate & UV Resistant</h3>
               <p className="text-sm text-accent-500">Built to last in harsh conditions.</p>
             </div>
           </div>
@@ -301,7 +301,7 @@ export default async function Home() {
       {/* Terms Note */}
       <section className="py-6 bg-gray-100 border-t">
         <div className="container mx-auto px-4 text-center text-sm text-accent-500">
-          <p>Approximate measurements apply. Anti-static options available. Terms &amp; Conditions Apply. Prices are subject to change and exclude VAT.</p>
+          <p>Approximate measurements apply. Anti-static options available. Terms & Conditions Apply. Prices are subject to change and exclude VAT.</p>
         </div>
       </section>
     </>

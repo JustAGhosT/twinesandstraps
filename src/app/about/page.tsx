@@ -91,7 +91,7 @@ export default function AboutPage() {
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
               <div className="text-primary-600 text-3xl mb-4">✓</div>
-              <h3 className="text-xl font-bold text-secondary-900 mb-3">Climate &amp; UV Resistant</h3>
+              <h3 className="text-xl font-bold text-secondary-900 mb-3">Climate & UV Resistant</h3>
               <p className="text-accent-600">Built to last in harsh conditions.</p>
             </div>
             <div className="bg-white p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
