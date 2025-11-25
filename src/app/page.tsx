@@ -31,26 +31,36 @@ export default async function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
-        <div className="container mx-auto px-4">
+      <section className="relative bg-gradient-to-r from-secondary-900 via-primary-600 to-secondary-900 text-white py-20 overflow-hidden">
+        {/* Diagonal pattern overlay */}
+        <div className="absolute inset-0 opacity-20">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute h-full w-16 bg-black transform -skew-x-12"
+              style={{ left: `${i * 14}%`, opacity: 0.3 }}
+            />
+          ))}
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Quality Ropes & Straps for Every Need
+              Boundless Strength, Endless Solutions!
             </h1>
-            <p className="text-xl mb-8 text-blue-100">
-              Trusted supplier for retail and business customers across South Africa. 
+            <p className="text-xl mb-8 text-gray-200">
+              Proudly South African manufacturer and supplier of quality ropes, twines, and straps. 
               From natural fiber to synthetic ropes, we have you covered.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link 
                 href="/products" 
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-center"
+                className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-center"
               >
                 Browse Products
               </Link>
               <Link 
                 href="/quote" 
-                className="bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors border border-blue-500 text-center"
+                className="bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-800 transition-colors border border-primary-500 text-center"
               >
                 Request a Quote
               </Link>
@@ -59,19 +69,47 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Brand Values Section */}
+      <section className="py-12 bg-warm-100">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="flex flex-col items-center">
+              <span className="text-3xl mb-2">🏭</span>
+              <h3 className="font-semibold text-secondary-900">Local Manufacturing</h3>
+              <p className="text-sm text-accent-500">Proudly South African</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-3xl mb-2">💪</span>
+              <h3 className="font-semibold text-secondary-900">Boundless Strength</h3>
+              <p className="text-sm text-accent-500">Built to last</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-3xl mb-2">☀️</span>
+              <h3 className="font-semibold text-secondary-900">UV Resistant</h3>
+              <p className="text-sm text-accent-500">Climate tough</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-3xl mb-2">🎯</span>
+              <h3 className="font-semibold text-secondary-900">Customization</h3>
+              <p className="text-sm text-accent-500">Tailored solutions</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Categories Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">Shop by Category</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center text-secondary-900">Shop by Category</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {categories.map((category) => (
               <Link 
                 key={category.id}
                 href={`/products?category=${category.slug}`}
-                className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow text-center"
+                className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow text-center border-l-4 border-primary-600"
               >
-                <h3 className="text-xl font-semibold mb-2">{category.name}</h3>
-                <p className="text-blue-600 hover:text-blue-700">Browse products →</p>
+                <h3 className="text-xl font-semibold mb-2 text-secondary-900">{category.name}</h3>
+                <p className="text-primary-600 hover:text-primary-700">Browse products →</p>
               </Link>
             ))}
           </div>
@@ -82,8 +120,8 @@ export default async function Home() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">Featured Products</h2>
-            <Link href="/products" className="text-blue-600 hover:text-blue-700 font-semibold">
+            <h2 className="text-3xl font-bold text-secondary-900">Featured Products</h2>
+            <Link href="/products" className="text-primary-600 hover:text-primary-700 font-semibold">
               View All →
             </Link>
           </div>
@@ -98,7 +136,7 @@ export default async function Home() {
       </section>
 
       {/* B2B Section */}
-      <section className="py-16 bg-gray-900 text-white">
+      <section className="py-16 bg-gradient-to-r from-secondary-900 to-primary-900 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Business Buyer?</h2>
           <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
@@ -107,7 +145,7 @@ export default async function Home() {
           </p>
           <Link 
             href="/quote" 
-            className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="inline-block bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
           >
             Request a Business Quote
           </Link>

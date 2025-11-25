@@ -5,8 +5,8 @@ import Footer from "@/components/Footer";
 import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "Twines and Straps SA",
-  description: "E-Commerce Website - Quality ropes, twines, and straps for retail and business customers",
+  title: "TASSA - Twines and Straps SA",
+  description: "Proudly South African manufacturer and supplier of quality ropes, twines, and straps. Boundless Strength, Endless Solutions!",
 };
 
 export default function RootLayout({

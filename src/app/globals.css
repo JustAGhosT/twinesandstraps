@@ -3,8 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 17, 24, 39;
+  --foreground-rgb: 26, 26, 26;
   --background-rgb: 255, 255, 255;
+  --tassa-red: 227, 30, 36;
+  --industrial-black: 26, 26, 26;
+  --steel-gray: 107, 107, 107;
+  --rope-beige: 196, 184, 165;
+  --safety-orange: 232, 119, 34;
+  --marine-blue: 43, 92, 158;
 }
 
 body {
