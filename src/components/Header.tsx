@@ -110,7 +110,6 @@ const Header: React.FC = () => {
               {[
                 { href: '/', label: 'Home' },
                 { href: '/products', label: 'Products' },
-                { href: '/quote', label: 'Request Quote' },
                 { href: '/contact', label: 'Contact' },
               ].map((link) => (
                 <Link 
