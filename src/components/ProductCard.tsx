@@ -42,9 +42,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         const data = await response.json();
         setImageUrl(data.image_url);
         setImageError(false);
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error(`Failed to generate image for product ${product.id}:`, errorData.error || response.statusText);
       }
     } catch (error) {
-      console.error('Failed to generate image:', error);
+      console.error(`Failed to generate image for product ${product.id}:`, error instanceof Error ? error.message : error);
     } finally {
       setIsGenerating(false);
     }
