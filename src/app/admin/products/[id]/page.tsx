@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import AIAssistantPanel from '@/components/AIAssistantPanel';
 
 interface Category {
   id: number;
@@ -176,6 +177,28 @@ export default function ProductEditPage() {
       setSaving(false);
     }
   };
+
+  // Prepare product data for AI assistant
+  const productDataForAI = useMemo(() => {
+    const selectedCategory = categories.find(c => c.id.toString() === form.category_id);
+    return {
+      name: form.name,
+      description: form.description,
+      material: form.material || null,
+      category: selectedCategory?.name,
+      price: parseFloat(form.price) || 0,
+    };
+  }, [form.name, form.description, form.material, form.category_id, form.price, categories]);
+
+  // Handle AI description suggestions
+  const handleApplyDescription = useCallback((description: string) => {
+    setForm(prev => ({ ...prev, description }));
+  }, []);
+
+  // Handle AI price suggestions
+  const handleApplyPrice = useCallback((price: number) => {
+    setForm(prev => ({ ...prev, price: price.toFixed(2) }));
+  }, []);
 
   if (loading) {
     return (
@@ -397,6 +420,13 @@ export default function ProductEditPage() {
                 </div>
               </div>
             </div>
+
+            {/* AI Assistant Panel */}
+            <AIAssistantPanel
+              productData={productDataForAI}
+              onApplyDescription={handleApplyDescription}
+              onApplyPrice={handleApplyPrice}
+            />
           </div>
         </div>
 
