@@ -1,21 +1,20 @@
 # Implementation Summary: WhatsApp Quote System
 
 ## Overview
-This document summarizes the changes made to transition the Twines and Straps SA website from a direct e-commerce platform to a WhatsApp-based quote system, as per client requirements.
+This document summarizes the changes made to the Twines and Straps SA website to implement a WhatsApp-based quote system alongside the existing cart functionality, as per client requirements.
 
 ## Client Requirements Met
 
-### 1. ✅ No Direct Sales on Website
-- Removed all "Add to Cart" functionality
-- Removed cart icon from navigation header
-- Removed checkout and payment processing features
-- Website now focuses on product showcase and quote requests
+### 1. ✅ Quote-Based Purchasing Model
+- Added "Request Quote via WhatsApp" functionality throughout the site
+- Cart retained for collecting items and sending bulk quote requests
+- Checkout feature controlled by feature flag (`NEXT_PUBLIC_FEATURE_CHECKOUT=false` by default)
+- Website focuses on product showcase and quote requests
 
-### 2. ✅ VAT Display Removed
-- Removed VAT calculations from all product displays
+### 2. ✅ Simplified VAT Display
 - Removed VAT breakdown from product cards (listing pages)
-- Removed VAT information from product detail pages
-- Simplified pricing to show single price without "incl. VAT" labels
+- VAT calculations retained in cart summary for quote accuracy
+- Simplified pricing on product cards to show single price
 
 ### 3. ✅ Product Specifications Displayed
 - Product detail pages show comprehensive specifications:
@@ -28,6 +27,7 @@ This document summarizes the changes made to transition the Twines and Straps SA
 
 ### 4. ✅ WhatsApp Quote System
 - "Request Quote via WhatsApp" button on every product page
+- Cart page includes "Send Quote Request" to WhatsApp with all items
 - Quote includes:
   - Product name
   - SKU
@@ -40,25 +40,27 @@ This document summarizes the changes made to transition the Twines and Straps SA
 
 ### Files Modified
 1. **src/components/ProductCard.tsx**
-   - Removed VAT calculations and display
-   - Simplified price display
+   - Simplified VAT display on listing pages
+   - Retained price display
 
 2. **src/components/ProductView.tsx**
-   - Removed "Add to Cart" button
-   - Added "Request Quote via WhatsApp" button
-   - Removed VAT calculations and display
-   - Added validation for WhatsApp number
-   - Added sanitization for product data
+   - Added "Request Quote" button alongside "Add to Cart"
+   - Cart and quote functionality controlled by feature flags
 
 3. **src/components/Header.tsx**
-   - Removed cart icon
-   - Maintained responsive navigation
+   - Cart icon retained with item count badge
+   - Responsive navigation maintained
 
-4. **src/app/page.tsx**
+4. **src/app/cart/page.tsx**
+   - Added "Send Quote Request" via WhatsApp
+   - VAT breakdown shown in cart summary
+   - Bulk quote functionality for all cart items
+
+5. **src/app/page.tsx**
    - Updated hero section text
    - Updated B2B section to mention WhatsApp
 
-5. **.env.example**
+6. **.env.example**
    - Added `NEXT_PUBLIC_WHATSAPP_NUMBER` configuration
 
 6. **docs/CHANGELOG.md**

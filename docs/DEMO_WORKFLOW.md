@@ -63,7 +63,7 @@ npm run dev
    - High-quality image with zoom
    - Complete specifications (SKU, material, dimensions)
    - Quantity selector
-   - "Add to Cart" button
+   - "Add to Cart" button (controlled by feature flag)
    - "Request Quote" button
    - WhatsApp quote integration
    - Related products section
@@ -72,11 +72,12 @@ npm run dev
 1. Add items to cart
 2. Navigate to `/cart`
 3. Demonstrate:
-   - Cart summary
+   - Cart summary with VAT breakdown
    - Quantity adjustments
    - Remove items
    - Price calculations
-   - Proceed to quote/checkout
+   - "Send Quote Request" via WhatsApp (sends all cart items)
+   - Continue shopping / Clear cart options
 
 ---
 
@@ -243,10 +244,9 @@ Briefly mention:
 
 Be prepared to discuss:
 
-1. **Hosting Options**
-   - Vercel (recommended)
-   - Netlify
-   - Self-hosted
+1. **Hosting**
+   - Currently deployed on Netlify
+   - Alternative: Vercel, Self-hosted
 
 2. **Payment Integration**
    - PayFast (SA popular)
@@ -254,7 +254,7 @@ Be prepared to discuss:
    - Yoco
 
 3. **Future Features**
-   - Full checkout flow
+   - Full checkout flow (already built, controlled by feature flag)
    - Product reviews
    - Inventory management
    - Email notifications

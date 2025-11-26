@@ -47,7 +47,7 @@ The `netlify.toml` file configures:
 - **Command**: `npm run lint && npm run build`
   - Runs linting before build to catch issues early
   - Generates Prisma client
-  - Applies pending database migrations via `prisma migrate deploy`
+  - Runs custom migration script (`tsx scripts/migrate-production.ts`) that intelligently handles database state before running `prisma migrate deploy`
   - Builds Next.js application
 - **Publish Directory**: `.next` (Next.js build output)
 - **Plugin**: `@netlify/plugin-nextjs` for optimal Next.js support

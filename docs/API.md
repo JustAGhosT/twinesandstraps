@@ -364,8 +364,9 @@ All endpoints return consistent error responses:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ADMIN_PASSWORD` | Yes | Admin panel password (min 8 characters) |
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `ADMIN_PASSWORD` | No | Admin panel password (min 8 characters). If not set, admin panel displays a configuration warning. |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Yes | WhatsApp Business number for quote requests (format: 27XXXXXXXXX) |
 
 ---
 
