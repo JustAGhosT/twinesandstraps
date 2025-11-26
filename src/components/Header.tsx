@@ -7,6 +7,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useUserAuth } from '@/contexts/UserAuthContext';
 import SearchBar from '@/components/SearchBar';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { useCustomLogo } from '@/hooks/useCustomLogo';
 
 const Header: React.FC = () => {
   const { getTotalItems } = useCart();
@@ -15,7 +16,7 @@ const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [customLogoUrl, setCustomLogoUrl] = useState<string | null>(null);
+  const customLogoUrl = useCustomLogo();
   const showSearchBar = useFeatureFlag('searchBar');
 
   useEffect(() => {
@@ -24,22 +25,6 @@ const Header: React.FC = () => {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-  
-  // Check for custom logo
-  useEffect(() => {
-    const checkLogo = async () => {
-      try {
-        // Try to fetch the logo file to check if it exists
-        const response = await fetch('/logo.svg', { method: 'HEAD' });
-        if (response.ok) {
-          setCustomLogoUrl('/logo.svg');
-        }
-      } catch {
-        // Logo doesn't exist, use default
-      }
-    };
-    checkLogo();
   }, []);
 
   return (

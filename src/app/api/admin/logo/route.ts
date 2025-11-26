@@ -31,11 +31,19 @@ function sanitizeSvg(content: string): string {
   // Remove javascript: URLs
   sanitized = sanitized.replace(/javascript\s*:/gi, '');
   
-  // Remove data: URLs that could contain scripts (but allow safe data URIs for images)
-  sanitized = sanitized.replace(/data\s*:\s*text\/html/gi, 'data:text/plain');
+  // Remove potentially dangerous data: URIs (allow only safe image formats)
+  // Block text/html, application/javascript, text/javascript, etc.
+  sanitized = sanitized.replace(/data\s*:\s*(?!image\/(?:png|jpeg|jpg|gif|webp|svg\+xml))[^"'\s)]+/gi, 'data:text/plain');
   
   // Remove foreignObject elements (can contain HTML)
   sanitized = sanitized.replace(/<foreignObject\b[^<]*(?:(?!<\/foreignObject>)<[^<]*)*<\/foreignObject>/gi, '');
+  
+  // Remove use elements with external references (potential XSS vector)
+  sanitized = sanitized.replace(/<use[^>]*xlink:href\s*=\s*["'](?!#)[^"']*["'][^>]*>/gi, '');
+  
+  // Remove set and animate elements that could manipulate attributes dangerously
+  sanitized = sanitized.replace(/<set\b[^>]*>/gi, '');
+  sanitized = sanitized.replace(/<animate\b[^>]*attributeName\s*=\s*["'](?:href|xlink:href)["'][^>]*>/gi, '');
   
   return sanitized;
 }
