@@ -36,21 +36,21 @@ See `.env.example` for complete list of environment variables and instructions.
 
 ### Changed - Client Requirements Update
 
-Based on client feedback, the business model has been updated from direct e-commerce sales to a quote-based approach:
+Based on client feedback, the business model has been updated to emphasize quote-based purchasing over direct e-commerce checkout:
 
 #### What Changed:
-1. **Removed Direct Sales Functionality**
-   - Removed "Add to Cart" functionality
-   - Removed cart icon from header
-   - No longer implementing PayFast payment integration (as per original PRD)
+1. **Enhanced Quote-Based Workflow**
+   - Added "Request Quote via WhatsApp" functionality across the site
+   - Cart functionality retained but checkout disabled by default (controlled by feature flag)
+   - Cart can be used to collect items and send bulk quote requests via WhatsApp
 
-2. **Removed VAT Display**
-   - Removed VAT calculations and display from product cards
-   - Removed VAT information from product detail pages
-   - Client is VAT registered but won't be selling directly, so VAT display not needed
+2. **Removed VAT Display from Product Cards**
+   - Simplified price display on product listing pages
+   - VAT breakdown still shown in cart summary
 
 3. **Added WhatsApp Quote Integration**
-   - Replaced "Add to Cart" with "Request Quote via WhatsApp" button
+   - "Request Quote via WhatsApp" button on product pages
+   - Cart summary includes "Send Quote Request" to WhatsApp with all items
    - Quote request includes: product name, SKU, quantity, unit price, and total
    - WhatsApp number configurable via `NEXT_PUBLIC_WHATSAPP_NUMBER` environment variable
 

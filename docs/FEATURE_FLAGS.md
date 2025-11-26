@@ -52,8 +52,18 @@ NEXT_PUBLIC_FEATURE_WISHLIST=true
 | Feature | Environment Variable | Default | Description |
 |---------|---------------------|---------|-------------|
 | Product Reviews | `NEXT_PUBLIC_FEATURE_PRODUCT_REVIEWS` | `false` | Customer reviews with star ratings |
-| Wishlist | `NEXT_PUBLIC_FEATURE_WISHLIST` | `false` | Save favorite products (localStorage) |
-| Compare Products | `NEXT_PUBLIC_FEATURE_COMPARE_PRODUCTS` | `false` | Side-by-side product comparison |
+| Wishlist | `NEXT_PUBLIC_FEATURE_WISHLIST` | `true` | Save favorite products (localStorage) |
+| Compare Products | `NEXT_PUBLIC_FEATURE_COMPARE_PRODUCTS` | `true` | Side-by-side product comparison |
+| Checkout | `NEXT_PUBLIC_FEATURE_CHECKOUT` | `false` | Full checkout flow (disabled for quote-based model) |
+| Show Prices | `NEXT_PUBLIC_FEATURE_SHOW_PRICES` | `true` | Display product prices |
+
+### User Features
+
+| Feature | Environment Variable | Default | Description |
+|---------|---------------------|---------|-------------|
+| User Auth | `NEXT_PUBLIC_FEATURE_USER_AUTH` | `true` | User registration and login |
+| View History | `NEXT_PUBLIC_FEATURE_VIEW_HISTORY` | `true` | Track product view history |
+| Recently Viewed | `NEXT_PUBLIC_FEATURE_RECENTLY_VIEWED` | `true` | Show recently viewed products |
 
 ## Usage in Code
 
@@ -125,19 +135,34 @@ export default function Component() {
 
 ```bash
 # All feature flags with defaults
+
+# Marketing & Engagement
 NEXT_PUBLIC_FEATURE_TESTIMONIALS=true
 NEXT_PUBLIC_FEATURE_NEWSLETTER=true
 NEXT_PUBLIC_FEATURE_WHATSAPP=true
 NEXT_PUBLIC_FEATURE_TRUST_BADGES=true
+
+# E-commerce Features
 NEXT_PUBLIC_FEATURE_RELATED_PRODUCTS=true
 NEXT_PUBLIC_FEATURE_RECOMMENDED_PRODUCTS=true
 NEXT_PUBLIC_FEATURE_QUICK_ADD_CART=true
 NEXT_PUBLIC_FEATURE_PRODUCT_ZOOM=true
+NEXT_PUBLIC_FEATURE_WISHLIST=true
+NEXT_PUBLIC_FEATURE_COMPARE_PRODUCTS=true
+NEXT_PUBLIC_FEATURE_SHOW_PRICES=true
+NEXT_PUBLIC_FEATURE_CHECKOUT=false          # Quote-based model by default
+
+# UI/UX Features
 NEXT_PUBLIC_FEATURE_BACK_TO_TOP=true
 NEXT_PUBLIC_FEATURE_SEARCH_BAR=true
+
+# User Features
+NEXT_PUBLIC_FEATURE_USER_AUTH=true
+NEXT_PUBLIC_FEATURE_VIEW_HISTORY=true
+NEXT_PUBLIC_FEATURE_RECENTLY_VIEWED=true
+
+# Disabled by default
 NEXT_PUBLIC_FEATURE_PRODUCT_REVIEWS=false
-NEXT_PUBLIC_FEATURE_WISHLIST=false
-NEXT_PUBLIC_FEATURE_COMPARE_PRODUCTS=false
 ```
 
 ## Adding New Feature Flags

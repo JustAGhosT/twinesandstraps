@@ -108,8 +108,8 @@ The project uses PostgreSQL. Follow these steps to set up your database:
 2. Create a new database/project
 3. Copy the connection string from the dashboard
 4. Add the `DATABASE_URL` to Netlify environment variables
-5. Database migrations are automatically applied during the Netlify build process via `prisma migrate deploy`
-   > **Note:** The build command runs `prisma generate && prisma migrate deploy && next build`, which ensures pending migrations are applied to the production database before each deployment.
+5. Database migrations are automatically applied during the Netlify build process via a custom migration script
+   > **Note:** The build command runs `prisma generate && tsx scripts/migrate-production.ts && next build`. The migration script intelligently handles various database states (e.g., existing tables, failed migrations) before running `prisma migrate deploy`.
 
 Example connection strings:
 ```

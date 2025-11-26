@@ -37,7 +37,7 @@ This document provides a comprehensive cost evaluation for building, deploying, 
 ### Budget Tier (Development/Low Traffic)
 | Service | Monthly Cost | Annual Cost |
 |---------|--------------|-------------|
-| Vercel Hosting | R0 (free tier) | R0 |
+| Netlify Hosting | R0 (free tier) | R0 |
 | PostgreSQL (Supabase/Neon free tier) | R0 | R0 |
 | Domain (.co.za) | ~R15 | ~R180 |
 | SSL Certificate | R0 (included) | R0 |
@@ -46,7 +46,7 @@ This document provides a comprehensive cost evaluation for building, deploying, 
 ### Production Tier (Moderate Traffic)
 | Service | Monthly Cost | Annual Cost |
 |---------|--------------|-------------|
-| Vercel Pro | R350 - R700 | R4,200 - R8,400 |
+| Netlify Pro | R350 - R700 | R4,200 - R8,400 |
 | PostgreSQL (Supabase Pro/Neon) | R300 - R900 | R3,600 - R10,800 |
 | Domain (.co.za) | ~R15 | ~R180 |
 | SSL Certificate | R0 (included) | R0 |
@@ -55,7 +55,7 @@ This document provides a comprehensive cost evaluation for building, deploying, 
 ### Enterprise Tier (High Traffic)
 | Service | Monthly Cost | Annual Cost |
 |---------|--------------|-------------|
-| Vercel Enterprise | R1,500+ | R18,000+ |
+| Netlify Enterprise | R1,500+ | R18,000+ |
 | Managed PostgreSQL (AWS RDS/GCP) | R1,000 - R3,000 | R12,000 - R36,000 |
 | Domain (.co.za) | ~R15 | ~R180 |
 | CDN (Cloudflare Pro) | R350 | R4,200 |
@@ -96,7 +96,7 @@ This document provides a comprehensive cost evaluation for building, deploying, 
 | Cloudinary Free | R0 | 25GB storage |
 | Cloudinary Plus | R175 | 225GB storage |
 | AWS S3 | R50 - R200 | Pay as you go |
-| Vercel Blob | Included in Pro | Simple integration |
+| Netlify Large Media | Included in Pro | Simple integration |
 
 ---
 
@@ -169,12 +169,12 @@ This codebase includes the following features (estimated agency value):
 ## Recommendations
 
 ### For Small Business / Startup
-- Use free tiers (Vercel, Supabase/Neon)
+- Use free tiers (Netlify, Supabase/Neon)
 - Start with WhatsApp/email for orders
 - **Budget: R200-500/year**
 
 ### For Growing Business
-- Upgrade to Vercel Pro + managed database
+- Upgrade to Netlify Pro + managed database
 - Implement payment gateway
 - Add email marketing integration
 - **Budget: R1,000-2,000/month**
