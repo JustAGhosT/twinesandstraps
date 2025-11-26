@@ -3,6 +3,9 @@ import prisma from '@/lib/prisma';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://twinesandstraps.netlify.app';
 
+// Force dynamic generation at runtime (not build time)
+export const dynamic = 'force-dynamic';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Get all products for dynamic sitemap entries
   const products = await prisma.product.findMany({
