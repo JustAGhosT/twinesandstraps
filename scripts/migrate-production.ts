@@ -11,6 +11,9 @@
 import { execSync } from 'child_process';
 import { PrismaClient } from '@prisma/client';
 
+// The init migration that creates the base tables (Product, Category, User)
+const INIT_MIGRATION_NAME = '20251117010205_init';
+
 const prisma = new PrismaClient();
 
 async function main() {
@@ -29,7 +32,7 @@ async function main() {
         console.log('Tables already exist. Baselining init migration...');
         
         // Mark the init migration as already applied
-        execSync('npx prisma migrate resolve --applied 20251117010205_init', {
+        execSync(`npx prisma migrate resolve --applied ${INIT_MIGRATION_NAME}`, {
           stdio: 'inherit',
         });
         
@@ -57,7 +60,7 @@ async function checkInitMigrationApplied(): Promise<boolean> {
     // Check if the _prisma_migrations table exists and has our init migration
     const result = await prisma.$queryRaw<{ count: bigint }[]>`
       SELECT COUNT(*) as count FROM "_prisma_migrations" 
-      WHERE migration_name = '20251117010205_init'
+      WHERE migration_name = ${INIT_MIGRATION_NAME}
     `;
     return Number(result[0].count) > 0;
   } catch {
@@ -69,6 +72,9 @@ async function checkInitMigrationApplied(): Promise<boolean> {
 async function checkTablesExist(): Promise<boolean> {
   try {
     // Check if the Product table exists (which is created by init migration)
+    // We check Product as a representative table - if it exists, the init migration
+    // was already applied manually. The init migration creates Product, Category,
+    // and User tables together, so checking one is sufficient.
     const result = await prisma.$queryRaw<{ exists: boolean }[]>`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
