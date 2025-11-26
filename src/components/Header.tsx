@@ -106,12 +106,27 @@ const Header: React.FC = () => {
                       <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                     </div>
                     <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      My Profile
+                    </Link>
+                    <Link
+                      href="/profile?tab=orders"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      My Orders
+                    </Link>
+                    <Link
                       href="/wishlist"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setUserMenuOpen(false)}
                     >
                       My Wishlist
                     </Link>
+                    <hr className="my-1" />
                     <button
                       onClick={() => {
                         logout();

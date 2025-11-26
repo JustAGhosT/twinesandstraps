@@ -41,8 +41,10 @@ model Product {
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 
-  category    Category @relation(fields: [category_id], references: [id])
-  category_id Int
+  category     Category      @relation(fields: [category_id], references: [id])
+  category_id  Int
+  order_items  OrderItem[]
+  view_history ViewHistory[]
 }
 
 model Category {
@@ -65,4 +67,90 @@ model User {
   marketing_consent Boolean   @default(false)
   created_at        DateTime  @default(now())
   last_login        DateTime?
+
+  // Relations
+  addresses    Address[]
+  orders       Order[]
+  view_history ViewHistory[]
+}
+
+model Address {
+  id             Int      @id @default(autoincrement())
+  user_id        Int
+  label          String   @default("Home") // Home, Work, etc.
+  street_address String
+  city           String
+  province       String
+  postal_code    String
+  country        String   @default("South Africa")
+  is_default     Boolean  @default(false)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  user            User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  shipping_orders Order[] @relation("ShippingAddress")
+  billing_orders  Order[] @relation("BillingAddress")
+}
+
+model Order {
+  id                  Int       @id @default(autoincrement())
+  order_number        String    @unique
+  user_id             Int
+  status              String    @default("PENDING") // PENDING, CONFIRMED, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+  payment_status      String    @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  payment_method      String?   // EFT, CARD, etc.
+  subtotal            Float
+  vat_amount          Float
+  shipping_cost       Float     @default(0)
+  total               Float
+  notes               String?
+  shipping_address_id Int?
+  billing_address_id  Int?
+  tracking_number     String?
+  shipped_at          DateTime?
+  delivered_at        DateTime?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  user             User       @relation(fields: [user_id], references: [id])
+  shipping_address Address?   @relation("ShippingAddress", fields: [shipping_address_id], references: [id])
+  billing_address  Address?   @relation("BillingAddress", fields: [billing_address_id], references: [id])
+  items            OrderItem[]
+  status_history   OrderStatusHistory[]
+}
+
+model OrderItem {
+  id           Int    @id @default(autoincrement())
+  order_id     Int
+  product_id   Int
+  product_name String // Stored at time of order in case product changes
+  product_sku  String
+  quantity     Int
+  unit_price   Float
+  total_price  Float
+
+  order   Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id])
+}
+
+model OrderStatusHistory {
+  id         Int      @id @default(autoincrement())
+  order_id   Int
+  status     String
+  notes      String?
+  created_at DateTime @default(now())
+
+  order Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
+}
+
+model ViewHistory {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  viewed_at  DateTime @default(now())
+
+  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, product_id])
 }
