@@ -80,6 +80,49 @@ async function callAzureOpenAI(
 }
 
 /**
+ * Safely extract and parse JSON from AI response
+ * The AI may include text before/after the JSON, so we find the first valid JSON object
+ */
+function extractJSON<T>(response: string): T {
+  // Try to parse the response directly first
+  try {
+    return JSON.parse(response) as T;
+  } catch {
+    // If direct parsing fails, try to find a JSON object in the response
+  }
+
+  // Find the first { and try to find its matching }
+  const startIndex = response.indexOf('{');
+  if (startIndex === -1) {
+    throw new Error('No JSON object found in response');
+  }
+
+  let depth = 0;
+  let endIndex = -1;
+  
+  for (let i = startIndex; i < response.length; i++) {
+    if (response[i] === '{') depth++;
+    if (response[i] === '}') depth--;
+    if (depth === 0) {
+      endIndex = i;
+      break;
+    }
+  }
+
+  if (endIndex === -1) {
+    throw new Error('Invalid JSON structure in response');
+  }
+
+  const jsonStr = response.substring(startIndex, endIndex + 1);
+  
+  try {
+    return JSON.parse(jsonStr) as T;
+  } catch (e) {
+    throw new Error(`Failed to parse JSON from AI response: ${e instanceof Error ? e.message : 'Unknown error'}`);
+  }
+}
+
+/**
  * Analyze a product for market insights, competitor analysis, and pricing suggestions
  */
 export async function analyzeProduct(product: {
@@ -125,13 +168,7 @@ Provide market insights, competitor analysis, pricing suggestions (in ZAR), and 
       { role: 'user', content: userPrompt },
     ]);
 
-    // Parse JSON response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Invalid JSON response from AI');
-    }
-    
-    return JSON.parse(jsonMatch[0]) as ProductAnalysis;
+    return extractJSON<ProductAnalysis>(response);
   } catch (error) {
     console.error('Error analyzing product:', error);
     throw error;
@@ -182,13 +219,7 @@ Provide an enhanced description suitable for a B2B e-commerce website.`;
       { role: 'user', content: userPrompt },
     ]);
 
-    // Parse JSON response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Invalid JSON response from AI');
-    }
-    
-    return JSON.parse(jsonMatch[0]) as DescriptionEnhancement;
+    return extractJSON<DescriptionEnhancement>(response);
   } catch (error) {
     console.error('Error enhancing description:', error);
     throw error;
@@ -224,13 +255,13 @@ Provide comprehensive market research analysis in valid JSON format with the fol
       { role: 'user', content: userPrompt },
     ]);
 
-    // Parse JSON response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Invalid JSON response from AI');
-    }
-    
-    return JSON.parse(jsonMatch[0]);
+    return extractJSON<{
+      overview: string;
+      trends: string[];
+      opportunities: string[];
+      challenges: string[];
+      competitors: string[];
+    }>(response);
   } catch (error) {
     console.error('Error getting market research:', error);
     throw error;
@@ -286,13 +317,12 @@ Provide a pricing recommendation in South African Rand (ZAR).`;
       { role: 'user', content: userPrompt },
     ]);
 
-    // Parse JSON response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Invalid JSON response from AI');
-    }
-    
-    return JSON.parse(jsonMatch[0]);
+    return extractJSON<{
+      suggested: number;
+      range: { min: number; max: number };
+      factors: string[];
+      strategy: string;
+    }>(response);
   } catch (error) {
     console.error('Error suggesting pricing:', error);
     throw error;

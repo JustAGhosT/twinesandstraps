@@ -62,12 +62,20 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        const price = parseFloat(currentPrice);
+        if (isNaN(price) || price < 0) {
+          return NextResponse.json(
+            { error: 'Invalid price format. Price must be a positive number.' },
+            { status: 400 }
+          );
+        }
+
         const analysis = await analyzeProduct({
           name,
           description,
           material,
           category,
-          currentPrice: parseFloat(currentPrice),
+          currentPrice: price,
         });
 
         return NextResponse.json({ success: true, data: analysis });
