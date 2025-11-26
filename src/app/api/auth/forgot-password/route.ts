@@ -22,25 +22,29 @@ export async function POST(request: NextRequest) {
     // Always return success to prevent email enumeration
     // But only create token if user exists
     if (user) {
-      // Invalidate any existing tokens for this user
-      await prisma.passwordResetToken.updateMany({
-        where: {
-          user_id: user.id,
-          used: false,
-        },
-        data: { used: true },
-      });
-
       // Generate new token
       const token = generatePasswordResetToken();
       const expiresAt = getPasswordResetExpiry();
 
-      await prisma.passwordResetToken.create({
-        data: {
-          user_id: user.id,
-          token,
-          expires_at: expiresAt,
-        },
+      // Use transaction to ensure token invalidation and creation are atomic
+      await prisma.$transaction(async (tx) => {
+        // Invalidate any existing tokens for this user
+        await tx.passwordResetToken.updateMany({
+          where: {
+            user_id: user.id,
+            used: false,
+          },
+          data: { used: true },
+        });
+
+        // Create new token
+        await tx.passwordResetToken.create({
+          data: {
+            user_id: user.id,
+            token,
+            expires_at: expiresAt,
+          },
+        });
       });
 
       // Build reset URL

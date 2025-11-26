@@ -23,11 +23,22 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+
+    // Validate and sanitize query parameters
+    const ALLOWED_SORT_FIELDS = ['name', 'email', 'created_at', 'last_login', 'role'];
+    const ALLOWED_SORT_ORDERS = ['asc', 'desc'];
+
+    const parsedPage = parseInt(searchParams.get('page') || '1');
+    const parsedLimit = parseInt(searchParams.get('limit') || '20');
     const search = searchParams.get('search') || '';
-    const sortBy = searchParams.get('sortBy') || 'created_at';
-    const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const sortByParam = searchParams.get('sortBy') || 'created_at';
+    const sortOrderParam = searchParams.get('sortOrder') || 'desc';
+
+    // Ensure valid values with fallbacks
+    const page = isNaN(parsedPage) || parsedPage < 1 ? 1 : parsedPage;
+    const limit = isNaN(parsedLimit) || parsedLimit < 1 || parsedLimit > 100 ? 20 : parsedLimit;
+    const sortBy = ALLOWED_SORT_FIELDS.includes(sortByParam) ? sortByParam : 'created_at';
+    const sortOrder = ALLOWED_SORT_ORDERS.includes(sortOrderParam) ? sortOrderParam : 'desc';
 
     const skip = (page - 1) * limit;
 
