@@ -75,12 +75,13 @@ export async function POST(request: NextRequest) {
     });
 
     // Set HTTP-only cookie for better security
+    // Path must be '/' to cover both /admin pages and /api/admin/* routes
     response.cookies.set('admin_session', session.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 24 * 60 * 60, // 24 hours
-      path: '/admin',
+      path: '/',
     });
 
     return response;
@@ -102,13 +103,13 @@ export async function DELETE(request: NextRequest) {
 
   const response = NextResponse.json({ success: true });
 
-  // Clear the cookie
+  // Clear the cookie - path must match login cookie path
   response.cookies.set('admin_session', '', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     maxAge: 0,
-    path: '/admin',
+    path: '/',
   });
 
   return response;

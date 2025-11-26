@@ -5,13 +5,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { requireAdminAuth } from '@/lib/admin-auth';
 
 // Allowed file types and their MIME types
+// Note: SVG is intentionally excluded due to XSS risks (can contain embedded JavaScript)
 const ALLOWED_TYPES: Record<string, string[]> = {
   '.jpg': ['image/jpeg'],
   '.jpeg': ['image/jpeg'],
   '.png': ['image/png'],
   '.webp': ['image/webp'],
   '.gif': ['image/gif'],
-  '.svg': ['image/svg+xml'],
 };
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB

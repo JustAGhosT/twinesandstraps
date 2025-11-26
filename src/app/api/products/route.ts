@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     const { page, limit, search, category, status, sort, order } = validation.data;
 
-    // Build where clause
+    // Build where clause for Prisma query
     const where: Record<string, unknown> = {};
 
     if (search) {
@@ -39,7 +39,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (category) {
-      where.category = { slug: category };
+      // Use 'is' for required relation filter per Prisma docs
+      where.category = { is: { slug: category } };
     }
 
     if (status) {
