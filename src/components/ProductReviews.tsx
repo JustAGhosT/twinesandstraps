@@ -1,52 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface Review {
   id: number;
-  author: string;
+  author_name: string;
   rating: number;
-  date: string;
-  title: string;
+  title: string | null;
   content: string;
-  verified: boolean;
+  verified_purchase: boolean;
+  created_at: string;
 }
 
 interface ProductReviewsProps {
   productId: number;
   productName: string;
 }
-
-// Sample reviews - in production, fetch from API/database
-const sampleReviews: Review[] = [
-  {
-    id: 1,
-    author: 'Johan M.',
-    rating: 5,
-    date: '2024-11-15',
-    title: 'Excellent quality twine',
-    content: 'This twine exceeded my expectations. Very strong and durable, perfect for our agricultural needs.',
-    verified: true,
-  },
-  {
-    id: 2,
-    author: 'Sarah P.',
-    rating: 4,
-    date: '2024-10-28',
-    title: 'Good product, fast delivery',
-    content: 'The rope quality is great. Delivery was quick. Would have given 5 stars but packaging could be improved.',
-    verified: true,
-  },
-  {
-    id: 3,
-    author: 'David K.',
-    rating: 5,
-    date: '2024-10-10',
-    title: 'Best local supplier',
-    content: 'Been using TASSA products for years. Consistent quality and great customer service.',
-    verified: false,
-  },
-];
 
 const StarRating: React.FC<{ rating: number; interactive?: boolean; onRate?: (rating: number) => void }> = ({
   rating,
@@ -83,10 +52,31 @@ const StarRating: React.FC<{ rating: number; interactive?: boolean; onRate?: (ra
 };
 
 const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName }) => {
-  const [reviews] = useState<Review[]>(sampleReviews);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [newReview, setNewReview] = useState({ rating: 0, title: '', content: '', author: '' });
+  const [newReview, setNewReview] = useState({ rating: 0, title: '', content: '', authorName: '', authorEmail: '', company: '' });
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchReviews = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/reviews?productId=${productId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setReviews(data);
+      }
+    } catch (err) {
+      console.error('Error fetching reviews:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [productId]);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
   const totalReviews = reviews.length;
   const averageRating = totalReviews > 0
@@ -96,14 +86,52 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
     (rating) => reviews.filter((r) => r.rating === rating).length
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: In production, send to API endpoint
-    // await fetch('/api/reviews', { method: 'POST', body: JSON.stringify({ productId, ...newReview }) });
-    setSubmitted(true);
-    setShowForm(false);
-    setNewReview({ rating: 0, title: '', content: '', author: '' });
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId,
+          authorName: newReview.authorName,
+          authorEmail: newReview.authorEmail || undefined,
+          company: newReview.company || undefined,
+          rating: newReview.rating,
+          title: newReview.title || undefined,
+          content: newReview.content,
+        }),
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+        setShowForm(false);
+        setNewReview({ rating: 0, title: '', content: '', authorName: '', authorEmail: '', company: '' });
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to submit review');
+      }
+    } catch (err) {
+      console.error('Error submitting review:', err);
+      setError('Failed to submit review. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="mt-8">
+        <h3 className="text-xl font-bold text-secondary-900 mb-6">Customer Reviews</h3>
+        <div className="flex items-center justify-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-8">
@@ -150,13 +178,19 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
         </div>
       )}
 
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          {error}
+        </div>
+      )}
+
       {/* Review Form */}
       {showForm && (
         <form onSubmit={handleSubmit} className="mb-6 bg-gray-50 rounded-lg p-6">
           <h4 className="font-semibold text-secondary-900 mb-4">Write a Review for {productName}</h4>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Your Rating *</label>
             <StarRating
               rating={newReview.rating}
               interactive
@@ -164,46 +198,67 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
             />
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Your Name *</label>
+              <input
+                type="text"
+                value={newReview.authorName}
+                onChange={(e) => setNewReview({ ...newReview, authorName: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email (optional)</label>
+              <input
+                type="email"
+                value={newReview.authorEmail}
+                onChange={(e) => setNewReview({ ...newReview, authorEmail: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Company (optional)</label>
             <input
               type="text"
-              value={newReview.author}
-              onChange={(e) => setNewReview({ ...newReview, author: e.target.value })}
+              value={newReview.company}
+              onChange={(e) => setNewReview({ ...newReview, company: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              required
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Review Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Review Title (optional)</label>
             <input
               type="text"
               value={newReview.title}
               onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              required
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Your Review *</label>
             <textarea
               value={newReview.content}
               onChange={(e) => setNewReview({ ...newReview, content: e.target.value })}
               rows={4}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               required
+              minLength={10}
             />
           </div>
 
           <div className="flex gap-3">
             <button
               type="submit"
-              disabled={newReview.rating === 0}
+              disabled={newReview.rating === 0 || submitting}
               className="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Submit Review
+              {submitting ? 'Submitting...' : 'Submit Review'}
             </button>
             <button
               type="button"
@@ -217,34 +272,42 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
       )}
 
       {/* Reviews List */}
-      <div className="space-y-4">
-        {reviews.map((review) => (
-          <div key={review.id} className="border-b border-gray-200 pb-4">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <div className="flex items-center gap-2">
-                  <StarRating rating={review.rating} />
-                  {review.verified && (
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
-                      Verified Purchase
-                    </span>
+      {reviews.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">
+          <p>No reviews yet. Be the first to review this product!</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {reviews.map((review) => (
+            <div key={review.id} className="border-b border-gray-200 pb-4">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <StarRating rating={review.rating} />
+                    {review.verified_purchase && (
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
+                        Verified Purchase
+                      </span>
+                    )}
+                  </div>
+                  {review.title && (
+                    <h4 className="font-semibold text-secondary-900 mt-1">{review.title}</h4>
                   )}
                 </div>
-                <h4 className="font-semibold text-secondary-900 mt-1">{review.title}</h4>
+                <span className="text-sm text-gray-500">
+                  {new Date(review.created_at).toLocaleDateString('en-ZA', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </span>
               </div>
-              <span className="text-sm text-gray-500">
-                {new Date(review.date).toLocaleDateString('en-ZA', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </span>
+              <p className="text-gray-600 mb-2">{review.content}</p>
+              <p className="text-sm text-gray-500">By {review.author_name}</p>
             </div>
-            <p className="text-gray-600 mb-2">{review.content}</p>
-            <p className="text-sm text-gray-500">By {review.author}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

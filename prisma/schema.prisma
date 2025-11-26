@@ -45,6 +45,7 @@ model Product {
   category_id  Int
   order_items  OrderItem[]
   view_history ViewHistory[]
+  reviews      Review[]
 }
 
 model Category {
@@ -73,6 +74,7 @@ model User {
   orders              Order[]
   view_history        ViewHistory[]
   password_reset_tokens PasswordResetToken[]
+  reviews             Review[]
 }
 
 model Address {
@@ -165,4 +167,26 @@ model PasswordResetToken {
   created_at DateTime @default(now())
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id                  Int       @id @default(autoincrement())
+  product_id          Int?
+  user_id             Int?
+  author_name         String
+  author_email        String?
+  company             String?
+  role                String?
+  rating              Int
+  title               String?
+  content             String
+  status              String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  verified_purchase   Boolean   @default(false)
+  promoted_to_testimonial Boolean @default(false)
+  admin_notes         String?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  product Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  user    User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
 }

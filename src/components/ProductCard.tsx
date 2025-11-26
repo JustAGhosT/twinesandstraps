@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import type { Product, Category } from '@/types/database';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
+import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 
 interface ProductCardProps {
   product: Product & { category?: Category };
@@ -15,6 +16,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   const [isAdding, setIsAdding] = useState(false);
   const [showAdded, setShowAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const showPrices = useFeatureFlag('showPrices');
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -117,13 +119,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
         
         {/* Price and Add to Cart */}
         <div className="flex items-center justify-between mt-auto gap-2">
-          <div className="flex flex-col">
-            <span className="text-base font-bold text-primary-600">
-              R{product.price.toFixed(2)}
-            </span>
-            <span className="text-xs text-gray-400">per unit</span>
-          </div>
-          {showAddToCart && (
+          {showPrices ? (
+            <div className="flex flex-col">
+              <span className="text-base font-bold text-primary-600">
+                R{product.price.toFixed(2)}
+              </span>
+              <span className="text-xs text-gray-400">per unit</span>
+            </div>
+          ) : (
+            <a
+              href="/quote"
+              className="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline"
+            >
+              Request Quote
+            </a>
+          )}
+          {showAddToCart && showPrices && (
             <div className="flex items-center gap-1">
               {/* Decrement button */}
               <button
