@@ -37,7 +37,7 @@ const Header: React.FC = () => {
               <span className="text-primary-600 font-bold text-sm">TS</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-wide group-hover:text-primary-500 transition-colors">TASSA</span>
+              <span className="text-lg font-bold tracking-wide text-white group-hover:text-primary-500 transition-colors">TASSA</span>
               <span className="text-[10px] text-white/60 -mt-1 hidden sm:block">Boundless Strength</span>
             </div>
           </Link>
