@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminAuthProvider, useAdminAuth } from '@/contexts/AdminAuthContext';
 
@@ -20,10 +21,26 @@ const navItems = [
 function AdminSidebar() {
   const pathname = usePathname();
   const { logout } = useAdminAuth();
+  const [customLogoUrl, setCustomLogoUrl] = useState<string | null>(null);
 
   const handleLogout = async () => {
     await logout();
   };
+  
+  // Check for custom logo
+  useEffect(() => {
+    const checkLogo = async () => {
+      try {
+        const response = await fetch('/logo.svg', { method: 'HEAD' });
+        if (response.ok) {
+          setCustomLogoUrl('/logo.svg');
+        }
+      } catch {
+        // Logo doesn't exist, use default
+      }
+    };
+    checkLogo();
+  }, []);
 
   return (
     <aside
@@ -37,8 +54,19 @@ function AdminSidebar() {
           className="flex items-center gap-2"
           aria-label="TASSA Admin Dashboard"
         >
-          <div className="w-8 h-8 rounded-full border-2 border-primary-500 flex items-center justify-center bg-white">
-            <span className="text-primary-600 font-bold text-xs" aria-hidden="true">TS</span>
+          <div className="w-8 h-8 rounded-full border-2 border-primary-500 flex items-center justify-center bg-white overflow-hidden">
+            {customLogoUrl ? (
+              <Image
+                src={customLogoUrl}
+                alt="TASSA Logo"
+                width={24}
+                height={24}
+                className="object-contain"
+                unoptimized
+              />
+            ) : (
+              <span className="text-primary-600 font-bold text-xs" aria-hidden="true">TS</span>
+            )}
           </div>
           <span className="font-bold">TASSA Admin</span>
         </Link>
