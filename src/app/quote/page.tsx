@@ -44,7 +44,7 @@ export default function QuotePage() {
     if (hasItems) {
       message += `*Products Requested:*\n`;
       items.forEach((item, index) => {
-        message += `${index + 1}. ${item.product.name} (SKU: ${item.product.sku})\n`;
+        message += `${index + 1}. ${item.product.name}${item.product.sku ? ` (SKU: ${item.product.sku})` : ''}\n`;
         message += `   Qty: ${item.quantity} × R${item.product.price.toFixed(2)} = R${(item.product.price * item.quantity).toFixed(2)}\n`;
       });
       message += `\n*Subtotal: R${getTotalPrice().toFixed(2)}*\n`;
@@ -56,7 +56,12 @@ export default function QuotePage() {
     }
 
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+    const popup = window.open(whatsappUrl, '_blank');
+
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      // Popup was blocked - provide fallback
+      window.location.href = whatsappUrl;
+    }
     setIsSubmitting(false);
   };
 

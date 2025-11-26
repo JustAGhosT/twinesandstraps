@@ -26,7 +26,13 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const stored = localStorage.getItem(WISHLIST_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        setItems(parsed);
+        // Rehydrate date fields from strings to Date objects
+        const rehydrated = parsed.map((item: Record<string, unknown>) => ({
+          ...item,
+          created_at: item.created_at ? new Date(item.created_at as string) : new Date(),
+          updated_at: item.updated_at ? new Date(item.updated_at as string) : new Date(),
+        }));
+        setItems(rehydrated);
       }
     } catch (error) {
       console.error('Error loading wishlist:', error);

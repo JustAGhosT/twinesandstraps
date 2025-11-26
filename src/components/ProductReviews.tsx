@@ -88,7 +88,10 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
   const [newReview, setNewReview] = useState({ rating: 0, title: '', content: '', author: '' });
   const [submitted, setSubmitted] = useState(false);
 
-  const averageRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
+  const totalReviews = reviews.length;
+  const averageRating = totalReviews > 0
+    ? reviews.reduce((acc, r) => acc + r.rating, 0) / totalReviews
+    : 0;
   const ratingCounts = [5, 4, 3, 2, 1].map(
     (rating) => reviews.filter((r) => r.rating === rating).length
   );
@@ -121,7 +124,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
                 <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-yellow-400 rounded-full"
-                    style={{ width: `${(ratingCounts[index] / reviews.length) * 100}%` }}
+                    style={{ width: `${totalReviews > 0 ? (ratingCounts[index] / totalReviews) * 100 : 0}%` }}
                   />
                 </div>
                 <span className="text-sm text-gray-500 w-8">{ratingCounts[index]}</span>

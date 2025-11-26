@@ -21,14 +21,17 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
   const [addedId, setAddedId] = useState<number | null>(null);
 
   useEffect(() => {
-    // Fetch products from the API
     fetch('/api/products/featured')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch products');
+        return res.json();
+      })
       .then(data => {
         setProducts(data.slice(0, maxProducts));
         setLoading(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error fetching recommended products:', error);
         setLoading(false);
       });
   }, [maxProducts]);
