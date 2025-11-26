@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import type { Product } from '@prisma/client';
 import { useCart } from '@/contexts/CartContext';
 import Image from 'next/image';
+import WishlistButton from '@/components/WishlistButton';
+import CompareButton from '@/components/CompareButton';
+import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 
 interface ProductViewProps {
   product: Product;
@@ -15,6 +18,8 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const [isZoomed, setIsZoomed] = useState(false);
   const { addToCart } = useCart();
   const totalPrice = product.price * quantity;
+  const showWishlist = useFeatureFlag('wishlist');
+  const showCompare = useFeatureFlag('compareProducts');
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
@@ -142,7 +147,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
             )}
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <button 
+            <button
               onClick={handleAddToCart}
               disabled={isOutOfStock}
               className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors ${
@@ -160,6 +165,13 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
               Request Quote
             </a>
           </div>
+          {/* Wishlist and Compare Buttons */}
+          {(showWishlist || showCompare) && (
+            <div className="flex gap-2 mt-3">
+              {showWishlist && <WishlistButton product={product} variant="button" />}
+              {showCompare && <CompareButton product={product} variant="button" />}
+            </div>
+          )}
           {showAddedToCart && (
             <div className="mt-3 p-3 bg-green-100 text-green-800 rounded-lg text-sm font-semibold">
               ✓ Added to cart successfully!
