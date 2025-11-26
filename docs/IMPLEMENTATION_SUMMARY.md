@@ -63,7 +63,7 @@ This document summarizes the changes made to the Twines and Straps SA website to
 6. **.env.example**
    - Added `NEXT_PUBLIC_WHATSAPP_NUMBER` configuration
 
-6. **docs/CHANGELOG.md**
+7. **docs/CHANGELOG.md**
    - Created to document all changes
 
 ### Configuration Required
