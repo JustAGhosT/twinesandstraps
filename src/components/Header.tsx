@@ -3,13 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
+import { useUserAuth } from '@/contexts/UserAuthContext';
 import SearchBar from '@/components/SearchBar';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 
 const Header: React.FC = () => {
   const { getTotalItems } = useCart();
+  const { user, isAuthenticated, logout } = useUserAuth();
   const totalItems = getTotalItems();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const showSearchBar = useFeatureFlag('searchBar');
 
@@ -71,8 +74,8 @@ const Header: React.FC = () => {
             {showSearchBar && <SearchBar />}
 
             {/* CTA Button - Desktop only */}
-            <Link 
-              href="/quote" 
+            <Link
+              href="/quote"
               className="hidden lg:flex items-center gap-2 bg-primary-600 hover:bg-primary-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-primary-600/40"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,6 +83,58 @@ const Header: React.FC = () => {
               </svg>
               Get Quote
             </Link>
+
+            {/* User Account */}
+            {isAuthenticated ? (
+              <div className="relative hidden md:block">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-2 p-2 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300"
+                  aria-label="User menu"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-sm font-semibold">
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <svg className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
+                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                    </div>
+                    <Link
+                      href="/wishlist"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      My Wishlist
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setUserMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="hidden md:flex items-center gap-2 p-2 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span className="text-sm">Sign In</span>
+              </Link>
+            )}
 
             {/* Cart */}
             <Link href="/cart" className="relative p-2 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-300">
@@ -120,9 +175,9 @@ const Header: React.FC = () => {
                 { href: '/about', label: 'About' },
                 { href: '/contact', label: 'Contact' },
               ].map((link) => (
-                <Link 
+                <Link
                   key={link.href}
-                  href={link.href} 
+                  href={link.href}
                   className="px-4 py-3 text-white/90 hover:bg-white/10 hover:text-white rounded-lg transition-all duration-300 flex items-center gap-3"
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -130,8 +185,54 @@ const Header: React.FC = () => {
                   {link.label}
                 </Link>
               ))}
-              <Link 
-                href="/quote" 
+
+              {/* User section in mobile menu */}
+              {isAuthenticated ? (
+                <>
+                  <div className="px-4 py-3 border-t border-white/10 mt-2">
+                    <p className="text-sm text-white/60">Signed in as</p>
+                    <p className="text-white font-medium">{user?.name}</p>
+                  </div>
+                  <Link
+                    href="/wishlist"
+                    className="px-4 py-3 text-white/90 hover:bg-white/10 hover:text-white rounded-lg transition-all duration-300 flex items-center gap-3"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary-600" />
+                    My Wishlist
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="px-4 py-3 text-red-400 hover:bg-white/10 rounded-lg transition-all duration-300 flex items-center gap-3 w-full text-left"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <div className="flex gap-2 mx-4 mt-2">
+                  <Link
+                    href="/login"
+                    className="flex-1 flex items-center justify-center gap-2 border border-white/20 text-white font-semibold px-4 py-3 rounded-lg transition-all duration-300 hover:bg-white/10"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="flex-1 flex items-center justify-center gap-2 bg-white/10 text-white font-semibold px-4 py-3 rounded-lg transition-all duration-300 hover:bg-white/20"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </div>
+              )}
+
+              <Link
+                href="/quote"
                 className="mx-4 mt-2 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-500 text-white font-semibold px-4 py-3 rounded-lg transition-all duration-300"
                 onClick={() => setMobileMenuOpen(false)}
               >

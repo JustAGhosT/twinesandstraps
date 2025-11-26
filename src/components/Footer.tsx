@@ -1,9 +1,34 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import NewsletterSignup from '@/components/NewsletterSignup';
 import { featureFlags } from '@/config/featureFlags';
 
 const Footer: React.FC = () => {
+  const router = useRouter();
+  const [clickCount, setClickCount] = useState(0);
+  const [lastClickTime, setLastClickTime] = useState(0);
+
+  // Hidden admin access - click logo 5 times quickly
+  const handleLogoClick = () => {
+    const now = Date.now();
+    if (now - lastClickTime > 2000) {
+      // Reset if more than 2 seconds since last click
+      setClickCount(1);
+    } else {
+      setClickCount(prev => prev + 1);
+    }
+    setLastClickTime(now);
+
+    if (clickCount >= 4) {
+      // 5th click
+      setClickCount(0);
+      router.push('/admin/login');
+    }
+  };
+
   return (
     <footer className="bg-secondary-900 text-white mt-auto">
       <div className="container mx-auto px-4 py-8">
@@ -11,12 +36,16 @@ const Footer: React.FC = () => {
           featureFlags.newsletterSignup ? 'lg:grid-cols-4' : 'lg:grid-cols-3'
         }`}>
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <button
+              onClick={handleLogoClick}
+              className="flex items-center gap-2 mb-4 cursor-default select-none"
+              aria-label="TASSA"
+            >
               <div className="w-8 h-8 rounded-full border-2 border-primary-600 flex items-center justify-center bg-white">
                 <span className="text-primary-600 font-bold text-xs">TS</span>
               </div>
               <h3 className="text-lg font-semibold">TASSA</h3>
-            </div>
+            </button>
             <p className="text-gray-400 text-sm mb-2">
               Twines and Straps SA (Pty) Ltd
             </p>
