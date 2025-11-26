@@ -13,12 +13,10 @@ export function middleware(request: NextRequest) {
   }
 
   // Allow public admin routes (login page)
+  // Note: We don't redirect away from login even if a cookie exists, because
+  // the cookie may be expired or invalid. Let the client-side AdminAuthContext
+  // handle the redirect after verifying with the server.
   if (PUBLIC_ADMIN_ROUTES.some(route => pathname.startsWith(route))) {
-    // If already logged in, redirect to dashboard
-    const session = request.cookies.get('admin_session');
-    if (session?.value) {
-      return NextResponse.redirect(new URL('/admin', request.url));
-    }
     return NextResponse.next();
   }
 
