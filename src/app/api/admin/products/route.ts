@@ -5,7 +5,7 @@ import { createProductSchema, validateBody, formatZodErrors } from '@/lib/valida
 
 export async function POST(request: NextRequest) {
   // Verify admin authentication
-  const authError = requireAdminAuth(request);
+  const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
   try {

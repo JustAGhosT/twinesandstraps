@@ -4,19 +4,21 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import RecommendedProducts from '@/components/RecommendedProducts';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
+  const { settings } = useSiteSettings();
   const showRecommendedProducts = useFeatureFlag('recommendedProducts');
 
   const handleSendToWhatsApp = () => {
-    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+    const whatsappNumber = settings.whatsappNumber;
     
     // Validate WhatsApp number is configured
     if (!whatsappNumber || whatsappNumber === '27XXXXXXXXX') {
-      alert('WhatsApp number not configured. Please contact us at info@twinesandstraps.co.za');
+      alert(`WhatsApp number not configured. Please contact us at ${settings.email}`);
       return;
     }
 

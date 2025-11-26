@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/admin/reviews - Get all reviews with filters
  */
 export async function GET(request: NextRequest) {
-  const authError = requireAdminAuth(request);
+  const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
   try {

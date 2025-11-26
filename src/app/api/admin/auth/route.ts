@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     // Success - clear failed attempts and create session
     clearLoginAttempts(ip);
-    const session = createSession();
+    const session = await createSession();
 
     const response = NextResponse.json({
       success: true,
@@ -98,7 +98,7 @@ export async function DELETE(request: NextRequest) {
   const token = getSessionToken(request);
 
   if (token) {
-    invalidateSession(token);
+    await invalidateSession(token);
   }
 
   const response = NextResponse.json({ success: true });

@@ -1,14 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 
 const WhatsAppButton: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '27XXXXXXXXX';
+  const { settings } = useSiteSettings();
+  const whatsappNumber = settings.whatsappNumber || '27XXXXXXXXX';
 
   const handleClick = () => {
     if (whatsappNumber === '27XXXXXXXXX') {
-      alert('WhatsApp number not configured. Please contact us at info@twinesandstraps.co.za');
+      alert(`WhatsApp number not configured. Please contact us at ${settings.email}`);
       return;
     }
     const message = encodeURIComponent('Hi! I would like to inquire about your products.');

@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
+import prisma from '@/lib/prisma';
 
-// In-memory session store (use Redis in production)
-const sessions = new Map<string, { expiry: number; createdAt: number }>();
-
-// Rate limiting store
+// Rate limiting store (kept in memory - acceptable for short-term rate limiting)
 const loginAttempts = new Map<string, { count: number; resetAt: number }>();
 
 const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
@@ -75,57 +73,78 @@ export function clearLoginAttempts(ip: string): void {
 }
 
 /**
- * Create a new admin session
+ * Create a new admin session in the database
  */
-export function createSession(): { token: string; expiry: number } {
+export async function createSession(): Promise<{ token: string; expiry: number }> {
   const token = uuidv4();
-  const expiry = Date.now() + SESSION_DURATION;
+  const expiryDate = new Date(Date.now() + SESSION_DURATION);
 
-  sessions.set(token, {
-    expiry,
-    createdAt: Date.now(),
+  await prisma.adminSession.create({
+    data: {
+      token,
+      expires_at: expiryDate,
+    },
   });
 
-  // Cleanup old sessions
-  cleanupSessions();
+  // Cleanup old sessions periodically (non-blocking)
+  cleanupSessions().catch(console.error);
 
-  return { token, expiry };
+  return { token, expiry: expiryDate.getTime() };
 }
 
 /**
- * Verify an admin session token
+ * Verify an admin session token against the database
  */
-export function verifySession(token: string | null): boolean {
+export async function verifySession(token: string | null): Promise<boolean> {
   if (!token) return false;
 
-  const session = sessions.get(token);
-  if (!session) return false;
+  try {
+    const session = await prisma.adminSession.findUnique({
+      where: { token },
+    });
 
-  if (Date.now() > session.expiry) {
-    sessions.delete(token);
+    if (!session) return false;
+
+    if (new Date() > session.expires_at) {
+      // Delete expired session
+      await prisma.adminSession.delete({ where: { token } }).catch(() => {});
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error verifying session:', error);
     return false;
   }
-
-  return true;
 }
 
 /**
- * Invalidate a session (logout)
+ * Invalidate a session (logout) - removes from database
  */
-export function invalidateSession(token: string): void {
-  sessions.delete(token);
+export async function invalidateSession(token: string): Promise<void> {
+  try {
+    await prisma.adminSession.delete({ where: { token } });
+  } catch (error) {
+    // Session may not exist, which is fine
+    console.error('Error invalidating session:', error);
+  }
 }
 
 /**
- * Cleanup expired sessions
+ * Cleanup expired sessions from the database
  */
-function cleanupSessions(): void {
-  const now = Date.now();
-  sessions.forEach((session, token) => {
-    if (now > session.expiry) {
-      sessions.delete(token);
-    }
-  });
+async function cleanupSessions(): Promise<void> {
+  try {
+    await prisma.adminSession.deleteMany({
+      where: {
+        expires_at: {
+          lt: new Date(),
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error cleaning up sessions:', error);
+  }
 }
 
 /**
@@ -144,13 +163,14 @@ export function getSessionToken(request: NextRequest): string | null {
 }
 
 /**
- * Middleware helper to verify admin authentication
+ * Middleware helper to verify admin authentication (async)
  * Returns null if authenticated, or an error response if not
  */
-export function requireAdminAuth(request: NextRequest): NextResponse | null {
+export async function requireAdminAuth(request: NextRequest): Promise<NextResponse | null> {
   const token = getSessionToken(request);
 
-  if (!verifySession(token)) {
+  const isValid = await verifySession(token);
+  if (!isValid) {
     return NextResponse.json(
       { error: 'Unauthorized. Please log in.' },
       { status: 401 }
