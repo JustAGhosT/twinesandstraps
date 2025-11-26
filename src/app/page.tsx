@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import prisma from '@/lib/prisma';
 import ProductCard from '@/components/ProductCard';
 
@@ -213,17 +214,64 @@ export default async function Home() {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center text-secondary-900">Shop by Category</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {categories.map((category) => (
-              <Link 
-                key={category.id}
-                href={`/products?category=${category.slug}`}
-                className="bg-white p-8 rounded-xl shadow-sm hover:shadow-lg transition-all text-center border-l-4 border-primary-600 group"
-              >
-                <h3 className="text-xl font-semibold mb-2 text-secondary-900 group-hover:text-primary-600 transition-colors">{category.name}</h3>
-                <p className="text-primary-600 hover:text-primary-700">Browse products →</p>
-              </Link>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {categories.map((category) => {
+              // Category-specific images and icons
+              const categoryData: Record<string, { image: string; icon: string; description: string }> = {
+                'twines': {
+                  image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
+                  icon: '🧵',
+                  description: 'High-quality twines for agricultural and industrial use'
+                },
+                'ropes': {
+                  image: 'https://images.unsplash.com/photo-1504280645497-4a3adfe6ade0?w=400&h=300&fit=crop',
+                  icon: '🪢',
+                  description: 'Durable ropes for all applications'
+                },
+                'natural-ropes': {
+                  image: 'https://images.unsplash.com/photo-1519638831568-d9897f54ed69?w=400&h=300&fit=crop',
+                  icon: '🌿',
+                  description: 'Eco-friendly natural fiber ropes'
+                }
+              };
+              const data = categoryData[category.slug] || {
+                image: 'https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=400&h=300&fit=crop',
+                icon: '📦',
+                description: 'Quality products for your needs'
+              };
+
+              return (
+                <Link
+                  key={category.id}
+                  href={`/products?category=${category.slug}`}
+                  className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all overflow-hidden group"
+                >
+                  <div className="relative h-40 bg-gray-200 overflow-hidden">
+                    <Image
+                      src={data.image}
+                      alt={category.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <span className="text-2xl mb-1 block">{data.icon}</span>
+                      <h3 className="text-xl font-bold text-white">{category.name}</h3>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-sm text-gray-600 mb-2">{data.description}</p>
+                    <span className="text-primary-600 font-medium text-sm group-hover:text-primary-700 inline-flex items-center gap-1">
+                      Browse products
+                      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

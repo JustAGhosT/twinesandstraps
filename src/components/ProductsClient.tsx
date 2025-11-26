@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import type { Product, Category } from '@prisma/client';
 import ProductCard from '@/components/ProductCard';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 type ProductWithCategory = Product & { category: Category };
 
@@ -16,9 +17,37 @@ type SortOption = 'newest' | 'price-low' | 'price-high' | 'name-asc' | 'name-des
 
 export default function ProductsClient({ products, categories }: ProductsClientProps) {
   const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('search') || '';
+  const categoryFilter = searchParams.get('category') || '';
+
+  // Filter products by search query and category
+  const filteredProducts = useMemo(() => {
+    let filtered = [...products];
+
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(query) ||
+        product.description.toLowerCase().includes(query) ||
+        product.sku.toLowerCase().includes(query) ||
+        (product.material && product.material.toLowerCase().includes(query))
+      );
+    }
+
+    // Filter by category
+    if (categoryFilter) {
+      filtered = filtered.filter(product =>
+        product.category?.slug === categoryFilter
+      );
+    }
+
+    return filtered;
+  }, [products, searchQuery, categoryFilter]);
 
   const sortedProducts = useMemo(() => {
-    const sorted = [...products];
+    const sorted = [...filteredProducts];
     switch (sortBy) {
       case 'price-low':
         return sorted.sort((a, b) => a.price - b.price);
@@ -32,7 +61,7 @@ export default function ProductsClient({ products, categories }: ProductsClientP
       default:
         return sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
-  }, [products, sortBy]);
+  }, [filteredProducts, sortBy]);
 
   // Count products per category
   const categoryProductCounts = useMemo(() => {
@@ -50,10 +79,20 @@ export default function ProductsClient({ products, categories }: ProductsClientP
       {/* Hero Banner */}
       <div className="bg-primary-600 text-white py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-2">Our Products</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            {searchQuery ? `Search Results for "${searchQuery}"` : 'Our Products'}
+          </h1>
           <p className="text-white/80">
-            Quality ropes, twines, and straps for every application. From industrial to agricultural use.
+            {searchQuery
+              ? `Found ${sortedProducts.length} product${sortedProducts.length !== 1 ? 's' : ''} matching your search.`
+              : 'Quality ropes, twines, and straps for every application. From industrial to agricultural use.'
+            }
           </p>
+          {searchQuery && (
+            <Link href="/products" className="inline-block mt-3 text-sm bg-white/20 hover:bg-white/30 px-4 py-1.5 rounded-full transition-colors">
+              Clear search
+            </Link>
+          )}
         </div>
       </div>
 
@@ -81,28 +120,36 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                 </div>
                 <ul className="space-y-1">
                   <li>
-                    <Link 
-                      href="/products" 
-                      className="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-primary-600 bg-primary-50"
+                    <Link
+                      href="/products"
+                      className={`flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                        !categoryFilter && !searchQuery
+                          ? 'text-primary-600 bg-primary-50'
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
                     >
                       <span className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary-500"></span>
+                        <span className={`w-1.5 h-1.5 rounded-full ${!categoryFilter && !searchQuery ? 'bg-primary-500' : 'bg-gray-400'}`}></span>
                         All Products
                       </span>
-                      <span className="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full">{products.length}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${!categoryFilter && !searchQuery ? 'bg-primary-100 text-primary-700' : 'text-gray-400'}`}>{products.length}</span>
                     </Link>
                   </li>
                   {categories.map((category) => (
                     <li key={category.id}>
-                      <Link 
+                      <Link
                         href={`/products?category=${category.slug}`}
-                        className="flex items-center justify-between px-3 py-2 rounded-md text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+                        className={`flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
+                          categoryFilter === category.slug
+                            ? 'text-primary-600 bg-primary-50 font-medium'
+                            : 'text-gray-600 hover:bg-gray-50'
+                        }`}
                       >
                         <span className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                          <span className={`w-1.5 h-1.5 rounded-full ${categoryFilter === category.slug ? 'bg-primary-500' : 'bg-gray-400'}`}></span>
                           {category.name}
                         </span>
-                        <span className="text-xs text-gray-400">{categoryProductCounts[category.slug] || 0}</span>
+                        <span className={`text-xs ${categoryFilter === category.slug ? 'bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full' : 'text-gray-400'}`}>{categoryProductCounts[category.slug] || 0}</span>
                       </Link>
                     </li>
                   ))}

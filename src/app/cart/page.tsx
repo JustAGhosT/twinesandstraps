@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 
 export default function CartPage() {
@@ -49,7 +50,7 @@ export default function CartPage() {
             </svg>
             <h2 className="text-2xl font-semibold mb-2 text-gray-900">Your cart is empty</h2>
             <p className="text-gray-600 mb-6">Add some products to get started</p>
-            <Link href="/products" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+            <Link href="/products" className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors">
               Browse Products
             </Link>
           </div>
@@ -70,12 +71,26 @@ export default function CartPage() {
               {items.map((item) => (
                 <div key={item.product.id} className="p-6 border-b last:border-b-0">
                   <div className="flex gap-4">
-                    <div className="w-24 h-24 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center">
-                      <span className="text-gray-400 text-sm">Image</span>
+                    <div className="w-24 h-24 bg-gray-100 rounded flex-shrink-0 relative overflow-hidden">
+                      {item.product.image_url ? (
+                        <Image
+                          src={item.product.image_url}
+                          alt={item.product.name}
+                          fill
+                          className="object-cover"
+                          sizes="96px"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="flex-grow">
-                      <Link href={`/products/${item.product.id}`} className="text-lg font-semibold hover:text-blue-600">
+                      <Link href={`/products/${item.product.id}`} className="text-lg font-semibold hover:text-primary-600">
                         {item.product.name}
                       </Link>
                       <p className="text-sm text-gray-600 mt-1">SKU: {item.product.sku}</p>
@@ -133,20 +148,41 @@ export default function CartPage() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
               <h2 className="text-xl font-bold mb-4">Order Summary</h2>
-              
-              <div className="space-y-3 mb-6">
-                <div className="flex justify-between text-gray-600">
-                  <span>Items ({items.reduce((sum, item) => sum + item.quantity, 0)})</span>
-                  <span>ZAR {getTotalPrice().toFixed(2)}</span>
-                </div>
-              </div>
 
-              <div className="border-t pt-4 mb-6">
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Total</span>
-                  <span>ZAR {getTotalPrice().toFixed(2)}</span>
-                </div>
-              </div>
+              {(() => {
+                const subtotal = getTotalPrice();
+                const vatRate = 0.15; // South African VAT rate
+                const vatAmount = subtotal * vatRate;
+                const total = subtotal + vatAmount;
+                const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+                return (
+                  <>
+                    <div className="space-y-3 mb-4">
+                      <div className="flex justify-between text-gray-600">
+                        <span>Items ({itemCount})</span>
+                        <span>R {subtotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600">
+                        <span>Subtotal (excl. VAT)</span>
+                        <span>R {subtotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600">
+                        <span>VAT (15%)</span>
+                        <span>R {vatAmount.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-4 mb-2">
+                      <div className="flex justify-between text-lg font-bold">
+                        <span>Total (incl. VAT)</span>
+                        <span>R {total.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-6">* Final quote may vary based on quantity and delivery</p>
+                  </>
+                );
+              })()}
 
               <button
                 onClick={handleSendToWhatsApp}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
+import SearchBar from '@/components/SearchBar';
 
 const Header: React.FC = () => {
   const { getTotalItems } = useCart();
@@ -47,6 +48,7 @@ const Header: React.FC = () => {
             {[
               { href: '/', label: 'Home' },
               { href: '/products', label: 'Products' },
+              { href: '/about', label: 'About' },
               { href: '/quote', label: 'Request Quote' },
               { href: '/contact', label: 'Contact' },
             ].map((link) => (
@@ -63,6 +65,9 @@ const Header: React.FC = () => {
 
           {/* Right Actions */}
           <div className="flex items-center space-x-3">
+            {/* Search */}
+            <SearchBar />
+
             {/* CTA Button - Desktop only */}
             <Link 
               href="/quote" 
@@ -110,6 +115,7 @@ const Header: React.FC = () => {
               {[
                 { href: '/', label: 'Home' },
                 { href: '/products', label: 'Products' },
+                { href: '/about', label: 'About' },
                 { href: '/contact', label: 'Contact' },
               ].map((link) => (
                 <Link 
