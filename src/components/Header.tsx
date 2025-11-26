@@ -3,12 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
+import SearchBar from '@/components/SearchBar';
+import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 
 const Header: React.FC = () => {
   const { getTotalItems } = useCart();
   const totalItems = getTotalItems();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const showSearchBar = useFeatureFlag('searchBar');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,6 +50,7 @@ const Header: React.FC = () => {
             {[
               { href: '/', label: 'Home' },
               { href: '/products', label: 'Products' },
+              { href: '/about', label: 'About' },
               { href: '/quote', label: 'Request Quote' },
               { href: '/contact', label: 'Contact' },
             ].map((link) => (
@@ -63,6 +67,9 @@ const Header: React.FC = () => {
 
           {/* Right Actions */}
           <div className="flex items-center space-x-3">
+            {/* Search */}
+            {showSearchBar && <SearchBar />}
+
             {/* CTA Button - Desktop only */}
             <Link 
               href="/quote" 
@@ -110,6 +117,7 @@ const Header: React.FC = () => {
               {[
                 { href: '/', label: 'Home' },
                 { href: '/products', label: 'Products' },
+                { href: '/about', label: 'About' },
                 { href: '/contact', label: 'Contact' },
               ].map((link) => (
                 <Link 

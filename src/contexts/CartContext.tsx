@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { Product } from '@prisma/client';
+import type { Product } from '@/types/database';
 
 interface CartItem {
   product: Product;

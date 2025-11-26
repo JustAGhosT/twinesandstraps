@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import type { Product } from '@prisma/client';
+import type { Product } from '@/types/database';
 import { useCart } from '@/contexts/CartContext';
 import Image from 'next/image';
+import WishlistButton from '@/components/WishlistButton';
+import CompareButton from '@/components/CompareButton';
+import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 
 interface ProductViewProps {
   product: Product;
@@ -12,8 +15,11 @@ interface ProductViewProps {
 const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const [showAddedToCart, setShowAddedToCart] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
   const { addToCart } = useCart();
   const totalPrice = product.price * quantity;
+  const showWishlist = useFeatureFlag('wishlist');
+  const showCompare = useFeatureFlag('compareProducts');
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
@@ -37,23 +43,63 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const isOutOfStock = product.stock_status === 'OUT_OF_STOCK';
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div>
-        <div className="aspect-square bg-gray-200 rounded-lg flex items-center justify-center relative overflow-hidden">
-          {product.image_url ? (
+    <>
+      {/* Image Zoom Modal */}
+      {isZoomed && product.image_url && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-zoom-out"
+          onClick={() => setIsZoomed(false)}
+        >
+          <button
+            onClick={() => setIsZoomed(false)}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
+            aria-label="Close zoom"
+          >
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div className="relative w-full max-w-4xl aspect-square">
             <Image
               src={product.image_url}
               alt={product.name}
               fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-contain"
+              sizes="100vw"
               priority
             />
-          ) : (
-            <span className="text-gray-500 text-lg">No Image Available</span>
-          )}
+          </div>
         </div>
-      </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <div
+            className={`aspect-square bg-gray-200 rounded-lg flex items-center justify-center relative overflow-hidden ${product.image_url ? 'cursor-zoom-in group' : ''}`}
+            onClick={() => product.image_url && setIsZoomed(true)}
+          >
+            {product.image_url ? (
+              <>
+                <Image
+                  src={product.image_url}
+                  alt={product.name}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
+                />
+                <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                  </svg>
+                  Click to zoom
+                </div>
+              </>
+            ) : (
+              <span className="text-gray-500 text-lg">No Image Available</span>
+            )}
+          </div>
+        </div>
       <div>
         <div className="mb-4">
           {getStockBadge()}
@@ -101,24 +147,31 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
             )}
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <button 
+            <button
               onClick={handleAddToCart}
               disabled={isOutOfStock}
               className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors ${
-                isOutOfStock 
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                isOutOfStock
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-primary-600 text-white hover:bg-primary-700'
               }`}
             >
               {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
             </button>
-            <a 
+            <a
               href="/quote"
-              className="flex-1 py-3 px-6 rounded-lg font-semibold border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-colors text-center"
+              className="flex-1 py-3 px-6 rounded-lg font-semibold border-2 border-primary-600 text-primary-600 hover:bg-primary-50 transition-colors text-center"
             >
               Request Quote
             </a>
           </div>
+          {/* Wishlist and Compare Buttons */}
+          {(showWishlist || showCompare) && (
+            <div className="flex gap-2 mt-3">
+              {showWishlist && <WishlistButton product={product} variant="button" />}
+              {showCompare && <CompareButton product={product} variant="button" />}
+            </div>
+          )}
           {showAddedToCart && (
             <div className="mt-3 p-3 bg-green-100 text-green-800 rounded-lg text-sm font-semibold">
               ✓ Added to cart successfully!
@@ -162,6 +215,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

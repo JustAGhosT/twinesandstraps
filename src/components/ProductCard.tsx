@@ -1,14 +1,35 @@
 'use client';
 
-import React from 'react';
-import type { Product, Category } from '@prisma/client';
+import React, { useState } from 'react';
+import type { Product, Category } from '@/types/database';
 import Image from 'next/image';
+import { useCart } from '@/contexts/CartContext';
 
 interface ProductCardProps {
   product: Product & { category?: Category };
+  showAddToCart?: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true }) => {
+  const { addToCart } = useCart();
+  const [isAdding, setIsAdding] = useState(false);
+  const [showAdded, setShowAdded] = useState(false);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (product.stock_status === 'OUT_OF_STOCK') return;
+
+    setIsAdding(true);
+    addToCart(product, 1);
+    setTimeout(() => {
+      setIsAdding(false);
+      setShowAdded(true);
+      setTimeout(() => setShowAdded(false), 1500);
+    }, 200);
+  };
+
+  const isOutOfStock = product.stock_status === 'OUT_OF_STOCK';
   const getStockBadge = () => {
     switch (product.stock_status) {
       case 'IN_STOCK':
@@ -78,12 +99,50 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           )}
         </div>
         
-        {/* Price */}
-        <div className="flex items-baseline gap-2 mt-auto">
-          <span className="text-base font-bold text-primary-600">
-            R{product.price.toFixed(2)}
-          </span>
-          <span className="text-xs text-gray-400">per unit</span>
+        {/* Price and Add to Cart */}
+        <div className="flex items-center justify-between mt-auto gap-2">
+          <div className="flex flex-col">
+            <span className="text-base font-bold text-primary-600">
+              R{product.price.toFixed(2)}
+            </span>
+            <span className="text-xs text-gray-400">per unit</span>
+          </div>
+          {showAddToCart && (
+            <button
+              onClick={handleAddToCart}
+              disabled={isOutOfStock || isAdding}
+              className={`relative px-3 py-1.5 rounded text-xs font-semibold transition-all ${
+                isOutOfStock
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : showAdded
+                  ? 'bg-green-500 text-white'
+                  : 'bg-primary-600 text-white hover:bg-primary-700 active:scale-95'
+              }`}
+            >
+              {isAdding ? (
+                <span className="flex items-center gap-1">
+                  <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                </span>
+              ) : showAdded ? (
+                <span className="flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Added
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Add
+                </span>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>
