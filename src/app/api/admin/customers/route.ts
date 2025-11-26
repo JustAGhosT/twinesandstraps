@@ -67,23 +67,29 @@ export async function GET(request: NextRequest) {
       prisma.user.count({ where }),
     ]);
 
-    // Calculate total spent for each customer
-    const customersWithStats = await Promise.all(
-      (customers as CustomerResult[]).map(async (customer: CustomerResult) => {
-        const orderStats = await prisma.order.aggregate({
-          where: {
-            user_id: customer.id,
-            status: { not: 'CANCELLED' },
-          },
-          _sum: { total: true },
-        });
+    // Get customer IDs for the batch query
+    const customerIds = (customers as CustomerResult[]).map(c => c.id);
 
-        return {
-          ...customer,
-          total_spent: orderStats._sum.total || 0,
-        };
-      })
+    // Batch query to get total spent for all customers at once (fixes N+1 query)
+    const orderTotals = await prisma.order.groupBy({
+      by: ['user_id'],
+      where: {
+        user_id: { in: customerIds },
+        status: { not: 'CANCELLED' },
+      },
+      _sum: { total: true },
+    });
+
+    // Create a map for quick lookup
+    const totalSpentMap = new Map(
+      orderTotals.map(ot => [ot.user_id, ot._sum.total || 0])
     );
+
+    // Merge totals with customer data
+    const customersWithStats = (customers as CustomerResult[]).map(customer => ({
+      ...customer,
+      total_spent: totalSpentMap.get(customer.id) || 0,
+    }));
 
     return NextResponse.json({
       customers: customersWithStats,

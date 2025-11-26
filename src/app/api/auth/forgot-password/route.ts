@@ -43,12 +43,15 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // In production, send email here
-      // For now, log the reset URL (development only)
+      // Build reset URL
       const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
-      console.log(`[DEV] Password reset link for ${email}: ${resetUrl}`);
 
-      // TODO: Send email with reset link
+      // Only log reset URL in development (security: never log tokens in production)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[DEV] Password reset link for ${email}: ${resetUrl}`);
+      }
+
+      // TODO: Send email with reset link in production
       // await sendPasswordResetEmail(user.email, user.name, resetUrl);
     }
 

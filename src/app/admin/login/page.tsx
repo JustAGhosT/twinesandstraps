@@ -26,9 +26,9 @@ function AdminLoginForm() {
       // Redirect to original page or dashboard
       const from = searchParams.get('from') || '/admin';
       router.push(from);
-    } else {
-      setError(authError || 'Invalid password');
     }
+    // Note: authError from context will be displayed via the JSX below
+    // Don't capture authError here as it may have stale value
   };
 
   return (

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminAuthProvider, useAdminAuth } from '@/contexts/AdminAuthContext';
@@ -128,35 +128,26 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   // Login page doesn't need the admin layout wrapper
   const isLoginPage = pathname === '/admin/login';
 
+  // Redirect to login if not authenticated (must be in useEffect to avoid calling during render)
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated && !isLoginPage) {
+      router.push(`/admin/login?from=${encodeURIComponent(pathname)}`);
+    }
+  }, [isLoading, isAuthenticated, isLoginPage, pathname, router]);
+
   if (isLoginPage) {
     return <>{children}</>;
   }
 
-  if (isLoading) {
+  if (isLoading || !isAuthenticated) {
     return (
       <div
         className="min-h-screen bg-gray-100 flex items-center justify-center"
         role="status"
-        aria-label="Loading admin panel"
+        aria-label={isLoading ? "Loading admin panel" : "Redirecting to login"}
       >
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" aria-hidden="true"></div>
-        <span className="sr-only">Loading...</span>
-      </div>
-    );
-  }
-
-  // If not authenticated, redirect to login (middleware should handle this,
-  // but this is a fallback for client-side navigation)
-  if (!isAuthenticated) {
-    router.push(`/admin/login?from=${encodeURIComponent(pathname)}`);
-    return (
-      <div
-        className="min-h-screen bg-gray-100 flex items-center justify-center"
-        role="status"
-        aria-label="Redirecting to login"
-      >
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" aria-hidden="true"></div>
-        <span className="sr-only">Redirecting...</span>
+        <span className="sr-only">{isLoading ? "Loading..." : "Redirecting..."}</span>
       </div>
     );
   }

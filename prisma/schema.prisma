@@ -131,7 +131,7 @@ model OrderItem {
   total_price  Float
 
   order   Order   @relation(fields: [order_id], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [product_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id], onDelete: Restrict)
 }
 
 model OrderStatusHistory {

@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 
-// In-memory session store (use Redis in production)
+// In-memory session store - WARNING: Use Redis/database in production for persistence across restarts
+// This store will be cleared on server restart and doesn't work with multiple server instances
+if (process.env.NODE_ENV === 'production') {
+  console.warn('[SECURITY] Using in-memory session store. Configure Redis or database for production.');
+}
 const sessions = new Map<string, {
   userId: number;
   email: string;
@@ -14,24 +18,35 @@ const sessions = new Map<string, {
 
 const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
+// PBKDF2 iterations - OWASP 2023 recommends 600,000 for SHA-256 or 210,000 for SHA-512
+// Using 310,000 as a balance between security and performance
+const PBKDF2_ITERATIONS = 310000;
+
 /**
  * Hash a password using PBKDF2
  * (Using built-in crypto to avoid dependency issues with bcrypt on edge)
  */
 export function hashPassword(password: string): string {
   const salt = crypto.randomBytes(16).toString('hex');
-  const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+  const hash = crypto.pbkdf2Sync(password, salt, PBKDF2_ITERATIONS, 64, 'sha512').toString('hex');
   return `${salt}:${hash}`;
 }
 
 /**
- * Verify a password against a hash
+ * Verify a password against a hash using timing-safe comparison
  */
 export function verifyPassword(password: string, storedHash: string): boolean {
   const [salt, hash] = storedHash.split(':');
   if (!salt || !hash) return false;
-  const verifyHash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
-  return hash === verifyHash;
+
+  const verifyHash = crypto.pbkdf2Sync(password, salt, PBKDF2_ITERATIONS, 64, 'sha512').toString('hex');
+
+  // Use timing-safe comparison to prevent timing attacks
+  const hashBuffer = Buffer.from(hash, 'hex');
+  const verifyBuffer = Buffer.from(verifyHash, 'hex');
+
+  if (hashBuffer.length !== verifyBuffer.length) return false;
+  return crypto.timingSafeEqual(hashBuffer, verifyBuffer);
 }
 
 /**

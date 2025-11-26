@@ -52,17 +52,20 @@ export async function PUT(
 
     const data = validation.data;
 
-    // If setting as default, unset others
-    if (data.is_default) {
-      await prisma.address.updateMany({
-        where: { user_id: user.userId, is_default: true, NOT: { id: addressId } },
-        data: { is_default: false },
-      });
-    }
+    // Use transaction to prevent race conditions when updating default address
+    const address = await prisma.$transaction(async (tx) => {
+      // If setting as default, unset others
+      if (data.is_default) {
+        await tx.address.updateMany({
+          where: { user_id: user.userId, is_default: true, NOT: { id: addressId } },
+          data: { is_default: false },
+        });
+      }
 
-    const address = await prisma.address.update({
-      where: { id: addressId },
-      data,
+      return tx.address.update({
+        where: { id: addressId },
+        data,
+      });
     });
 
     return NextResponse.json({ success: true, address });
@@ -99,22 +102,25 @@ export async function DELETE(
       return NextResponse.json({ error: 'Address not found' }, { status: 404 });
     }
 
-    await prisma.address.delete({ where: { id: addressId } });
+    // Use transaction to prevent race conditions when deleting and reassigning default
+    await prisma.$transaction(async (tx) => {
+      await tx.address.delete({ where: { id: addressId } });
 
-    // If deleted address was default, set another as default
-    if (existing.is_default) {
-      const firstAddress = await prisma.address.findFirst({
-        where: { user_id: user.userId },
-        orderBy: { created_at: 'asc' },
-      });
-
-      if (firstAddress) {
-        await prisma.address.update({
-          where: { id: firstAddress.id },
-          data: { is_default: true },
+      // If deleted address was default, set another as default
+      if (existing.is_default) {
+        const firstAddress = await tx.address.findFirst({
+          where: { user_id: user.userId },
+          orderBy: { created_at: 'asc' },
         });
+
+        if (firstAddress) {
+          await tx.address.update({
+            where: { id: firstAddress.id },
+            data: { is_default: true },
+          });
+        }
       }
-    }
+    });
 
     return NextResponse.json({ success: true });
   } catch (error) {
