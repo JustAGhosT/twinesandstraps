@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { Providers } from "@/components/Providers";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import BackToTop from "@/components/BackToTop";
+import SkipLink from "@/components/SkipLink";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://twinesandstraps.netlify.app';
 
@@ -71,9 +72,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="flex flex-col min-h-screen">
+        <SkipLink />
         <Providers>
           <Header />
-          <main className="flex-grow">{children}</main>
+          <main id="main-content" className="flex-grow">{children}</main>
           <Footer />
           <BackToTop />
           <WhatsAppButton />
