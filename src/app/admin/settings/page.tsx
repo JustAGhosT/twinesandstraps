@@ -64,16 +64,23 @@ export default function SettingsPage() {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 
       // Also try to save via API
-      await fetch('/api/admin/settings', {
+      const res = await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings),
       });
 
+      if (!res.ok) {
+        console.warn('API save failed, settings saved locally only');
+      }
+
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
       console.error('Error saving settings:', error);
+      // Still show success since localStorage save succeeded
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
     } finally {
       setSaving(false);
     }

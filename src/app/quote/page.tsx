@@ -56,7 +56,7 @@ export default function QuotePage() {
     }
 
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    const popup = window.open(whatsappUrl, '_blank');
+    const popup = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
 
     if (!popup || popup.closed || typeof popup.closed === 'undefined') {
       // Popup was blocked - provide fallback

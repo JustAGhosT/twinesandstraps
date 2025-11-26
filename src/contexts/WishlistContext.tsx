@@ -24,20 +24,32 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     try {
       const stored = localStorage.getItem(WISHLIST_STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        // Rehydrate date fields from strings to Date objects
-        const rehydrated = parsed.map((item: Record<string, unknown>) => ({
-          ...item,
-          created_at: item.created_at ? new Date(item.created_at as string) : new Date(),
-          updated_at: item.updated_at ? new Date(item.updated_at as string) : new Date(),
-        }));
-        setItems(rehydrated);
+      if (!stored) {
+        setIsLoaded(true);
+        return;
       }
+
+      const parsed = JSON.parse(stored);
+
+      // Validate that parsed data is an array
+      if (!Array.isArray(parsed)) {
+        console.warn('Invalid wishlist data in localStorage, ignoring');
+        setIsLoaded(true);
+        return;
+      }
+
+      // Rehydrate date fields from strings to Date objects
+      const rehydrated = parsed.map((item: Record<string, unknown>) => ({
+        ...item,
+        created_at: typeof item.created_at === 'string' ? new Date(item.created_at) : new Date(),
+        updated_at: typeof item.updated_at === 'string' ? new Date(item.updated_at) : new Date(),
+      })) as Product[];
+      setItems(rehydrated);
     } catch (error) {
       console.error('Error loading wishlist:', error);
+    } finally {
+      setIsLoaded(true);
     }
-    setIsLoaded(true);
   }, []);
 
   // Save wishlist to localStorage whenever it changes

@@ -4,6 +4,8 @@ import prisma from '@/lib/prisma';
 import ProductView from '@/components/ProductView';
 import RelatedProducts from '@/components/RelatedProducts';
 import ProductReviews from '@/components/ProductReviews';
+import ViewHistoryTracker from '@/components/ViewHistoryTracker';
+import RecentlyViewed from '@/components/RecentlyViewed';
 import Link from 'next/link';
 import { featureFlags } from '@/config/featureFlags';
 
@@ -173,6 +175,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
+      {/* Track view history for authenticated users */}
+      {featureFlags.viewHistory && (
+        <ViewHistoryTracker productId={product.id} />
+      )}
+
       <div className="bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumbs */}
@@ -216,6 +223,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         </div>
       </div>
     </div>
+
+      {/* Recently Viewed Products */}
+      {featureFlags.recentlyViewed && (
+        <RecentlyViewed excludeProductId={product.id} />
+      )}
     </>
   );
 }

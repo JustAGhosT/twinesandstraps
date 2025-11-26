@@ -12,7 +12,7 @@ const WhatsAppButton: React.FC = () => {
       return;
     }
     const message = encodeURIComponent('Hi! I would like to inquire about your products.');
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank', 'noopener,noreferrer');
   };
 
   return (

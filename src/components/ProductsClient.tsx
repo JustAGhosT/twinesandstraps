@@ -36,6 +36,7 @@ export default function ProductsClient({ products, categories }: ProductsClientP
 
   // Get price and diameter ranges from products
   const priceStats = useMemo(() => {
+    if (products.length === 0) return { min: 0, max: 10000 };
     const prices = products.map(p => p.price);
     return {
       min: Math.floor(Math.min(...prices)),

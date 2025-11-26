@@ -41,13 +41,40 @@ export type CreateCategoryInput = z.infer<typeof createCategorySchema>;
 export type UpdateCategoryInput = z.infer<typeof updateCategorySchema>;
 
 /**
- * Authentication validation schemas
+ * Admin authentication validation schemas
  */
 export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
+
+/**
+ * User authentication validation schemas
+ */
+export const userRegistrationSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name too long'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().max(20).optional(),
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+  confirmPassword: z.string(),
+  marketingConsent: z.boolean().default(false),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Passwords do not match',
+  path: ['confirmPassword'],
+});
+
+export const userLoginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+export type UserRegistrationInput = z.infer<typeof userRegistrationSchema>;
+export type UserLoginInput = z.infer<typeof userLoginSchema>;
 
 /**
  * Site settings validation schema

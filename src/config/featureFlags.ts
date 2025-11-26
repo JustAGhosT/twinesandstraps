@@ -19,15 +19,21 @@ export interface FeatureFlags {
   recommendedProducts: boolean;
   quickAddToCart: boolean;
   productZoom: boolean;
+  wishlist: boolean;
+  compareProducts: boolean;
 
   // UI/UX Features
   backToTop: boolean;
   searchBar: boolean;
 
+  // User Features
+  userAuth: boolean;
+  viewHistory: boolean;
+  recentlyViewed: boolean;
+
   // Future Features (disabled by default)
   productReviews: boolean;
-  wishlist: boolean;
-  compareProducts: boolean;
+  checkout: boolean;
 }
 
 /**
@@ -56,15 +62,21 @@ export const featureFlags: FeatureFlags = {
   recommendedProducts: envBool(process.env.NEXT_PUBLIC_FEATURE_RECOMMENDED_PRODUCTS, true),
   quickAddToCart: envBool(process.env.NEXT_PUBLIC_FEATURE_QUICK_ADD_CART, true),
   productZoom: envBool(process.env.NEXT_PUBLIC_FEATURE_PRODUCT_ZOOM, true),
+  wishlist: envBool(process.env.NEXT_PUBLIC_FEATURE_WISHLIST, true),
+  compareProducts: envBool(process.env.NEXT_PUBLIC_FEATURE_COMPARE_PRODUCTS, true),
 
   // UI/UX Features - enabled by default
   backToTop: envBool(process.env.NEXT_PUBLIC_FEATURE_BACK_TO_TOP, true),
   searchBar: envBool(process.env.NEXT_PUBLIC_FEATURE_SEARCH_BAR, true),
 
+  // User Features - enabled by default
+  userAuth: envBool(process.env.NEXT_PUBLIC_FEATURE_USER_AUTH, true),
+  viewHistory: envBool(process.env.NEXT_PUBLIC_FEATURE_VIEW_HISTORY, true),
+  recentlyViewed: envBool(process.env.NEXT_PUBLIC_FEATURE_RECENTLY_VIEWED, true),
+
   // Future Features - disabled by default
   productReviews: envBool(process.env.NEXT_PUBLIC_FEATURE_PRODUCT_REVIEWS, false),
-  wishlist: envBool(process.env.NEXT_PUBLIC_FEATURE_WISHLIST, false),
-  compareProducts: envBool(process.env.NEXT_PUBLIC_FEATURE_COMPARE_PRODUCTS, false),
+  checkout: envBool(process.env.NEXT_PUBLIC_FEATURE_CHECKOUT, false),
 };
 
 /**

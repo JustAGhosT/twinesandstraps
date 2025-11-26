@@ -43,4 +43,10 @@ export interface User {
   last_login: Date | null;
 }
 
+/**
+ * SafeUser type excludes sensitive fields like password_hash
+ * Use this type for any user data sent to the client
+ */
+export type SafeUser = Omit<User, 'password_hash'>;
+
 export type ProductWithCategory = Product & { category?: Category };
