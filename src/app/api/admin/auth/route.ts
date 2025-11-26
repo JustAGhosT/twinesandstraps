@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ valid: true });
   } catch (error) {
     console.error('Session verification error:', error);
-    return NextResponse.json({ valid: false, error: 'Session verification failed' }, { status: 500 });
+    return NextResponse.json({ valid: false }, { status: 500 });
   }
 }
 

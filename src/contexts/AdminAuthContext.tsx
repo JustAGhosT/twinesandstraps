@@ -65,8 +65,9 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           // Session not valid on server - clear local storage
           localStorage.removeItem(ADMIN_SESSION_KEY);
         }
-      } catch {
-        // On error, clear session for security
+      } catch (err) {
+        // On error, clear session for security but log for debugging
+        console.error('Session verification failed:', err);
         localStorage.removeItem(ADMIN_SESSION_KEY);
       }
       setIsLoading(false);
