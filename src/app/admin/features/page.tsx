@@ -93,6 +93,13 @@ const featureConfigs: FeatureConfig[] = [
     envVar: 'NEXT_PUBLIC_FEATURE_COMPARE_PRODUCTS',
   },
   {
+    key: 'showPrices',
+    name: 'Show Prices',
+    description: 'Display product prices on the website (disable for quote-only mode)',
+    category: 'E-commerce Features',
+    envVar: 'NEXT_PUBLIC_FEATURE_SHOW_PRICES',
+  },
+  {
     key: 'checkout',
     name: 'Checkout',
     description: 'Enable full checkout flow (disabled = WhatsApp quote only)',

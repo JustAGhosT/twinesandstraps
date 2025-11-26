@@ -21,6 +21,7 @@ export interface FeatureFlags {
   productZoom: boolean;
   wishlist: boolean;
   compareProducts: boolean;
+  showPrices: boolean;
 
   // UI/UX Features
   backToTop: boolean;
@@ -64,6 +65,7 @@ export const featureFlags: FeatureFlags = {
   productZoom: envBool(process.env.NEXT_PUBLIC_FEATURE_PRODUCT_ZOOM, true),
   wishlist: envBool(process.env.NEXT_PUBLIC_FEATURE_WISHLIST, true),
   compareProducts: envBool(process.env.NEXT_PUBLIC_FEATURE_COMPARE_PRODUCTS, true),
+  showPrices: envBool(process.env.NEXT_PUBLIC_FEATURE_SHOW_PRICES, true),
 
   // UI/UX Features - enabled by default
   backToTop: envBool(process.env.NEXT_PUBLIC_FEATURE_BACK_TO_TOP, true),

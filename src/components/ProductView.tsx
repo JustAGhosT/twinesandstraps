@@ -20,6 +20,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const totalPrice = product.price * quantity;
   const showWishlist = useFeatureFlag('wishlist');
   const showCompare = useFeatureFlag('compareProducts');
+  const showPrices = useFeatureFlag('showPrices');
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
@@ -105,11 +106,22 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
           {getStockBadge()}
         </div>
         <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
-        <div className="mb-6">
-          <div className="flex items-baseline gap-3 mb-2">
-            <span className="text-3xl font-bold text-gray-900">ZAR {product.price.toFixed(2)}</span>
+        {showPrices ? (
+          <div className="mb-6">
+            <div className="flex items-baseline gap-3 mb-2">
+              <span className="text-3xl font-bold text-gray-900">ZAR {product.price.toFixed(2)}</span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mb-6">
+            <a
+              href="/quote"
+              className="inline-block px-6 py-2 bg-primary-50 text-primary-700 rounded-lg font-semibold hover:bg-primary-100 transition-colors"
+            >
+              Request Quote for Pricing
+            </a>
+          </div>
+        )}
         <p className="text-gray-600 mb-6 leading-relaxed">{product.description}</p>
         
         {/* Quantity Selector and Add to Cart */}
@@ -120,7 +132,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
               <button 
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 className="px-4 py-2 hover:bg-gray-100 transition-colors"
-                disabled={isOutOfStock}
+                disabled={isOutOfStock || !showPrices}
               >
                 -
               </button>
@@ -130,37 +142,39 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                 className="w-16 text-center border-x py-2"
                 min="1"
-                disabled={isOutOfStock}
+                disabled={isOutOfStock || !showPrices}
               />
               <button 
                 onClick={() => setQuantity(quantity + 1)}
                 className="px-4 py-2 hover:bg-gray-100 transition-colors"
-                disabled={isOutOfStock}
+                disabled={isOutOfStock || !showPrices}
               >
                 +
               </button>
             </div>
-            {quantity > 1 && (
+            {showPrices && quantity > 1 && (
               <div className="text-sm text-gray-600">
                 <p>Total: ZAR {totalPrice.toFixed(2)}</p>
               </div>
             )}
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={handleAddToCart}
-              disabled={isOutOfStock}
-              className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors ${
-                isOutOfStock
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-primary-600 text-white hover:bg-primary-700'
-              }`}
-            >
-              {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-            </button>
+            {showPrices && (
+              <button
+                onClick={handleAddToCart}
+                disabled={isOutOfStock}
+                className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors ${
+                  isOutOfStock
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-primary-600 text-white hover:bg-primary-700'
+                }`}
+              >
+                {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+              </button>
+            )}
             <a
               href="/quote"
-              className="flex-1 py-3 px-6 rounded-lg font-semibold border-2 border-primary-600 text-primary-600 hover:bg-primary-50 transition-colors text-center"
+              className={`${showPrices ? 'flex-1' : 'w-full'} py-3 px-6 rounded-lg font-semibold border-2 border-primary-600 text-primary-600 hover:bg-primary-50 transition-colors text-center`}
             >
               Request Quote
             </a>
