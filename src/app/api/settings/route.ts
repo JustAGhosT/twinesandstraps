@@ -14,6 +14,7 @@ const DEFAULT_SETTINGS = {
   address: '',
   businessHours: 'Mon-Fri 8:00-17:00',
   vatRate: '15',
+  logoUrl: '',
   socialFacebook: '',
   socialInstagram: '',
   socialLinkedIn: '',
@@ -29,6 +30,7 @@ function dbToApiFormat(dbSettings: {
   address: string;
   business_hours: string;
   vat_rate: string;
+  logo_url: string;
   social_facebook: string;
   social_instagram: string;
   social_linkedin: string;
@@ -42,6 +44,7 @@ function dbToApiFormat(dbSettings: {
     address: dbSettings.address,
     businessHours: dbSettings.business_hours,
     vatRate: dbSettings.vat_rate,
+    logoUrl: dbSettings.logo_url,
     socialFacebook: dbSettings.social_facebook,
     socialInstagram: dbSettings.social_instagram,
     socialLinkedIn: dbSettings.social_linkedin,

@@ -12,6 +12,7 @@ interface SiteSettings {
   address: string;
   businessHours: string;
   vatRate: string;
+  logoUrl: string;
   socialFacebook: string;
   socialInstagram: string;
   socialLinkedIn: string;
@@ -26,6 +27,7 @@ const defaultSettings: SiteSettings = {
   address: '',
   businessHours: 'Mon-Fri 8:00-17:00',
   vatRate: '15',
+  logoUrl: '',
   socialFacebook: '',
   socialInstagram: '',
   socialLinkedIn: '',
@@ -46,8 +48,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   
-  // Logo state
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  // Logo state - now derived from settings.logoUrl
   const [logoLoading, setLogoLoading] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
   const [logoSuccess, setLogoSuccess] = useState<string | null>(null);
@@ -83,9 +84,6 @@ export default function SettingsPage() {
   useEffect(() => {
     // Load settings from API (database)
     loadSettings();
-    
-    // Check if a custom logo exists
-    checkLogoStatus();
   }, []);
 
   const loadSettings = async () => {
@@ -108,20 +106,6 @@ export default function SettingsPage() {
       setLoadError('Failed to load settings. Please refresh the page.');
     } finally {
       setLoading(false);
-    }
-  };
-  
-  const checkLogoStatus = async () => {
-    try {
-      const res = await fetch('/api/admin/logo');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.hasLogo && data.url) {
-          setLogoUrl(data.url + '?t=' + Date.now()); // Cache bust
-        }
-      }
-    } catch (error) {
-      console.error('Error checking logo status:', error);
     }
   };
   
@@ -164,7 +148,9 @@ export default function SettingsPage() {
         return;
       }
       
-      setLogoUrl(data.url + '?t=' + Date.now()); // Cache bust
+      // Update settings with new logo URL
+      setSettings(prev => ({ ...prev, logoUrl: data.url }));
+      setOriginalSettings(prev => ({ ...prev, logoUrl: data.url }));
       setLogoSuccess('Logo uploaded successfully! It will appear in the header after refreshing.');
       setTimeout(() => setLogoSuccess(null), 5000);
     } catch (error) {
@@ -199,7 +185,9 @@ export default function SettingsPage() {
         return;
       }
       
-      setLogoUrl(null);
+      // Update settings with empty logo URL
+      setSettings(prev => ({ ...prev, logoUrl: '' }));
+      setOriginalSettings(prev => ({ ...prev, logoUrl: '' }));
       setLogoSuccess('Logo removed successfully! The default logo will be used.');
       setTimeout(() => setLogoSuccess(null), 5000);
     } catch (error) {
@@ -321,9 +309,9 @@ export default function SettingsPage() {
             {/* Logo Preview */}
             <div className="flex-shrink-0">
               <div className="w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 overflow-hidden">
-                {logoUrl ? (
+                {settings.logoUrl ? (
                   <Image
-                    src={logoUrl}
+                    src={settings.logoUrl}
                     alt="Current logo"
                     width={80}
                     height={80}
@@ -374,7 +362,7 @@ export default function SettingsPage() {
                   )}
                 </label>
                 
-                {logoUrl && (
+                {settings.logoUrl && (
                   <button
                     type="button"
                     onClick={handleLogoRemove}

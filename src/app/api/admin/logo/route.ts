@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, readFile, mkdir, unlink } from 'fs/promises';
-import path from 'path';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import prisma from '@/lib/prisma';
 
 // Only allow SVG format for logos
 const ALLOWED_MIME_TYPE = 'image/svg+xml';
 const MAX_FILE_SIZE = 512 * 1024; // 512KB - SVGs should be small
-const LOGO_FILENAME = 'logo.svg';
-const LOGO_DIR = path.join(process.cwd(), 'public');
+const SITE_SETTINGS_ID = 1;
 
 // Basic SVG validation to ensure it's a valid SVG
 function isValidSvg(content: string): boolean {
@@ -82,13 +80,24 @@ export async function GET(request: NextRequest) {
   if (authError) return authError;
 
   try {
-    const logoPath = path.join(LOGO_DIR, LOGO_FILENAME);
-    await readFile(logoPath);
-    return NextResponse.json({ 
-      hasLogo: true, 
-      url: `/${LOGO_FILENAME}` 
+    const settings = await prisma.siteSetting.findUnique({
+      where: { id: SITE_SETTINGS_ID },
+      select: { logo_url: true },
     });
-  } catch {
+
+    if (settings?.logo_url) {
+      return NextResponse.json({ 
+        hasLogo: true, 
+        url: settings.logo_url,
+      });
+    }
+    
+    return NextResponse.json({ 
+      hasLogo: false, 
+      url: null 
+    });
+  } catch (error) {
+    console.error('Error fetching logo:', error);
     return NextResponse.json({ 
       hasLogo: false, 
       url: null 
@@ -123,9 +132,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file extension
-    const ext = path.extname(file.name).toLowerCase();
-    if (ext !== '.svg') {
+    // Validate file extension - must be exactly .svg at the end
+    const fileName = file.name.toLowerCase();
+    const svgExtensionMatch = fileName.match(/\.svg$/);
+    if (!svgExtensionMatch) {
       return NextResponse.json(
         {
           error: 'Invalid file type',
@@ -187,16 +197,25 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Ensure directory exists
-    await mkdir(LOGO_DIR, { recursive: true });
+    // Convert SVG to data URL for storage in database
+    const base64Content = Buffer.from(sanitizedContent).toString('base64');
+    const dataUrl = `data:image/svg+xml;base64,${base64Content}`;
 
-    // Save the sanitized SVG
-    const logoPath = path.join(LOGO_DIR, LOGO_FILENAME);
-    await writeFile(logoPath, sanitizedContent, 'utf-8');
+    // Store logo URL in database
+    await prisma.siteSetting.upsert({
+      where: { id: SITE_SETTINGS_ID },
+      create: {
+        id: SITE_SETTINGS_ID,
+        logo_url: dataUrl,
+      },
+      update: {
+        logo_url: dataUrl,
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      url: `/${LOGO_FILENAME}`,
+      url: dataUrl,
       message: 'Logo uploaded successfully'
     });
   } catch (error) {
@@ -214,22 +233,23 @@ export async function DELETE(request: NextRequest) {
   if (authError) return authError;
 
   try {
-    const logoPath = path.join(LOGO_DIR, LOGO_FILENAME);
-    await unlink(logoPath);
+    // Clear logo URL in database
+    await prisma.siteSetting.upsert({
+      where: { id: SITE_SETTINGS_ID },
+      create: {
+        id: SITE_SETTINGS_ID,
+        logo_url: '',
+      },
+      update: {
+        logo_url: '',
+      },
+    });
     
     return NextResponse.json({
       success: true,
       message: 'Logo removed successfully'
     });
   } catch (error) {
-    // If file doesn't exist, that's okay
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      return NextResponse.json({
-        success: true,
-        message: 'No logo to remove'
-      });
-    }
-    
     console.error('Error removing logo:', error);
     return NextResponse.json(
       { error: 'Failed to remove logo. Please try again.' },

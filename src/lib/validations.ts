@@ -88,6 +88,7 @@ export const siteSettingsSchema = z.object({
   address: z.string().max(500).optional(),
   businessHours: z.string().max(200).optional(),
   vatRate: z.string().regex(/^[0-9.]+$/, 'VAT rate must be a number').optional(),
+  logoUrl: z.string().url().or(z.literal('')).optional(),
   socialFacebook: z.string().url().or(z.literal('')).optional(),
   socialInstagram: z.string().url().or(z.literal('')).optional(),
   socialLinkedIn: z.string().url().or(z.literal('')).optional(),

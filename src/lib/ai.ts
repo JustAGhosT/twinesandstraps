@@ -1,23 +1,82 @@
 /**
- * AI Integration Library for Azure OpenAI
+ * AI Integration Library for Azure OpenAI and OpenAI
  * 
  * This module provides AI-powered features for product management:
  * - Market research and competitor analysis
  * - Price suggestions
  * - Description enhancement
  * - Product insights
+ * - SWOT analysis
+ * - Competitor research
+ * - Product recommendations
+ * - Business insights
+ * 
+ * Supports both Azure OpenAI and OpenAI API (set OPENAI_API_KEY for OpenAI)
  */
+
+// Company configuration - can be customized per deployment
+const COMPANY_NAME = process.env.COMPANY_NAME || 'Twines and Straps SA';
+const COMPANY_FULL_NAME = process.env.COMPANY_FULL_NAME || 'Twines and Straps SA (Pty) Ltd';
+const COMPANY_INDUSTRY = process.env.COMPANY_INDUSTRY || 'industrial twines, ropes, and strapping materials';
 
 // AI Configuration from environment variables
 const AZURE_AI_ENDPOINT = process.env.AZURE_AI_ENDPOINT;
 const AZURE_AI_API_KEY = process.env.AZURE_AI_API_KEY;
 const AZURE_AI_DEPLOYMENT_NAME = process.env.AZURE_AI_DEPLOYMENT_NAME || 'gpt-4o';
 
+// OpenAI API configuration (alternative to Azure)
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
+
+/**
+ * Determine which AI provider to use (Azure is preferred if both are configured)
+ */
+function getAIProvider(): 'azure' | 'openai' | null {
+  // Prefer Azure OpenAI if configured
+  if (AZURE_AI_ENDPOINT && AZURE_AI_API_KEY) return 'azure';
+  // Fall back to OpenAI if Azure is not configured
+  if (OPENAI_API_KEY) return 'openai';
+  return null;
+}
+
 /**
  * Check if AI features are configured
  */
 export function isAIConfigured(): boolean {
-  return Boolean(AZURE_AI_ENDPOINT && AZURE_AI_API_KEY);
+  return getAIProvider() !== null;
+}
+
+/**
+ * Get AI configuration status with detailed provider info
+ */
+export function getAIStatus(): { 
+  configured: boolean; 
+  provider: 'azure' | 'openai' | null;
+  message: string;
+} {
+  const provider = getAIProvider();
+  
+  if (provider === 'azure') {
+    return {
+      configured: true,
+      provider: 'azure',
+      message: 'Using Azure OpenAI (preferred provider)',
+    };
+  }
+  
+  if (provider === 'openai') {
+    return {
+      configured: true,
+      provider: 'openai',
+      message: 'Using OpenAI API (Azure not configured)',
+    };
+  }
+  
+  return {
+    configured: false,
+    provider: null,
+    message: 'AI is not configured. Set AZURE_AI_ENDPOINT + AZURE_AI_API_KEY (preferred), or OPENAI_API_KEY as alternative.',
+  };
 }
 
 /**
@@ -51,10 +110,6 @@ async function callAzureOpenAI(
   messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
   temperature: number = 0.7
 ): Promise<string> {
-  if (!isAIConfigured()) {
-    throw new Error('Azure AI is not configured. Please set AZURE_AI_ENDPOINT and AZURE_AI_API_KEY environment variables.');
-  }
-
   const url = `${AZURE_AI_ENDPOINT}/openai/deployments/${AZURE_AI_DEPLOYMENT_NAME}/chat/completions?api-version=2024-02-01`;
   
   const response = await fetch(url, {
@@ -77,6 +132,56 @@ async function callAzureOpenAI(
 
   const data = await response.json();
   return data.choices[0]?.message?.content || '';
+}
+
+/**
+ * Call OpenAI API directly
+ */
+async function callOpenAI(
+  messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
+  temperature: number = 0.7
+): Promise<string> {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: OPENAI_MODEL,
+      messages,
+      temperature,
+      max_tokens: 2000,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`OpenAI API error: ${response.status} - ${error}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0]?.message?.content || '';
+}
+
+/**
+ * Call the configured AI provider
+ */
+async function callAI(
+  messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
+  temperature: number = 0.7
+): Promise<string> {
+  const provider = getAIProvider();
+  
+  if (!provider) {
+    throw new Error('AI is not configured. Please set AZURE_AI_ENDPOINT and AZURE_AI_API_KEY, or OPENAI_API_KEY environment variables.');
+  }
+  
+  if (provider === 'azure') {
+    return callAzureOpenAI(messages, temperature);
+  }
+  
+  return callOpenAI(messages, temperature);
 }
 
 /**
@@ -163,7 +268,7 @@ Current Price: R${product.currentPrice.toFixed(2)}
 Provide market insights, competitor analysis, pricing suggestions (in ZAR), and description improvements for the South African industrial market.`;
 
   try {
-    const response = await callAzureOpenAI([
+    const response = await callAI([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
     ]);
@@ -214,7 +319,7 @@ ${currentDescription}
 Provide an enhanced description suitable for a B2B e-commerce website.`;
 
   try {
-    const response = await callAzureOpenAI([
+    const response = await callAI([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
     ]);
@@ -250,7 +355,7 @@ Provide comprehensive market research analysis in valid JSON format with the fol
   const userPrompt = `Provide market research for the "${category}" category in the South African industrial supplies market, focusing on twines, ropes, and strapping materials.`;
 
   try {
-    const response = await callAzureOpenAI([
+    const response = await callAI([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
     ]);
@@ -312,7 +417,7 @@ ${similarProductsInfo}
 Provide a pricing recommendation in South African Rand (ZAR).`;
 
   try {
-    const response = await callAzureOpenAI([
+    const response = await callAI([
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },
     ]);
@@ -325,6 +430,326 @@ Provide a pricing recommendation in South African Rand (ZAR).`;
     }>(response);
   } catch (error) {
     console.error('Error suggesting pricing:', error);
+    throw error;
+  }
+}
+
+/**
+ * SWOT Analysis for a product or business category
+ */
+export interface SWOTAnalysis {
+  strengths: string[];
+  weaknesses: string[];
+  opportunities: string[];
+  threats: string[];
+  summary: string;
+  recommendations: string[];
+}
+
+export async function performSWOTAnalysis(context: {
+  productName?: string;
+  category?: string;
+  description?: string;
+  businessContext?: string;
+}): Promise<SWOTAnalysis> {
+  const systemPrompt = `You are a strategic business analyst specializing in the South African industrial supplies market, particularly in twines, ropes, and strapping materials.
+
+Perform a comprehensive SWOT analysis considering:
+- The South African industrial market dynamics
+- Import/export factors and local manufacturing advantages
+- Competition from international suppliers
+- Twines and Straps SA's position as a local manufacturer
+
+Always respond in valid JSON format with the following structure:
+{
+  "strengths": ["array of 4-6 key strengths"],
+  "weaknesses": ["array of 3-5 weaknesses to address"],
+  "opportunities": ["array of 4-6 market opportunities"],
+  "threats": ["array of 3-5 potential threats"],
+  "summary": "brief executive summary of the analysis",
+  "recommendations": ["array of 3-5 actionable recommendations"]
+}`;
+
+  const userPrompt = `Perform a SWOT analysis for Twines and Straps SA with the following context:
+
+Company: Twines and Straps SA (Pty) Ltd - South African manufacturer of industrial twines and ropes
+Product/Category: ${context.productName || context.category || 'Industrial twines and ropes'}
+Description: ${context.description || 'Industrial-grade twines, ropes, and strapping materials for various applications'}
+Additional Context: ${context.businessContext || 'B2B supplier serving agricultural, manufacturing, and logistics sectors'}
+
+Provide detailed strategic insights for the South African market.`;
+
+  try {
+    const response = await callAI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ], 0.6);
+
+    return extractJSON<SWOTAnalysis>(response);
+  } catch (error) {
+    console.error('Error performing SWOT analysis:', error);
+    throw error;
+  }
+}
+
+/**
+ * Deep competitor research and analysis
+ */
+export interface CompetitorResearch {
+  competitors: Array<{
+    name: string;
+    type: 'local' | 'international' | 'online';
+    strengths: string[];
+    weaknesses: string[];
+    pricePosition: 'budget' | 'mid-range' | 'premium';
+  }>;
+  marketPosition: string;
+  competitiveAdvantages: string[];
+  areasForImprovement: string[];
+  strategicRecommendations: string[];
+}
+
+export async function performCompetitorResearch(context: {
+  category: string;
+  productTypes?: string[];
+  region?: string;
+}): Promise<CompetitorResearch> {
+  const systemPrompt = `You are a competitive intelligence analyst specializing in the South African industrial supplies market.
+
+Research and analyze competitors in the twines, ropes, and strapping industry considering:
+- Local South African manufacturers
+- International importers and distributors
+- Online marketplaces and suppliers
+- Price positioning and market share
+
+Provide actionable competitive intelligence in valid JSON format:
+{
+  "competitors": [
+    {
+      "name": "competitor name",
+      "type": "local|international|online",
+      "strengths": ["key strengths"],
+      "weaknesses": ["known weaknesses"],
+      "pricePosition": "budget|mid-range|premium"
+    }
+  ],
+  "marketPosition": "analysis of Twines and Straps SA's position",
+  "competitiveAdvantages": ["current advantages"],
+  "areasForImprovement": ["areas to develop"],
+  "strategicRecommendations": ["actionable recommendations"]
+}`;
+
+  const userPrompt = `Conduct competitor research for Twines and Straps SA:
+
+Category Focus: ${context.category}
+Product Types: ${context.productTypes?.join(', ') || 'Industrial twines, ropes, strapping materials'}
+Geographic Focus: ${context.region || 'South Africa (with consideration of African export markets)'}
+
+Identify key competitors, their positioning, and provide strategic recommendations for competitive advantage.`;
+
+  try {
+    const response = await callAI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ], 0.6);
+
+    return extractJSON<CompetitorResearch>(response);
+  } catch (error) {
+    console.error('Error performing competitor research:', error);
+    throw error;
+  }
+}
+
+/**
+ * Product bundle and cross-sell recommendations
+ */
+export interface ProductRecommendations {
+  relatedProducts: Array<{
+    suggestion: string;
+    reason: string;
+    potentialMargin: 'low' | 'medium' | 'high';
+  }>;
+  bundleIdeas: Array<{
+    name: string;
+    products: string[];
+    targetCustomer: string;
+    valueProposition: string;
+  }>;
+  crossSellOpportunities: string[];
+  upSellStrategies: string[];
+}
+
+export async function getProductRecommendations(context: {
+  currentProduct: string;
+  category?: string;
+  customerSegment?: string;
+  existingProducts?: string[];
+}): Promise<ProductRecommendations> {
+  const systemPrompt = `You are a product strategy consultant for industrial B2B suppliers in South Africa.
+
+Analyze product opportunities and provide recommendations for:
+- Related products that complement existing offerings
+- Product bundles for different customer segments
+- Cross-selling opportunities
+- Upselling strategies
+
+Consider the industrial twines and ropes market context.
+
+Respond in valid JSON format:
+{
+  "relatedProducts": [
+    {
+      "suggestion": "product idea",
+      "reason": "why this fits",
+      "potentialMargin": "low|medium|high"
+    }
+  ],
+  "bundleIdeas": [
+    {
+      "name": "bundle name",
+      "products": ["product list"],
+      "targetCustomer": "customer segment",
+      "valueProposition": "why customers would buy"
+    }
+  ],
+  "crossSellOpportunities": ["opportunities"],
+  "upSellStrategies": ["strategies"]
+}`;
+
+  const existingProductsInfo = context.existingProducts?.length 
+    ? `\nExisting product catalog includes: ${context.existingProducts.join(', ')}`
+    : '';
+
+  const userPrompt = `Provide product recommendations for Twines and Straps SA:
+
+Current Product Focus: ${context.currentProduct}
+Category: ${context.category || 'Industrial supplies'}
+Target Customer Segment: ${context.customerSegment || 'B2B industrial, agricultural, and logistics'}
+${existingProductsInfo}
+
+Suggest related products, bundles, and sales strategies for the South African market.`;
+
+  try {
+    const response = await callAI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ], 0.7);
+
+    return extractJSON<ProductRecommendations>(response);
+  } catch (error) {
+    console.error('Error getting product recommendations:', error);
+    throw error;
+  }
+}
+
+/**
+ * Business insights and strategic recommendations
+ */
+export interface BusinessInsights {
+  marketTrends: Array<{
+    trend: string;
+    impact: 'positive' | 'negative' | 'neutral';
+    timeframe: 'immediate' | 'short-term' | 'long-term';
+    recommendation: string;
+  }>;
+  growthOpportunities: Array<{
+    opportunity: string;
+    investmentLevel: 'low' | 'medium' | 'high';
+    potentialReturn: string;
+    implementation: string;
+  }>;
+  riskAssessment: Array<{
+    risk: string;
+    likelihood: 'low' | 'medium' | 'high';
+    mitigation: string;
+  }>;
+  actionPlan: Array<{
+    action: string;
+    priority: 'high' | 'medium' | 'low';
+    timeline: string;
+    expectedOutcome: string;
+  }>;
+}
+
+export async function getBusinessInsights(context: {
+  focusArea?: string;
+  currentChallenges?: string[];
+  goals?: string[];
+}): Promise<BusinessInsights> {
+  const systemPrompt = `You are a senior business strategist advising Twines and Straps SA, a South African manufacturer of industrial twines and ropes.
+
+Provide strategic business insights considering:
+- The South African economic environment
+- Manufacturing sector dynamics
+- Export opportunities in Africa
+- E-commerce and digital transformation
+- Sustainability trends in industrial supplies
+
+Respond in valid JSON format:
+{
+  "marketTrends": [
+    {
+      "trend": "description",
+      "impact": "positive|negative|neutral",
+      "timeframe": "immediate|short-term|long-term",
+      "recommendation": "what to do"
+    }
+  ],
+  "growthOpportunities": [
+    {
+      "opportunity": "description",
+      "investmentLevel": "low|medium|high",
+      "potentialReturn": "expected ROI",
+      "implementation": "how to implement"
+    }
+  ],
+  "riskAssessment": [
+    {
+      "risk": "description",
+      "likelihood": "low|medium|high",
+      "mitigation": "how to mitigate"
+    }
+  ],
+  "actionPlan": [
+    {
+      "action": "specific action",
+      "priority": "high|medium|low",
+      "timeline": "when to complete",
+      "expectedOutcome": "what success looks like"
+    }
+  ]
+}`;
+
+  const challengesInfo = context.currentChallenges?.length
+    ? `\nCurrent Challenges: ${context.currentChallenges.join('; ')}`
+    : '';
+
+  const goalsInfo = context.goals?.length
+    ? `\nBusiness Goals: ${context.goals.join('; ')}`
+    : '';
+
+  const userPrompt = `Provide strategic business insights for Twines and Straps SA:
+
+Focus Area: ${context.focusArea || 'Overall business growth and market positioning'}
+${challengesInfo}
+${goalsInfo}
+
+Company Context: 
+- South African manufacturer of industrial twines, ropes, and strapping materials
+- B2B focus serving agricultural, manufacturing, logistics, and construction sectors
+- Positioned as a quality local manufacturer with competitive pricing
+
+Provide actionable insights and a clear action plan.`;
+
+  try {
+    const response = await callAI([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ], 0.6);
+
+    return extractJSON<BusinessInsights>(response);
+  } catch (error) {
+    console.error('Error getting business insights:', error);
     throw error;
   }
 }

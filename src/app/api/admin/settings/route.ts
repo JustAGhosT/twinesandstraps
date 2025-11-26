@@ -15,6 +15,7 @@ const DEFAULT_SETTINGS = {
   address: '',
   businessHours: 'Mon-Fri 8:00-17:00',
   vatRate: '15',
+  logoUrl: '',
   socialFacebook: '',
   socialInstagram: '',
   socialLinkedIn: '',
@@ -30,6 +31,7 @@ interface DbSettingsUpdate {
   address?: string;
   business_hours?: string;
   vat_rate?: string;
+  logo_url?: string;
   social_facebook?: string;
   social_instagram?: string;
   social_linkedin?: string;
@@ -45,6 +47,7 @@ function dbToApiFormat(dbSettings: {
   address: string;
   business_hours: string;
   vat_rate: string;
+  logo_url: string;
   social_facebook: string;
   social_instagram: string;
   social_linkedin: string;
@@ -58,6 +61,7 @@ function dbToApiFormat(dbSettings: {
     address: dbSettings.address,
     businessHours: dbSettings.business_hours,
     vatRate: dbSettings.vat_rate,
+    logoUrl: dbSettings.logo_url,
     socialFacebook: dbSettings.social_facebook,
     socialInstagram: dbSettings.social_instagram,
     socialLinkedIn: dbSettings.social_linkedin,
@@ -74,6 +78,7 @@ function apiToDbFormat(apiSettings: {
   address?: string;
   businessHours?: string;
   vatRate?: string;
+  logoUrl?: string;
   socialFacebook?: string;
   socialInstagram?: string;
   socialLinkedIn?: string;
@@ -87,6 +92,7 @@ function apiToDbFormat(apiSettings: {
   if (apiSettings.address !== undefined) dbData.address = apiSettings.address;
   if (apiSettings.businessHours !== undefined) dbData.business_hours = apiSettings.businessHours;
   if (apiSettings.vatRate !== undefined) dbData.vat_rate = apiSettings.vatRate;
+  if (apiSettings.logoUrl !== undefined) dbData.logo_url = apiSettings.logoUrl;
   if (apiSettings.socialFacebook !== undefined) dbData.social_facebook = apiSettings.socialFacebook;
   if (apiSettings.socialInstagram !== undefined) dbData.social_instagram = apiSettings.socialInstagram;
   if (apiSettings.socialLinkedIn !== undefined) dbData.social_linkedin = apiSettings.socialLinkedIn;
@@ -126,6 +132,7 @@ interface ApiSettings {
   address: string;
   businessHours: string;
   vatRate: string;
+  logoUrl: string;
   socialFacebook: string;
   socialInstagram: string;
   socialLinkedIn: string;
@@ -141,6 +148,7 @@ const FIELD_LABELS: Record<keyof ApiSettings, string> = {
   address: 'Address',
   businessHours: 'Business Hours',
   vatRate: 'VAT Rate',
+  logoUrl: 'Logo URL',
   socialFacebook: 'Facebook URL',
   socialInstagram: 'Instagram URL',
   socialLinkedIn: 'LinkedIn URL',

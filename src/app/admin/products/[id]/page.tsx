@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import AIAssistantPanel from '@/components/AIAssistantPanel';
+import UseAIButton from '@/components/UseAIButton';
 
 interface Category {
   id: number;
@@ -276,7 +277,20 @@ export default function ProductEditPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-sm font-medium text-gray-700">Description *</label>
+                    <UseAIButton
+                      action="enhance-description"
+                      label="Enhance"
+                      contextData={{
+                        description: form.description,
+                        name: form.name,
+                        material: form.material,
+                      }}
+                      onApply={(value) => setForm(prev => ({ ...prev, description: String(value) }))}
+                      disabled={!form.name || !form.description}
+                    />
+                  </div>
                   <textarea
                     name="description"
                     value={form.description}
@@ -378,7 +392,24 @@ export default function ProductEditPage() {
               <h2 className="text-lg font-semibold text-secondary-900 mb-4">Pricing & Stock</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Price (ZAR) *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-sm font-medium text-gray-700">Price (ZAR) *</label>
+                    <UseAIButton
+                      action="suggest-pricing"
+                      label="Suggest"
+                      contextData={{
+                        name: form.name,
+                        material: form.material,
+                      }}
+                      onApply={(value) => {
+                        const numValue = Number(value);
+                        if (!isNaN(numValue) && numValue > 0) {
+                          setForm(prev => ({ ...prev, price: numValue.toFixed(2) }));
+                        }
+                      }}
+                      disabled={!form.name}
+                    />
+                  </div>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">R</span>
                     <input

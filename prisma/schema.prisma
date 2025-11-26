@@ -212,6 +212,7 @@ model SiteSetting {
   address         String   @default("")
   business_hours  String   @default("Mon-Fri 8:00-17:00")
   vat_rate        String   @default("15")
+  logo_url        String   @default("")
   social_facebook String   @default("")
   social_instagram String  @default("")
   social_linkedin  String  @default("")
