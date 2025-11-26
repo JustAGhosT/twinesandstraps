@@ -11,6 +11,7 @@ export interface SiteSettings {
   address: string;
   businessHours: string;
   vatRate: string;
+  logoUrl: string;
   socialFacebook: string;
   socialInstagram: string;
   socialLinkedIn: string;
@@ -25,6 +26,7 @@ const defaultSettings: SiteSettings = {
   address: '',
   businessHours: 'Mon-Fri 8:00-17:00',
   vatRate: '15',
+  logoUrl: '',
   socialFacebook: '',
   socialInstagram: '',
   socialLinkedIn: '',
