@@ -1,6 +1,10 @@
 # Feature Flags
 
-This document describes the feature flag system used to toggle optional features on/off without code changes.
+Toggle site features on/off without code changes using environment variables.
+
+> **Looking for setup instructions?** See the [Setup Guide](./SETUP.md) for environment configuration.
+
+---
 
 ## Overview
 

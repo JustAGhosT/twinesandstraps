@@ -1,4 +1,8 @@
-# Twines and Straps SA: E-Commerce Website PRD
+# Product Requirements Document (PRD)
+
+Full product vision and business requirements for the Twines and Straps SA e-commerce platform.
+
+---
 
 ## 1. Executive Summary
 

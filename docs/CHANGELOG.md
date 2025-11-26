@@ -1,6 +1,8 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+Notable changes to the Twines and Straps SA platform.
+
+---
 
 ## [Unreleased] - 2025-11-25
 

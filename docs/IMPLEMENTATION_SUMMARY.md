@@ -1,7 +1,16 @@
-# Implementation Summary: WhatsApp Quote System
+# WhatsApp Quote System
+
+Overview of the quote-based purchasing system using WhatsApp integration.
+
+> **Looking for setup instructions?** See the [Setup Guide](./SETUP.md) for environment configuration.
+
+---
 
 ## Overview
-This document summarizes the changes made to the Twines and Straps SA website to implement a WhatsApp-based quote system alongside the existing cart functionality, as per client requirements.
+
+This document summarizes the WhatsApp-based quote system implemented for Twines and Straps SA. The system enables customers to request personalized quotes through WhatsApp while maintaining full cart functionality.
+
+---
 
 ## Client Requirements Met
 

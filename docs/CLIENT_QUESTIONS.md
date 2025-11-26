@@ -1,7 +1,6 @@
-# TASSA Website Enhancement - Client Questions
+# Client Questions
 
-## Purpose
-This document outlines questions for the client to gather information that will enhance the website's credibility and professional appearance.
+Information needed from the client to enhance website credibility and professional appearance.
 
 ---
 
