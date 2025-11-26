@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Image from 'next/image';
 
 interface SiteSettings {
@@ -31,10 +31,18 @@ const defaultSettings: SiteSettings = {
   socialLinkedIn: '',
 };
 
+// Save result interface for detailed feedback
+interface SaveResult {
+  changedFieldLabels: string[];
+  changeCount: number;
+}
+
 export default function SettingsPage() {
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
+  const [originalSettings, setOriginalSettings] = useState<SiteSettings>(defaultSettings);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveResult, setSaveResult] = useState<SaveResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   
@@ -44,6 +52,33 @@ export default function SettingsPage() {
   const [logoError, setLogoError] = useState<string | null>(null);
   const [logoSuccess, setLogoSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Track which fields have been modified - memoized to avoid recalculation on every render
+  const modifiedFields = useMemo(() => {
+    const modified: string[] = [];
+    for (const key of Object.keys(settings) as Array<keyof SiteSettings>) {
+      if (settings[key] !== originalSettings[key]) {
+        modified.push(key);
+      }
+    }
+    return modified;
+  }, [settings, originalSettings]);
+  
+  const hasUnsavedChanges = modifiedFields.length > 0;
+  
+  // Helper to check if a specific field is modified
+  const isFieldModified = (fieldName: keyof SiteSettings): boolean => {
+    return modifiedFields.includes(fieldName);
+  };
+  
+  // Helper to get input class with modified state indicator
+  const getInputClassName = (fieldName: keyof SiteSettings): string => {
+    const baseClass = 'w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500';
+    if (isFieldModified(fieldName)) {
+      return `${baseClass} border-amber-400 bg-amber-50`;
+    }
+    return `${baseClass} border-gray-300`;
+  };
 
   useEffect(() => {
     // Load settings from API (database)
@@ -60,7 +95,9 @@ export default function SettingsPage() {
       const res = await fetch('/api/admin/settings');
       if (res.ok) {
         const data = await res.json();
-        setSettings({ ...defaultSettings, ...data });
+        const loadedSettings = { ...defaultSettings, ...data };
+        setSettings(loadedSettings);
+        setOriginalSettings(loadedSettings);
       } else if (res.status === 401) {
         setLoadError('Session expired. Please log in again.');
       } else {
@@ -177,11 +214,13 @@ export default function SettingsPage() {
     const { name, value } = e.target;
     setSettings(prev => ({ ...prev, [name]: value }));
     setSaved(false);
+    setSaveResult(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setSaveResult(null);
 
     try {
       // Save settings to database via API
@@ -191,8 +230,9 @@ export default function SettingsPage() {
         body: JSON.stringify(settings),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
         if (res.status === 401) {
           setLoadError('Session expired. Please log in again.');
           return;
@@ -200,8 +240,20 @@ export default function SettingsPage() {
         throw new Error(data.error || 'Failed to save settings');
       }
 
+      // Update original settings to match saved state
+      setOriginalSettings(settings);
+      
+      // Set save result with change details
+      setSaveResult({
+        changedFieldLabels: data.changedFieldLabels || [],
+        changeCount: data.changeCount || 0,
+      });
+      
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      setTimeout(() => {
+        setSaved(false);
+        setSaveResult(null);
+      }, 5000);
     } catch (error) {
       console.error('Error saving settings:', error);
       alert(error instanceof Error ? error.message : 'Failed to save settings. Please try again.');
@@ -361,34 +413,43 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold text-secondary-900 mb-4">Company Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Company Name
+                {isFieldModified('companyName') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+              </label>
               <input
                 type="text"
                 name="companyName"
                 value={settings.companyName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={getInputClassName('companyName')}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tagline
+                {isFieldModified('tagline') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+              </label>
               <input
                 type="text"
                 name="tagline"
                 value={settings.tagline}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={getInputClassName('tagline')}
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Address
+                {isFieldModified('address') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+              </label>
               <textarea
                 name="address"
                 value={settings.address}
                 onChange={handleChange}
                 rows={2}
                 placeholder="Enter your business address"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={getInputClassName('address')}
               />
             </div>
           </div>
@@ -399,46 +460,58 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold text-secondary-900 mb-4">Contact Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address
+                {isFieldModified('email') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+              </label>
               <input
                 type="email"
                 name="email"
                 value={settings.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={getInputClassName('email')}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone Number
+                {isFieldModified('phone') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+              </label>
               <input
                 type="text"
                 name="phone"
                 value={settings.phone}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={getInputClassName('phone')}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp Number</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                WhatsApp Number
+                {isFieldModified('whatsappNumber') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+              </label>
               <input
                 type="text"
                 name="whatsappNumber"
                 value={settings.whatsappNumber}
                 onChange={handleChange}
                 placeholder="e.g. 27821234567"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={getInputClassName('whatsappNumber')}
               />
               <p className="text-xs text-gray-500 mt-1">Include country code without + sign</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Business Hours</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Business Hours
+                {isFieldModified('businessHours') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+              </label>
               <input
                 type="text"
                 name="businessHours"
                 value={settings.businessHours}
                 onChange={handleChange}
                 placeholder="e.g. Mon-Fri 8:00-17:00"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={getInputClassName('businessHours')}
               />
             </div>
           </div>
@@ -449,7 +522,10 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold text-secondary-900 mb-4">Business Settings</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">VAT Rate (%)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                VAT Rate (%)
+                {isFieldModified('vatRate') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+              </label>
               <input
                 type="number"
                 name="vatRate"
@@ -458,7 +534,7 @@ export default function SettingsPage() {
                 min="0"
                 max="100"
                 step="0.1"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={getInputClassName('vatRate')}
               />
             </div>
           </div>
@@ -469,44 +545,96 @@ export default function SettingsPage() {
           <h2 className="text-lg font-semibold text-secondary-900 mb-4">Social Media Links</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Facebook</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Facebook
+                {isFieldModified('socialFacebook') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+              </label>
               <input
                 type="url"
                 name="socialFacebook"
                 value={settings.socialFacebook}
                 onChange={handleChange}
                 placeholder="https://facebook.com/..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={getInputClassName('socialFacebook')}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Instagram
+                {isFieldModified('socialInstagram') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+              </label>
               <input
                 type="url"
                 name="socialInstagram"
                 value={settings.socialInstagram}
                 onChange={handleChange}
                 placeholder="https://instagram.com/..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={getInputClassName('socialInstagram')}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                LinkedIn
+                {isFieldModified('socialLinkedIn') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+              </label>
               <input
                 type="url"
                 name="socialLinkedIn"
                 value={settings.socialLinkedIn}
                 onChange={handleChange}
                 placeholder="https://linkedin.com/company/..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={getInputClassName('socialLinkedIn')}
               />
             </div>
           </div>
         </div>
 
+        {/* Unsaved Changes Banner */}
+        {hasUnsavedChanges && !saved && (
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <h3 className="font-medium text-amber-800">You have unsaved changes</h3>
+                <p className="text-sm text-amber-700 mt-1">
+                  {modifiedFields.length} field{modifiedFields.length !== 1 ? 's' : ''} modified. Click &quot;Save Settings&quot; to apply your changes.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
-          <div>
-            {saved && (
+          <div className="flex-1">
+            {saved && saveResult && (
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <div>
+                    <h3 className="font-medium text-green-800">Settings saved successfully!</h3>
+                    {saveResult.changeCount > 0 ? (
+                      <div className="mt-1">
+                        <p className="text-sm text-green-700">
+                          Updated {saveResult.changeCount} field{saveResult.changeCount !== 1 ? 's' : ''}:
+                        </p>
+                        <ul className="mt-1 text-sm text-green-600 list-disc list-inside">
+                          {saveResult.changedFieldLabels.map((label, index) => (
+                            <li key={index}>{label}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-green-700 mt-1">No changes detected.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            {saved && !saveResult && (
               <span className="text-green-600 flex items-center gap-2">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -518,7 +646,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
+            className="px-6 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 ml-4"
           >
             {saving ? 'Saving...' : 'Save Settings'}
           </button>

@@ -116,6 +116,51 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Type for API settings format
+interface ApiSettings {
+  companyName: string;
+  tagline: string;
+  email: string;
+  phone: string;
+  whatsappNumber: string;
+  address: string;
+  businessHours: string;
+  vatRate: string;
+  socialFacebook: string;
+  socialInstagram: string;
+  socialLinkedIn: string;
+}
+
+// Field labels for human-readable change messages
+const FIELD_LABELS: Record<keyof ApiSettings, string> = {
+  companyName: 'Company Name',
+  tagline: 'Tagline',
+  email: 'Email Address',
+  phone: 'Phone Number',
+  whatsappNumber: 'WhatsApp Number',
+  address: 'Address',
+  businessHours: 'Business Hours',
+  vatRate: 'VAT Rate',
+  socialFacebook: 'Facebook URL',
+  socialInstagram: 'Instagram URL',
+  socialLinkedIn: 'LinkedIn URL',
+};
+
+// Helper to detect which fields changed (type-safe version)
+function getChangedFields(
+  oldSettings: ApiSettings,
+  newSettings: Partial<ApiSettings>
+): Array<keyof ApiSettings> {
+  const changedFields: Array<keyof ApiSettings> = [];
+  const keys = Object.keys(FIELD_LABELS) as Array<keyof ApiSettings>;
+  for (const key of keys) {
+    if (newSettings[key] !== undefined && oldSettings[key] !== newSettings[key]) {
+      changedFields.push(key);
+    }
+  }
+  return changedFields;
+}
+
 export async function POST(request: NextRequest) {
   // Verify admin authentication
   const authError = await requireAdminAuth(request);
@@ -133,6 +178,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get current settings to compare for changes
+    const currentSettings = await prisma.siteSetting.findUnique({
+      where: { id: SITE_SETTINGS_ID },
+    });
+
+    const currentApiFormat: ApiSettings = currentSettings 
+      ? dbToApiFormat(currentSettings)
+      : DEFAULT_SETTINGS;
+
+    // Determine which fields changed
+    const changedFields = getChangedFields(currentApiFormat, validation.data);
+
     // Convert to database format
     const dbData = apiToDbFormat(validation.data);
 
@@ -146,9 +203,15 @@ export async function POST(request: NextRequest) {
       update: dbData,
     });
 
+    // Build human-readable change summary
+    const changedFieldLabels = changedFields.map(field => FIELD_LABELS[field] || field);
+
     return NextResponse.json({ 
       success: true, 
-      settings: dbToApiFormat(updatedSettings) 
+      settings: dbToApiFormat(updatedSettings),
+      changedFields,
+      changedFieldLabels,
+      changeCount: changedFields.length,
     });
   } catch (error) {
     console.error('Error saving settings:', error);
