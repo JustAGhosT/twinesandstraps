@@ -6,10 +6,44 @@ import {
   clearLoginAttempts,
   createSession,
   invalidateSession,
+  verifySession,
   getSessionToken,
   getClientIP,
 } from '@/lib/admin-auth';
 import { loginSchema, validateBody, formatZodErrors } from '@/lib/validations';
+
+/**
+ * GET - Verify if the current session is valid
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const token = getSessionToken(request);
+    
+    if (!token) {
+      return NextResponse.json({ valid: false }, { status: 401 });
+    }
+
+    const isValid = await verifySession(token);
+    
+    if (!isValid) {
+      // Clear the invalid cookie
+      const response = NextResponse.json({ valid: false }, { status: 401 });
+      response.cookies.set('admin_session', '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 0,
+        path: '/',
+      });
+      return response;
+    }
+
+    return NextResponse.json({ valid: true });
+  } catch (error) {
+    console.error('Session verification error:', error);
+    return NextResponse.json({ valid: false, error: 'Session verification failed' }, { status: 500 });
+  }
+}
 
 export async function POST(request: NextRequest) {
   const ip = getClientIP(request);
