@@ -14,6 +14,11 @@
  * Supports both Azure OpenAI and OpenAI API (set OPENAI_API_KEY for OpenAI)
  */
 
+// Company configuration - can be customized per deployment
+const COMPANY_NAME = process.env.COMPANY_NAME || 'Twines and Straps SA';
+const COMPANY_FULL_NAME = process.env.COMPANY_FULL_NAME || 'Twines and Straps SA (Pty) Ltd';
+const COMPANY_INDUSTRY = process.env.COMPANY_INDUSTRY || 'industrial twines, ropes, and strapping materials';
+
 // AI Configuration from environment variables
 const AZURE_AI_ENDPOINT = process.env.AZURE_AI_ENDPOINT;
 const AZURE_AI_API_KEY = process.env.AZURE_AI_API_KEY;

@@ -326,7 +326,7 @@ export default function AIAssistantPanel({
           </div>
           <div className="text-left">
             <h3 className="font-semibold">AI Business Assistant</h3>
-            <p className="text-sm text-white/80">SWOT, competitors, insights & more</p>
+            <p className="text-sm text-white/80">SWOT, competitors, insights, & more</p>
           </div>
         </div>
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
