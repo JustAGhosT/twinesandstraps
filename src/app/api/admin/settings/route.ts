@@ -3,6 +3,9 @@ import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { siteSettingsSchema, validateBody, formatZodErrors } from '@/lib/validations';
 
+// Singleton ID for site settings - there's only one settings record
+const SITE_SETTINGS_ID = 1;
+
 const DEFAULT_SETTINGS = {
   companyName: 'Twines and Straps SA (Pty) Ltd',
   tagline: 'Boundless Strength, Endless Solutions!',
@@ -16,6 +19,21 @@ const DEFAULT_SETTINGS = {
   socialInstagram: '',
   socialLinkedIn: '',
 };
+
+// Type for database format fields
+interface DbSettingsUpdate {
+  company_name?: string;
+  tagline?: string;
+  email?: string;
+  phone?: string;
+  whatsapp_number?: string;
+  address?: string;
+  business_hours?: string;
+  vat_rate?: string;
+  social_facebook?: string;
+  social_instagram?: string;
+  social_linkedin?: string;
+}
 
 // Helper to convert database fields to API format
 function dbToApiFormat(dbSettings: {
@@ -59,8 +77,8 @@ function apiToDbFormat(apiSettings: {
   socialFacebook?: string;
   socialInstagram?: string;
   socialLinkedIn?: string;
-}) {
-  const dbData: Record<string, string> = {};
+}): DbSettingsUpdate {
+  const dbData: DbSettingsUpdate = {};
   if (apiSettings.companyName !== undefined) dbData.company_name = apiSettings.companyName;
   if (apiSettings.tagline !== undefined) dbData.tagline = apiSettings.tagline;
   if (apiSettings.email !== undefined) dbData.email = apiSettings.email;
@@ -81,9 +99,9 @@ export async function GET(request: NextRequest) {
   if (authError) return authError;
 
   try {
-    // Try to get settings from database (singleton with id=1)
+    // Try to get settings from database (singleton pattern)
     const settings = await prisma.siteSetting.findUnique({
-      where: { id: 1 },
+      where: { id: SITE_SETTINGS_ID },
     });
 
     if (settings) {
@@ -120,9 +138,9 @@ export async function POST(request: NextRequest) {
 
     // Upsert settings (create if doesn't exist, update if exists)
     const updatedSettings = await prisma.siteSetting.upsert({
-      where: { id: 1 },
+      where: { id: SITE_SETTINGS_ID },
       create: {
-        id: 1,
+        id: SITE_SETTINGS_ID,
         ...dbData,
       },
       update: dbData,

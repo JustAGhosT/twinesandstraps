@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+// Singleton ID for site settings - there's only one settings record
+const SITE_SETTINGS_ID = 1;
+
 // Default settings to use if database doesn't have settings yet
 const DEFAULT_SETTINGS = {
   companyName: 'Twines and Straps SA (Pty) Ltd',
@@ -51,9 +54,9 @@ function dbToApiFormat(dbSettings: {
  */
 export async function GET() {
   try {
-    // Try to get settings from database (singleton with id=1)
+    // Try to get settings from database (singleton pattern)
     const settings = await prisma.siteSetting.findUnique({
-      where: { id: 1 },
+      where: { id: SITE_SETTINGS_ID },
     });
 
     if (settings) {
