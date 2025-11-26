@@ -5,7 +5,11 @@ import {
   analyzeProduct, 
   enhanceDescription, 
   getMarketResearch, 
-  suggestPricing 
+  suggestPricing,
+  performSWOTAnalysis,
+  performCompetitorResearch,
+  getProductRecommendations,
+  getBusinessInsights
 } from '@/lib/ai';
 
 /**
@@ -19,6 +23,10 @@ import {
  * - enhance-description: Improve product description
  * - market-research: Get market research for a category
  * - suggest-pricing: Get pricing suggestions
+ * - swot-analysis: Perform SWOT analysis
+ * - competitor-research: Deep competitor analysis
+ * - product-recommendations: Get product bundle and cross-sell recommendations
+ * - business-insights: Get strategic business insights
  * - status: Check if AI is configured
  */
 export async function POST(request: NextRequest) {
@@ -135,9 +143,86 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: true, data: pricing });
       }
 
+      case 'swot-analysis': {
+        const { productName, category, description, businessContext } = params;
+
+        const swot = await performSWOTAnalysis({
+          productName,
+          category,
+          description,
+          businessContext,
+        });
+
+        return NextResponse.json({ success: true, data: swot });
+      }
+
+      case 'competitor-research': {
+        const { category, productTypes, region } = params;
+
+        if (!category) {
+          return NextResponse.json(
+            { error: 'Missing required field: category' },
+            { status: 400 }
+          );
+        }
+
+        const competitors = await performCompetitorResearch({
+          category,
+          productTypes,
+          region,
+        });
+
+        return NextResponse.json({ success: true, data: competitors });
+      }
+
+      case 'product-recommendations': {
+        const { currentProduct, category, customerSegment, existingProducts } = params;
+
+        if (!currentProduct) {
+          return NextResponse.json(
+            { error: 'Missing required field: currentProduct' },
+            { status: 400 }
+          );
+        }
+
+        const recommendations = await getProductRecommendations({
+          currentProduct,
+          category,
+          customerSegment,
+          existingProducts,
+        });
+
+        return NextResponse.json({ success: true, data: recommendations });
+      }
+
+      case 'business-insights': {
+        const { focusArea, currentChallenges, goals } = params;
+
+        const insights = await getBusinessInsights({
+          focusArea,
+          currentChallenges,
+          goals,
+        });
+
+        return NextResponse.json({ success: true, data: insights });
+      }
+
       default:
         return NextResponse.json(
-          { error: 'Unknown action', validActions: ['status', 'analyze', 'enhance-description', 'market-research', 'suggest-pricing'] },
+          { 
+            error: 'Unknown action', 
+            validActions: [
+              'status', 
+              'analyze', 
+              'enhance-description', 
+              'market-research', 
+              'suggest-pricing',
+              'swot-analysis',
+              'competitor-research',
+              'product-recommendations',
+              'business-insights'
+            ] 
+          },
           { status: 400 }
         );
     }
@@ -172,6 +257,10 @@ export async function GET(request: NextRequest) {
       'Description enhancement',
       'Market research',
       'Pricing suggestions',
+      'SWOT analysis',
+      'Competitor research',
+      'Product recommendations',
+      'Business insights',
     ],
   });
 }
