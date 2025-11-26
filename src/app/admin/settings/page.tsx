@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Image from 'next/image';
 
 interface SiteSettings {
@@ -53,8 +53,8 @@ export default function SettingsPage() {
   const [logoSuccess, setLogoSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Track which fields have been modified
-  const getModifiedFields = (): string[] => {
+  // Track which fields have been modified - memoized to avoid recalculation on every render
+  const modifiedFields = useMemo(() => {
     const modified: string[] = [];
     for (const key of Object.keys(settings) as Array<keyof SiteSettings>) {
       if (settings[key] !== originalSettings[key]) {
@@ -62,9 +62,8 @@ export default function SettingsPage() {
       }
     }
     return modified;
-  };
+  }, [settings, originalSettings]);
   
-  const modifiedFields = getModifiedFields();
   const hasUnsavedChanges = modifiedFields.length > 0;
   
   // Helper to check if a specific field is modified

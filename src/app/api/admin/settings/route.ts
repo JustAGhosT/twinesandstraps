@@ -116,8 +116,23 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Type for API settings format
+interface ApiSettings {
+  companyName: string;
+  tagline: string;
+  email: string;
+  phone: string;
+  whatsappNumber: string;
+  address: string;
+  businessHours: string;
+  vatRate: string;
+  socialFacebook: string;
+  socialInstagram: string;
+  socialLinkedIn: string;
+}
+
 // Field labels for human-readable change messages
-const FIELD_LABELS: Record<string, string> = {
+const FIELD_LABELS: Record<keyof ApiSettings, string> = {
   companyName: 'Company Name',
   tagline: 'Tagline',
   email: 'Email Address',
@@ -131,14 +146,15 @@ const FIELD_LABELS: Record<string, string> = {
   socialLinkedIn: 'LinkedIn URL',
 };
 
-// Helper to detect which fields changed
+// Helper to detect which fields changed (type-safe version)
 function getChangedFields(
-  oldSettings: Record<string, string>,
-  newSettings: Record<string, string>
-): string[] {
-  const changedFields: string[] = [];
-  for (const key of Object.keys(newSettings)) {
-    if (oldSettings[key] !== newSettings[key]) {
+  oldSettings: ApiSettings,
+  newSettings: Partial<ApiSettings>
+): Array<keyof ApiSettings> {
+  const changedFields: Array<keyof ApiSettings> = [];
+  const keys = Object.keys(FIELD_LABELS) as Array<keyof ApiSettings>;
+  for (const key of keys) {
+    if (newSettings[key] !== undefined && oldSettings[key] !== newSettings[key]) {
       changedFields.push(key);
     }
   }
@@ -167,15 +183,12 @@ export async function POST(request: NextRequest) {
       where: { id: SITE_SETTINGS_ID },
     });
 
-    const currentApiFormat = currentSettings 
+    const currentApiFormat: ApiSettings = currentSettings 
       ? dbToApiFormat(currentSettings)
       : DEFAULT_SETTINGS;
 
     // Determine which fields changed
-    const changedFields = getChangedFields(
-      currentApiFormat as unknown as Record<string, string>,
-      validation.data as unknown as Record<string, string>
-    );
+    const changedFields = getChangedFields(currentApiFormat, validation.data);
 
     // Convert to database format
     const dbData = apiToDbFormat(validation.data);
