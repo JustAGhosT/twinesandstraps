@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { AdminAuthProvider, useAdminAuth } from '@/contexts/AdminAuthContext';
 
 const navItems = [
@@ -118,91 +118,17 @@ function AdminSidebar() {
   );
 }
 
-function AdminLoginForm() {
-  const { login, error: authError } = useAdminAuth();
-  const [password, setPassword] = React.useState('');
-  const [loading, setLoading] = React.useState(false);
-  const errorId = React.useId();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    await login(password);
-    setLoading(false);
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md" role="main">
-        <div className="text-center mb-8">
-          <div
-            className="w-16 h-16 rounded-full border-4 border-primary-600 flex items-center justify-center bg-white mx-auto mb-4"
-            aria-hidden="true"
-          >
-            <span className="text-primary-600 font-bold text-xl">TS</span>
-          </div>
-          <h1 className="text-2xl font-bold text-secondary-900">Admin Login</h1>
-          <p className="text-gray-500 mt-2">Enter your password to access the admin panel</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                authError ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="Enter admin password"
-              required
-              autoComplete="current-password"
-              aria-invalid={authError ? 'true' : 'false'}
-              aria-describedby={authError ? errorId : undefined}
-            />
-          </div>
-
-          {authError && (
-            <div
-              id={errorId}
-              className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm"
-              role="alert"
-              aria-live="polite"
-            >
-              {authError}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-            aria-busy={loading}
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-gray-500 mt-6">
-          <Link
-            href="/"
-            className="text-primary-600 hover:text-primary-700 focus:outline-none focus:underline"
-          >
-            ← Back to website
-          </Link>
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
   const { isAuthenticated, isLoading } = useAdminAuth();
+
+  // Login page doesn't need the admin layout wrapper
+  const isLoginPage = pathname === '/admin/login';
+
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
   if (isLoading) {
     return (
@@ -217,8 +143,20 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     );
   }
 
+  // If not authenticated, redirect to login (middleware should handle this,
+  // but this is a fallback for client-side navigation)
   if (!isAuthenticated) {
-    return <AdminLoginForm />;
+    router.push(`/admin/login?from=${encodeURIComponent(pathname)}`);
+    return (
+      <div
+        className="min-h-screen bg-gray-100 flex items-center justify-center"
+        role="status"
+        aria-label="Redirecting to login"
+      >
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" aria-hidden="true"></div>
+        <span className="sr-only">Redirecting...</span>
+      </div>
+    );
   }
 
   return (
