@@ -113,7 +113,7 @@ model Order {
   created_at          DateTime  @default(now())
   updated_at          DateTime  @updatedAt
 
-  user             User       @relation(fields: [user_id], references: [id])
+  user             User       @relation(fields: [user_id], references: [id], onDelete: Restrict)
   shipping_address Address?   @relation("ShippingAddress", fields: [shipping_address_id], references: [id])
   billing_address  Address?   @relation("BillingAddress", fields: [billing_address_id], references: [id])
   items            OrderItem[]
