@@ -270,9 +270,10 @@ You must configure a cloud database for production. The CI/CD pipeline now valid
 5. **Run migrations** on your production database:
    > **Note:** With the latest pipeline configuration, migrations are automatically applied during Netlify builds via `prisma migrate deploy`. However, you can also run them manually if needed:
    ```bash
+   # For production deployments (applies migration files)
    DATABASE_URL="your-prod-url" npx prisma migrate deploy
-   # or for development/initial setup:
-   npx prisma db push
+   # For local development (creates and applies migrations interactively)
+   npx prisma migrate dev
    ```
 
 ### "Unauthorized: could not retrieve project" Error
