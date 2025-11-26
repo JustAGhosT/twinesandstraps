@@ -69,9 +69,10 @@ model User {
   last_login        DateTime?
 
   // Relations
-  addresses    Address[]
-  orders       Order[]
-  view_history ViewHistory[]
+  addresses           Address[]
+  orders              Order[]
+  view_history        ViewHistory[]
+  password_reset_tokens PasswordResetToken[]
 }
 
 model Address {
@@ -153,4 +154,15 @@ model ViewHistory {
   product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, product_id])
+}
+
+model PasswordResetToken {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  token      String   @unique
+  expires_at DateTime
+  used       Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }

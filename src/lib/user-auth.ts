@@ -185,3 +185,18 @@ export function validatePasswordStrength(password: string): { valid: boolean; me
   }
   return { valid: true };
 }
+
+/**
+ * Generate a secure password reset token
+ * Returns a URL-safe token string
+ */
+export function generatePasswordResetToken(): string {
+  return crypto.randomBytes(32).toString('base64url');
+}
+
+/**
+ * Calculate password reset token expiry (1 hour from now)
+ */
+export function getPasswordResetExpiry(): Date {
+  return new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+}
