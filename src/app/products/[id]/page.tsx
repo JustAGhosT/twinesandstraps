@@ -1,6 +1,7 @@
 import React from 'react';
 import prisma from '@/lib/prisma';
 import ProductView from '@/components/ProductView';
+import RelatedProducts from '@/components/RelatedProducts';
 import Link from 'next/link';
 
 // Force dynamic rendering - data is fetched at request time
@@ -14,12 +15,12 @@ interface ProductDetailPageProps {
 
 async function getProduct(id: string) {
   const productId = parseInt(id, 10);
-  
+
   // Validate that the ID is a valid positive number
   if (isNaN(productId) || productId <= 0 || !Number.isFinite(productId)) {
     return null;
   }
-  
+
   const product = await prisma.product.findUnique({
     where: {
       id: productId,
@@ -29,6 +30,28 @@ async function getProduct(id: string) {
     },
   });
   return product;
+}
+
+async function getRelatedProducts(productId: number, categoryId: number) {
+  const relatedProducts = await prisma.product.findMany({
+    where: {
+      category_id: categoryId,
+      id: {
+        not: productId
+      },
+      stock_status: {
+        not: 'OUT_OF_STOCK'
+      }
+    },
+    include: {
+      category: true,
+    },
+    take: 4,
+    orderBy: {
+      created_at: 'desc'
+    }
+  });
+  return relatedProducts;
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
@@ -47,6 +70,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       </div>
     );
   }
+
+  // Fetch related products from the same category
+  const relatedProducts = await getRelatedProducts(product.id, product.category_id);
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -68,6 +94,13 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
           <ProductView product={product} />
         </div>
+
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm p-6 md:p-8 mt-6">
+            <RelatedProducts products={relatedProducts} title="You May Also Like" />
+          </div>
+        )}
 
         {/* Back to Products Link */}
         <div className="mt-8">

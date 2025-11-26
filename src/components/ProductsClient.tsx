@@ -17,11 +17,60 @@ type SortOption = 'newest' | 'price-low' | 'price-high' | 'name-asc' | 'name-des
 
 export default function ProductsClient({ products, categories }: ProductsClientProps) {
   const [sortBy, setSortBy] = useState<SortOption>('newest');
+  const [materialFilter, setMaterialFilter] = useState<string>('');
+  const [diameterRange, setDiameterRange] = useState<{ min: number; max: number }>({ min: 0, max: 100 });
+  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 10000 });
+  const [showFilters, setShowFilters] = useState(false);
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('search') || '';
   const categoryFilter = searchParams.get('category') || '';
 
-  // Filter products by search query and category
+  // Get unique materials from products
+  const uniqueMaterials = useMemo(() => {
+    const materials = new Set<string>();
+    products.forEach(p => {
+      if (p.material) materials.add(p.material);
+    });
+    return Array.from(materials).sort();
+  }, [products]);
+
+  // Get price and diameter ranges from products
+  const priceStats = useMemo(() => {
+    const prices = products.map(p => p.price);
+    return {
+      min: Math.floor(Math.min(...prices)),
+      max: Math.ceil(Math.max(...prices))
+    };
+  }, [products]);
+
+  const diameterStats = useMemo(() => {
+    const diameters = products.filter(p => p.diameter).map(p => p.diameter as number);
+    if (diameters.length === 0) return { min: 0, max: 100 };
+    return {
+      min: Math.floor(Math.min(...diameters)),
+      max: Math.ceil(Math.max(...diameters))
+    };
+  }, [products]);
+
+  // Initialize ranges on first render
+  React.useEffect(() => {
+    setPriceRange({ min: priceStats.min, max: priceStats.max });
+    setDiameterRange({ min: diameterStats.min, max: diameterStats.max });
+  }, [priceStats, diameterStats]);
+
+  const clearAllFilters = () => {
+    setMaterialFilter('');
+    setPriceRange({ min: priceStats.min, max: priceStats.max });
+    setDiameterRange({ min: diameterStats.min, max: diameterStats.max });
+  };
+
+  const hasActiveFilters = materialFilter ||
+    priceRange.min > priceStats.min ||
+    priceRange.max < priceStats.max ||
+    diameterRange.min > diameterStats.min ||
+    diameterRange.max < diameterStats.max;
+
+  // Filter products by all criteria
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
@@ -43,8 +92,26 @@ export default function ProductsClient({ products, categories }: ProductsClientP
       );
     }
 
+    // Filter by material
+    if (materialFilter) {
+      filtered = filtered.filter(product =>
+        product.material === materialFilter
+      );
+    }
+
+    // Filter by price range
+    filtered = filtered.filter(product =>
+      product.price >= priceRange.min && product.price <= priceRange.max
+    );
+
+    // Filter by diameter range
+    filtered = filtered.filter(product => {
+      if (!product.diameter) return true; // Include products without diameter
+      return product.diameter >= diameterRange.min && product.diameter <= diameterRange.max;
+    });
+
     return filtered;
-  }, [products, searchQuery, categoryFilter]);
+  }, [products, searchQuery, categoryFilter, materialFilter, priceRange, diameterRange]);
 
   const sortedProducts = useMemo(() => {
     const sorted = [...filteredProducts];
@@ -158,14 +225,121 @@ export default function ProductsClient({ products, categories }: ProductsClientP
 
               {/* Divider */}
               <hr className="my-4 border-gray-200" />
-              
+
+              {/* Filters Toggle (Mobile) */}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="lg:hidden w-full flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 mb-4"
+              >
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  </svg>
+                  Filters
+                  {hasActiveFilters && <span className="w-2 h-2 bg-primary-500 rounded-full" />}
+                </span>
+                <svg className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Filters Section */}
+              <div className={`space-y-4 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+                {/* Clear Filters */}
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Clear all filters
+                  </button>
+                )}
+
+                {/* Material Filter */}
+                {uniqueMaterials.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">Material</h4>
+                    <select
+                      value={materialFilter}
+                      onChange={(e) => setMaterialFilter(e.target.value)}
+                      className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    >
+                      <option value="">All Materials</option>
+                      {uniqueMaterials.map(material => (
+                        <option key={material} value={material}>{material}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Price Range Filter */}
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">Price Range (R)</h4>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={priceRange.min}
+                      onChange={(e) => setPriceRange({ ...priceRange, min: Number(e.target.value) })}
+                      min={priceStats.min}
+                      max={priceRange.max}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:ring-2 focus:ring-primary-500"
+                      placeholder="Min"
+                    />
+                    <span className="text-gray-400">-</span>
+                    <input
+                      type="number"
+                      value={priceRange.max}
+                      onChange={(e) => setPriceRange({ ...priceRange, max: Number(e.target.value) })}
+                      min={priceRange.min}
+                      max={priceStats.max}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:ring-2 focus:ring-primary-500"
+                      placeholder="Max"
+                    />
+                  </div>
+                </div>
+
+                {/* Diameter Range Filter */}
+                {diameterStats.max > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">Diameter (mm)</h4>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        value={diameterRange.min}
+                        onChange={(e) => setDiameterRange({ ...diameterRange, min: Number(e.target.value) })}
+                        min={diameterStats.min}
+                        max={diameterRange.max}
+                        className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:ring-2 focus:ring-primary-500"
+                        placeholder="Min"
+                      />
+                      <span className="text-gray-400">-</span>
+                      <input
+                        type="number"
+                        value={diameterRange.max}
+                        onChange={(e) => setDiameterRange({ ...diameterRange, max: Number(e.target.value) })}
+                        min={diameterRange.min}
+                        max={diameterStats.max}
+                        className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:ring-2 focus:ring-primary-500"
+                        placeholder="Max"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Divider */}
+              <hr className="my-4 border-gray-200" />
+
               {/* Need Help Section */}
               <div>
                 <h3 className="text-sm font-semibold text-gray-900 mb-2">Need Help?</h3>
                 <p className="text-xs text-gray-500 mb-3">
                   Can&apos;t find what you&apos;re looking for? Request a custom quote.
                 </p>
-                <Link 
+                <Link
                   href="/quote"
                   className="block w-full text-center bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
                 >
