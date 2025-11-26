@@ -1,5 +1,7 @@
 # Twines and Straps SA E-Commerce Platform
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/27ce6415-e0b4-4dd5-abdd-def736b7f6b4/deploy-status)](https://app.netlify.com/projects/twinesandstraps/deploys)
+
 This repository contains the source code for the Twines and Straps SA e-commerce platform, a combined B2C/B2B solution built with Next.js, TypeScript, and Tailwind CSS.
 
 ## Deployment URLs
