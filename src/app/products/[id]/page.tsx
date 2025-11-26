@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import ProductView from '@/components/ProductView';
 import RelatedProducts from '@/components/RelatedProducts';
 import Link from 'next/link';
+import { featureFlags } from '@/config/featureFlags';
 
 // Force dynamic rendering - data is fetched at request time
 export const dynamic = 'force-dynamic';
@@ -192,7 +193,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         </div>
 
         {/* Related Products */}
-        {relatedProducts.length > 0 && (
+        {featureFlags.relatedProducts && relatedProducts.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm p-6 md:p-8 mt-6">
             <RelatedProducts products={relatedProducts} title="You May Also Like" />
           </div>

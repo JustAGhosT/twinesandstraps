@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 import ProductCard from '@/components/ProductCard';
 import Testimonials from '@/components/Testimonials';
 import TrustBadges from '@/components/TrustBadges';
+import { featureFlags } from '@/config/featureFlags';
 
 // Force dynamic rendering - data is fetched at request time
 export const dynamic = 'force-dynamic';
@@ -170,7 +171,7 @@ export default async function Home() {
       </section>
 
       {/* Trust Badges */}
-      <TrustBadges />
+      {featureFlags.trustBadges && <TrustBadges />}
 
       {/* Our Customers Section */}
       <section className="py-16 bg-white">
@@ -327,7 +328,7 @@ export default async function Home() {
       </section>
 
       {/* Customer Testimonials */}
-      <Testimonials />
+      {featureFlags.testimonials && <Testimonials />}
 
       {/* B2B Section */}
       <section className="py-16 bg-gradient-to-r from-secondary-900 to-primary-900 text-white">

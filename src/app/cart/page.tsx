@@ -5,9 +5,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import RecommendedProducts from '@/components/RecommendedProducts';
+import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
+  const showRecommendedProducts = useFeatureFlag('recommendedProducts');
 
   const handleSendToWhatsApp = () => {
     const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
@@ -62,9 +64,11 @@ export default function CartPage() {
           </div>
 
           {/* Recommended Products */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <RecommendedProducts title="You might be interested in" maxProducts={4} />
-          </div>
+          {showRecommendedProducts && (
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <RecommendedProducts title="You might be interested in" maxProducts={4} />
+            </div>
+          )}
         </div>
       </div>
     );

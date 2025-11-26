@@ -4,12 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 import SearchBar from '@/components/SearchBar';
+import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 
 const Header: React.FC = () => {
   const { getTotalItems } = useCart();
   const totalItems = getTotalItems();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const showSearchBar = useFeatureFlag('searchBar');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -66,7 +68,7 @@ const Header: React.FC = () => {
           {/* Right Actions */}
           <div className="flex items-center space-x-3">
             {/* Search */}
-            <SearchBar />
+            {showSearchBar && <SearchBar />}
 
             {/* CTA Button - Desktop only */}
             <Link 

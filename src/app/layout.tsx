@@ -6,6 +6,7 @@ import { Providers } from "@/components/Providers";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import BackToTop from "@/components/BackToTop";
 import SkipLink from "@/components/SkipLink";
+import { featureFlags } from "@/config/featureFlags";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://twinesandstraps.netlify.app';
 
@@ -77,8 +78,8 @@ export default function RootLayout({
           <Header />
           <main id="main-content" className="flex-grow">{children}</main>
           <Footer />
-          <BackToTop />
-          <WhatsAppButton />
+          {featureFlags.backToTop && <BackToTop />}
+          {featureFlags.whatsappButton && <WhatsAppButton />}
         </Providers>
       </body>
     </html>
