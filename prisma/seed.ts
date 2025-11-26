@@ -28,16 +28,20 @@ const productImages: Record<string, string> = {
 async function main() {
   console.log('Seeding database with products...');
 
-  // Create categories
-  const twinesCategory = await prisma.category.create({
-    data: {
+  // Create or update categories using upsert
+  const twinesCategory = await prisma.category.upsert({
+    where: { slug: 'twines' },
+    update: { name: 'Twines' },
+    create: {
       name: 'Twines',
       slug: 'twines',
     },
   })
 
-  const syntheticRopesCategory = await prisma.category.create({
-    data: {
+  const syntheticRopesCategory = await prisma.category.upsert({
+    where: { slug: 'ropes' },
+    update: { name: 'Ropes' },
+    create: {
       name: 'Ropes',
       slug: 'ropes',
     },
@@ -219,14 +223,26 @@ async function main() {
     },
   ];
 
-  // Create all products
+  // Create or update all products using upsert
   const allProducts = [...twineProducts, ...ropeProducts];
   
   for (const productData of allProducts) {
-    await prisma.product.create({
-      data: productData,
+    await prisma.product.upsert({
+      where: { sku: productData.sku },
+      update: {
+        name: productData.name,
+        description: productData.description,
+        price: productData.price,
+        material: productData.material,
+        diameter: productData.diameter,
+        length: productData.length,
+        strength_rating: productData.strength_rating,
+        category_id: productData.category_id,
+        image_url: productData.image_url,
+      },
+      create: productData,
     });
-    console.log(`Created product: ${productData.name}`);
+    console.log(`Upserted product: ${productData.name}`);
   }
 
   console.log(`\nSeeding completed! Created ${allProducts.length} products.`);
