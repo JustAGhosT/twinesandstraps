@@ -84,9 +84,16 @@ async function main() {
   }
 }
 
+/**
+ * Represents a record from the Prisma _prisma_migrations table.
+ * This table tracks the state of all applied migrations.
+ */
 interface MigrationRecord {
+  /** The unique name of the migration (e.g., '20251117010205_init') */
   migration_name: string;
+  /** Timestamp when the migration completed successfully. Null if migration is in progress or failed. */
   finished_at: Date | null;
+  /** Timestamp when the migration was rolled back. Null if migration hasn't been rolled back. */
   rolled_back_at: Date | null;
 }
 
@@ -103,7 +110,10 @@ async function getInitMigrationStatus(): Promise<'not_found' | 'applied' | 'fail
     }
     
     const migration = result[0];
-    // A migration is considered failed if finished_at is null and it hasn't been rolled back
+    // Migration status is determined by the finished_at and rolled_back_at timestamps:
+    // - finished_at=null, rolled_back_at=null: Migration started but never completed (failed)
+    // - finished_at=set, rolled_back_at=null: Migration completed successfully (applied)
+    // - rolled_back_at=set: Migration was rolled back (will be retried on next deploy)
     if (migration.finished_at === null && migration.rolled_back_at === null) {
       return 'failed';
     }
