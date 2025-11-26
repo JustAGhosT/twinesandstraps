@@ -2,6 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import prisma from '@/lib/prisma';
 import ProductCard from '@/components/ProductCard';
+import Testimonials from '@/components/Testimonials';
+import TrustBadges from '@/components/TrustBadges';
 
 // Force dynamic rendering - data is fetched at request time
 export const dynamic = 'force-dynamic';
@@ -167,6 +169,9 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Trust Badges */}
+      <TrustBadges />
+
       {/* Our Customers Section */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
@@ -320,6 +325,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Customer Testimonials */}
+      <Testimonials />
 
       {/* B2B Section */}
       <section className="py-16 bg-gradient-to-r from-secondary-900 to-primary-900 text-white">

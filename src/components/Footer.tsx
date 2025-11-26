@@ -1,11 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
+import NewsletterSignup from '@/components/NewsletterSignup';
 
 const Footer: React.FC = () => {
   return (
     <footer className="bg-secondary-900 text-white mt-auto">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-full border-2 border-primary-600 flex items-center justify-center bg-white">
@@ -57,6 +58,9 @@ const Footer: React.FC = () => {
               <span className="inline-block px-2 py-1 bg-primary-600/20 text-primary-500 rounded text-xs">🏭 Local Manufacturing</span>
               <span className="inline-block px-2 py-1 bg-primary-600/20 text-primary-500 rounded text-xs">🇿🇦 Proudly SA</span>
             </div>
+          </div>
+          <div className="md:col-span-2 lg:col-span-1">
+            <NewsletterSignup variant="footer" />
           </div>
         </div>
         <div className="border-t border-secondary-700 mt-8 pt-8 text-center text-gray-400 text-sm">
