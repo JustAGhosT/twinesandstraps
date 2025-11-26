@@ -4,6 +4,10 @@ import React, { useState, useCallback } from 'react';
 
 export type AIActionType = 'enhance-description' | 'suggest-pricing' | 'analyze';
 
+// Constants for text truncation
+const MAX_REASONING_LENGTH = 100;
+const MAX_DESCRIPTION_LINES = 4;
+
 interface UseAIButtonProps {
   /** The action type to perform */
   action: AIActionType;
@@ -184,7 +188,9 @@ export default function UseAIButton({
                 <div className="space-y-3">
                   {action === 'enhance-description' && result.enhanced && (
                     <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-700 line-clamp-4">{result.enhanced}</p>
+                      <p className="text-sm text-gray-700" style={{ display: '-webkit-box', WebkitLineClamp: MAX_DESCRIPTION_LINES, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {result.enhanced}
+                      </p>
                     </div>
                   )}
                   
@@ -207,7 +213,9 @@ export default function UseAIButton({
                         R{result.priceSuggestion.recommended.toFixed(2)}
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
-                        {result.priceSuggestion.reasoning.substring(0, 100)}...
+                        {result.priceSuggestion.reasoning.length > MAX_REASONING_LENGTH 
+                          ? `${result.priceSuggestion.reasoning.substring(0, MAX_REASONING_LENGTH)}...`
+                          : result.priceSuggestion.reasoning}
                       </p>
                     </div>
                   )}

@@ -132,9 +132,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file extension
+    // Validate file extension - must be exactly .svg at the end
     const fileName = file.name.toLowerCase();
-    if (!fileName.endsWith('.svg')) {
+    const svgExtensionMatch = fileName.match(/\.svg$/);
+    if (!svgExtensionMatch) {
       return NextResponse.json(
         {
           error: 'Invalid file type',

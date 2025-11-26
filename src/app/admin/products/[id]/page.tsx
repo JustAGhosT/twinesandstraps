@@ -401,7 +401,12 @@ export default function ProductEditPage() {
                         name: form.name,
                         material: form.material,
                       }}
-                      onApply={(value) => setForm(prev => ({ ...prev, price: Number(value).toFixed(2) }))}
+                      onApply={(value) => {
+                        const numValue = Number(value);
+                        if (!isNaN(numValue) && numValue > 0) {
+                          setForm(prev => ({ ...prev, price: numValue.toFixed(2) }));
+                        }
+                      }}
                       disabled={!form.name}
                     />
                   </div>
