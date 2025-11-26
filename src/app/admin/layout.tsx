@@ -2,8 +2,10 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { AdminAuthProvider, useAdminAuth } from '@/contexts/AdminAuthContext';
+import { useCustomLogo } from '@/hooks/useCustomLogo';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -20,6 +22,7 @@ const navItems = [
 function AdminSidebar() {
   const pathname = usePathname();
   const { logout } = useAdminAuth();
+  const customLogoUrl = useCustomLogo();
 
   const handleLogout = async () => {
     await logout();
@@ -37,8 +40,19 @@ function AdminSidebar() {
           className="flex items-center gap-2"
           aria-label="TASSA Admin Dashboard"
         >
-          <div className="w-8 h-8 rounded-full border-2 border-primary-500 flex items-center justify-center bg-white">
-            <span className="text-primary-600 font-bold text-xs" aria-hidden="true">TS</span>
+          <div className="w-8 h-8 rounded-full border-2 border-primary-500 flex items-center justify-center bg-white overflow-hidden">
+            {customLogoUrl ? (
+              <Image
+                src={customLogoUrl}
+                alt="TASSA Logo"
+                width={24}
+                height={24}
+                className="object-contain"
+                unoptimized
+              />
+            ) : (
+              <span className="text-primary-600 font-bold text-xs" aria-hidden="true">TS</span>
+            )}
           </div>
           <span className="font-bold">TASSA Admin</span>
         </Link>

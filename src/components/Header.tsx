@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { useUserAuth } from '@/contexts/UserAuthContext';
 import SearchBar from '@/components/SearchBar';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { useCustomLogo } from '@/hooks/useCustomLogo';
 
 const Header: React.FC = () => {
   const { getTotalItems } = useCart();
@@ -14,6 +16,7 @@ const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const customLogoUrl = useCustomLogo();
   const showSearchBar = useFeatureFlag('searchBar');
 
   useEffect(() => {
@@ -39,8 +42,19 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-full border-2 border-primary-600 flex items-center justify-center bg-white shadow-md group-hover:shadow-primary-600/30 group-hover:border-primary-500 transition-all duration-300">
-              <span className="text-primary-600 font-bold text-sm">TS</span>
+            <div className="w-10 h-10 rounded-full border-2 border-primary-600 flex items-center justify-center bg-white shadow-md group-hover:shadow-primary-600/30 group-hover:border-primary-500 transition-all duration-300 overflow-hidden">
+              {customLogoUrl ? (
+                <Image
+                  src={customLogoUrl}
+                  alt="TASSA Logo"
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                  unoptimized
+                />
+              ) : (
+                <span className="text-primary-600 font-bold text-sm">TS</span>
+              )}
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-bold tracking-wide text-white group-hover:text-primary-500 transition-colors">TASSA</span>
