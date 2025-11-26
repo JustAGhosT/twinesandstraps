@@ -92,6 +92,36 @@ const featureConfigs: FeatureConfig[] = [
     category: 'E-commerce Features',
     envVar: 'NEXT_PUBLIC_FEATURE_COMPARE_PRODUCTS',
   },
+  {
+    key: 'checkout',
+    name: 'Checkout',
+    description: 'Enable full checkout flow (disabled = WhatsApp quote only)',
+    category: 'E-commerce Features',
+    envVar: 'NEXT_PUBLIC_FEATURE_CHECKOUT',
+  },
+
+  // User Features
+  {
+    key: 'userAuth',
+    name: 'User Authentication',
+    description: 'Enable user registration and login',
+    category: 'User Features',
+    envVar: 'NEXT_PUBLIC_FEATURE_USER_AUTH',
+  },
+  {
+    key: 'viewHistory',
+    name: 'View History',
+    description: 'Track product view history for logged-in users',
+    category: 'User Features',
+    envVar: 'NEXT_PUBLIC_FEATURE_VIEW_HISTORY',
+  },
+  {
+    key: 'recentlyViewed',
+    name: 'Recently Viewed',
+    description: 'Show recently viewed products on product pages',
+    category: 'User Features',
+    envVar: 'NEXT_PUBLIC_FEATURE_RECENTLY_VIEWED',
+  },
 
   // UI/UX Features
   {

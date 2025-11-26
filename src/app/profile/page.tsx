@@ -66,6 +66,12 @@ export default function ProfilePage() {
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Address modal state
+  const [addressModalOpen, setAddressModalOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [addressSaving, setAddressSaving] = useState(false);
+  const [addressError, setAddressError] = useState('');
+
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login?from=/profile');
@@ -128,6 +134,80 @@ export default function ProfilePage() {
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
+    }
+  };
+
+  // Address management functions
+  const handleAddAddress = () => {
+    setEditingAddress(null);
+    setAddressError('');
+    setAddressModalOpen(true);
+  };
+
+  const handleEditAddress = (address: Address) => {
+    setEditingAddress(address);
+    setAddressError('');
+    setAddressModalOpen(true);
+  };
+
+  const handleDeleteAddress = async (addressId: number) => {
+    if (!confirm('Are you sure you want to delete this address?')) return;
+
+    try {
+      const res = await fetch(`/api/user/addresses/${addressId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        fetchAddresses();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete address');
+      }
+    } catch {
+      alert('Failed to delete address');
+    }
+  };
+
+  const handleSaveAddress = async (addressData: Omit<Address, 'id'>) => {
+    setAddressSaving(true);
+    setAddressError('');
+
+    try {
+      const url = editingAddress
+        ? `/api/user/addresses/${editingAddress.id}`
+        : '/api/user/addresses';
+      const method = editingAddress ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(addressData),
+      });
+
+      if (res.ok) {
+        setAddressModalOpen(false);
+        fetchAddresses();
+      } else {
+        const data = await res.json();
+        setAddressError(data.error || 'Failed to save address');
+      }
+    } catch {
+      setAddressError('Failed to save address');
+    } finally {
+      setAddressSaving(false);
+    }
+  };
+
+  const handleClearHistory = async () => {
+    if (!confirm('Are you sure you want to clear your view history?')) return;
+
+    try {
+      const res = await fetch('/api/user/view-history', { method: 'DELETE' });
+      if (res.ok) {
+        setViewHistory([]);
+      }
+    } catch {
+      alert('Failed to clear history');
     }
   };
 
@@ -368,7 +448,10 @@ export default function ProfilePage() {
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-secondary-900">Saved Addresses</h2>
-                <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm">
+                <button
+                  onClick={handleAddAddress}
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
+                >
                   Add New Address
                 </button>
               </div>
@@ -378,6 +461,12 @@ export default function ProfilePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <p className="text-gray-500">No addresses saved yet</p>
+                  <button
+                    onClick={handleAddAddress}
+                    className="mt-4 text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    Add your first address
+                  </button>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -395,8 +484,18 @@ export default function ProfilePage() {
                         {address.country}
                       </div>
                       <div className="mt-3 flex gap-2">
-                        <button className="text-sm text-primary-600 hover:text-primary-700">Edit</button>
-                        <button className="text-sm text-red-600 hover:text-red-700">Delete</button>
+                        <button
+                          onClick={() => handleEditAddress(address)}
+                          className="text-sm text-primary-600 hover:text-primary-700"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteAddress(address.id)}
+                          className="text-sm text-red-600 hover:text-red-700"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -411,7 +510,12 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-secondary-900">Recently Viewed Products</h2>
                 {viewHistory.length > 0 && (
-                  <button className="text-red-600 hover:text-red-700 text-sm">Clear History</button>
+                  <button
+                    onClick={handleClearHistory}
+                    className="text-red-600 hover:text-red-700 text-sm"
+                  >
+                    Clear History
+                  </button>
                 )}
               </div>
               {viewHistory.length === 0 ? (
@@ -462,6 +566,17 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+
+      {/* Address Modal */}
+      {addressModalOpen && (
+        <AddressModal
+          address={editingAddress}
+          onSave={handleSaveAddress}
+          onClose={() => setAddressModalOpen(false)}
+          saving={addressSaving}
+          error={addressError}
+        />
+      )}
     </div>
   );
 }
@@ -644,6 +759,173 @@ function ProfileSettings({ profile, onUpdate }: { profile: UserProfile; onUpdate
           >
             {changingPassword ? 'Changing...' : 'Change Password'}
           </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// Address Modal Component
+function AddressModal({
+  address,
+  onSave,
+  onClose,
+  saving,
+  error,
+}: {
+  address: Address | null;
+  onSave: (data: Omit<Address, 'id'>) => void;
+  onClose: () => void;
+  saving: boolean;
+  error: string;
+}) {
+  const [label, setLabel] = useState(address?.label || 'Home');
+  const [streetAddress, setStreetAddress] = useState(address?.street_address || '');
+  const [city, setCity] = useState(address?.city || '');
+  const [province, setProvince] = useState(address?.province || '');
+  const [postalCode, setPostalCode] = useState(address?.postal_code || '');
+  const [country] = useState(address?.country || 'South Africa');
+  const [isDefault, setIsDefault] = useState(address?.is_default || false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave({
+      label,
+      street_address: streetAddress,
+      city,
+      province,
+      postal_code: postalCode,
+      country,
+      is_default: isDefault,
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b">
+          <h2 className="text-xl font-bold text-secondary-900">
+            {address ? 'Edit Address' : 'Add New Address'}
+          </h2>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Label</label>
+            <select
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            >
+              <option value="Home">Home</option>
+              <option value="Work">Work</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+            <input
+              type="text"
+              value={streetAddress}
+              onChange={(e) => setStreetAddress(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              placeholder="123 Main Street"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                placeholder="Johannesburg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Province</label>
+              <select
+                value={province}
+                onChange={(e) => setProvince(e.target.value)}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="">Select province</option>
+                <option value="Eastern Cape">Eastern Cape</option>
+                <option value="Free State">Free State</option>
+                <option value="Gauteng">Gauteng</option>
+                <option value="KwaZulu-Natal">KwaZulu-Natal</option>
+                <option value="Limpopo">Limpopo</option>
+                <option value="Mpumalanga">Mpumalanga</option>
+                <option value="Northern Cape">Northern Cape</option>
+                <option value="North West">North West</option>
+                <option value="Western Cape">Western Cape</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+            <input
+              type="text"
+              value={postalCode}
+              onChange={(e) => setPostalCode(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              placeholder="2000"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+            <input
+              type="text"
+              value={country}
+              disabled
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="isDefault"
+              checked={isDefault}
+              onChange={(e) => setIsDefault(e.target.checked)}
+              className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+            />
+            <label htmlFor="isDefault" className="text-sm text-gray-700">
+              Set as default address
+            </label>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
+            >
+              {saving ? 'Saving...' : address ? 'Update Address' : 'Add Address'}
+            </button>
+          </div>
         </form>
       </div>
     </div>
