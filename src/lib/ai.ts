@@ -29,10 +29,12 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
 
 /**
- * Determine which AI provider to use
+ * Determine which AI provider to use (Azure is preferred if both are configured)
  */
 function getAIProvider(): 'azure' | 'openai' | null {
+  // Prefer Azure OpenAI if configured
   if (AZURE_AI_ENDPOINT && AZURE_AI_API_KEY) return 'azure';
+  // Fall back to OpenAI if Azure is not configured
   if (OPENAI_API_KEY) return 'openai';
   return null;
 }
@@ -42,6 +44,39 @@ function getAIProvider(): 'azure' | 'openai' | null {
  */
 export function isAIConfigured(): boolean {
   return getAIProvider() !== null;
+}
+
+/**
+ * Get AI configuration status with detailed provider info
+ */
+export function getAIStatus(): { 
+  configured: boolean; 
+  provider: 'azure' | 'openai' | null;
+  message: string;
+} {
+  const provider = getAIProvider();
+  
+  if (provider === 'azure') {
+    return {
+      configured: true,
+      provider: 'azure',
+      message: 'Using Azure OpenAI (preferred provider)',
+    };
+  }
+  
+  if (provider === 'openai') {
+    return {
+      configured: true,
+      provider: 'openai',
+      message: 'Using OpenAI API (Azure not configured)',
+    };
+  }
+  
+  return {
+    configured: false,
+    provider: null,
+    message: 'AI is not configured. Set AZURE_AI_ENDPOINT + AZURE_AI_API_KEY (preferred), or OPENAI_API_KEY as alternative.',
+  };
 }
 
 /**

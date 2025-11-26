@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { 
-  isAIConfigured, 
+  isAIConfigured,
+  getAIStatus,
   analyzeProduct, 
   enhanceDescription, 
   getMarketResearch, 
@@ -40,20 +41,21 @@ export async function POST(request: NextRequest) {
 
     // Check AI configuration status
     if (action === 'status') {
+      const status = getAIStatus();
       return NextResponse.json({
-        configured: isAIConfigured(),
-        message: isAIConfigured() 
-          ? 'AI features are available' 
-          : 'AI is not configured. Set AZURE_AI_ENDPOINT and AZURE_AI_API_KEY in environment variables.',
+        configured: status.configured,
+        provider: status.provider,
+        message: status.message,
       });
     }
 
     // Validate AI is configured for other actions
     if (!isAIConfigured()) {
+      const status = getAIStatus();
       return NextResponse.json(
         { 
           error: 'AI not configured',
-          message: 'Azure AI is not configured. Please set AZURE_AI_ENDPOINT and AZURE_AI_API_KEY environment variables.',
+          message: status.message,
         },
         { status: 503 }
       );
@@ -247,11 +249,11 @@ export async function GET(request: NextRequest) {
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
+  const status = getAIStatus();
   return NextResponse.json({
-    configured: isAIConfigured(),
-    message: isAIConfigured() 
-      ? 'AI features are available' 
-      : 'AI is not configured. Set AZURE_AI_ENDPOINT and AZURE_AI_API_KEY in environment variables.',
+    configured: status.configured,
+    provider: status.provider,
+    message: status.message,
     features: [
       'Product market analysis',
       'Description enhancement',

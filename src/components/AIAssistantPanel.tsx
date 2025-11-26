@@ -18,6 +18,7 @@ type AIAction = 'status' | 'analyze' | 'enhance-description' | 'market-research'
 
 interface AIStatus {
   configured: boolean;
+  provider: 'azure' | 'openai' | null;
   message: string;
 }
 
@@ -350,7 +351,9 @@ export default function AIAssistantPanel({
             <div>
               <h3 className="font-semibold">AI Business Assistant</h3>
               <p className="text-sm text-white/80">
-                {aiStatus?.configured ? 'Ready to help' : 'Checking status...'}
+                {aiStatus?.configured 
+                  ? `Ready (${aiStatus.provider === 'azure' ? 'Azure OpenAI' : 'OpenAI'})` 
+                  : 'Checking status...'}
               </p>
             </div>
           </div>
