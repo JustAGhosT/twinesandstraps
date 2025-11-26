@@ -19,31 +19,59 @@ function isValidSvg(content: string): boolean {
   return hasXmlOrSvg && hasSvgElement;
 }
 
-// Sanitize SVG content to remove potentially dangerous elements
+/**
+ * Sanitize SVG content by removing potentially dangerous elements.
+ * Uses iterative approach to handle nested/repeated patterns.
+ */
 function sanitizeSvg(content: string): string {
-  // Remove script tags and their content
-  let sanitized = content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  let sanitized = content;
+  let previousLength: number;
   
-  // Remove on* event handlers (onclick, onload, etc.)
-  sanitized = sanitized.replace(/\son\w+\s*=\s*["'][^"']*["']/gi, '');
-  sanitized = sanitized.replace(/\son\w+\s*=\s*[^\s>]*/gi, '');
-  
-  // Remove javascript: URLs
-  sanitized = sanitized.replace(/javascript\s*:/gi, '');
-  
-  // Remove potentially dangerous data: URIs (allow only safe image formats)
-  // Block text/html, application/javascript, text/javascript, etc.
-  sanitized = sanitized.replace(/data\s*:\s*(?!image\/(?:png|jpeg|jpg|gif|webp|svg\+xml))[^"'\s)]+/gi, 'data:text/plain');
-  
-  // Remove foreignObject elements (can contain HTML)
-  sanitized = sanitized.replace(/<foreignObject\b[^<]*(?:(?!<\/foreignObject>)<[^<]*)*<\/foreignObject>/gi, '');
-  
-  // Remove use elements with external references (potential XSS vector)
-  sanitized = sanitized.replace(/<use[^>]*xlink:href\s*=\s*["'](?!#)[^"']*["'][^>]*>/gi, '');
-  
-  // Remove set and animate elements that could manipulate attributes dangerously
-  sanitized = sanitized.replace(/<set\b[^>]*>/gi, '');
-  sanitized = sanitized.replace(/<animate\b[^>]*attributeName\s*=\s*["'](?:href|xlink:href)["'][^>]*>/gi, '');
+  // Iterate until no more changes are made (handles nested patterns)
+  do {
+    previousLength = sanitized.length;
+    
+    // Remove script elements with flexible whitespace handling
+    // Matches <script...>...</script> with any whitespace variations
+    sanitized = sanitized.replace(/<script[^>]*>[\s\S]*?<\/\s*script\s*>/gi, '');
+    // Also remove self-closing script tags
+    sanitized = sanitized.replace(/<script[^>]*\/\s*>/gi, '');
+    // Remove orphan script tags
+    sanitized = sanitized.replace(/<\/?script[^>]*>/gi, '');
+    
+    // Remove on* event handlers - match attribute patterns more precisely
+    // Handle quoted values
+    sanitized = sanitized.replace(/\s+on[a-z]+\s*=\s*"[^"]*"/gi, '');
+    sanitized = sanitized.replace(/\s+on[a-z]+\s*=\s*'[^']*'/gi, '');
+    // Handle unquoted values
+    sanitized = sanitized.replace(/\s+on[a-z]+\s*=\s*[^\s>"']+/gi, '');
+    
+    // Remove javascript: protocol in any context
+    sanitized = sanitized.replace(/javascript\s*:/gi, 'blocked:');
+    
+    // Remove potentially dangerous data: URIs
+    // Block anything that's not an image type
+    sanitized = sanitized.replace(/data\s*:\s*(?!image\/(?:png|jpeg|jpg|gif|webp|svg\+xml))[a-z/+]+/gi, 'data:text/plain');
+    
+    // Remove foreignObject elements (can contain arbitrary HTML)
+    sanitized = sanitized.replace(/<foreignObject[^>]*>[\s\S]*?<\/\s*foreignObject\s*>/gi, '');
+    sanitized = sanitized.replace(/<foreignObject[^>]*\/\s*>/gi, '');
+    
+    // Remove use elements with external references
+    sanitized = sanitized.replace(/<use[^>]*href\s*=\s*["'](?!#)[^"']*["'][^>]*\/?>/gi, '');
+    
+    // Remove set elements (can modify attributes dynamically)
+    sanitized = sanitized.replace(/<set[^>]*\/?>/gi, '');
+    
+    // Remove animate elements that target href attributes
+    sanitized = sanitized.replace(/<animate[^>]*attributeName\s*=\s*["'](?:href|xlink:href)["'][^>]*\/?>/gi, '');
+    
+    // Remove iframe and object elements
+    sanitized = sanitized.replace(/<iframe[^>]*>[\s\S]*?<\/\s*iframe\s*>/gi, '');
+    sanitized = sanitized.replace(/<object[^>]*>[\s\S]*?<\/\s*object\s*>/gi, '');
+    sanitized = sanitized.replace(/<embed[^>]*\/?>/gi, '');
+    
+  } while (sanitized.length !== previousLength);
   
   return sanitized;
 }
@@ -134,6 +162,30 @@ export async function POST(request: NextRequest) {
 
     // Sanitize SVG content
     const sanitizedContent = sanitizeSvg(content);
+    
+    // Post-sanitization security check: reject if dangerous patterns remain
+    // This is an additional safety layer in case the sanitization missed something
+    const dangerousPatterns = [
+      /<script/i,
+      /\son[a-z]+\s*=/i,
+      /javascript\s*:/i,
+      /<iframe/i,
+      /<object/i,
+      /<embed/i,
+      /<foreignObject/i,
+    ];
+    
+    for (const pattern of dangerousPatterns) {
+      if (pattern.test(sanitizedContent)) {
+        return NextResponse.json(
+          {
+            error: 'SVG contains potentially unsafe content',
+            details: { security: 'The SVG file contains elements that are not allowed for security reasons' }
+          },
+          { status: 400 }
+        );
+      }
+    }
 
     // Ensure directory exists
     await mkdir(LOGO_DIR, { recursive: true });
