@@ -1,4 +1,10 @@
-# TASSA API Documentation
+# API Documentation
+
+REST API reference for the Twines and Straps SA platform.
+
+> **Looking for setup instructions?** See the [Setup Guide](./SETUP.md) for environment configuration.
+
+---
 
 ## Overview
 
@@ -357,16 +363,6 @@ All endpoints return consistent error responses:
   "error": "Failed to create product. Please try again."
 }
 ```
-
----
-
-## Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `ADMIN_PASSWORD` | No | Admin panel password (min 8 characters). If not set, admin panel displays a configuration warning. |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Yes | WhatsApp Business number for quote requests (format: 27XXXXXXXXX) |
 
 ---
 

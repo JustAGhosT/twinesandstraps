@@ -1,6 +1,6 @@
-# TASSA Website Improvement Phases
+# Improvement Phases
 
-This document outlines the phased approach to implementing website improvements for twinesandstraps.netlify.app.
+Roadmap for implementing website improvements in phases.
 
 ---
 

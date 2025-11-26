@@ -1,6 +1,8 @@
-# Demo Workflow: TASSA E-Commerce System
+# Demo Workflow
 
-A step-by-step guide for presenting the Twines and Straps SA e-commerce system to clients.
+Step-by-step guide for presenting the platform to clients and stakeholders.
+
+> **Looking for setup instructions?** See the [Setup Guide](./SETUP.md) for environment configuration.
 
 ---
 

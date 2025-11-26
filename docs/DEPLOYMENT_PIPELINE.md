@@ -1,170 +1,95 @@
-# Deployment Pipeline Documentation
+# Deployment Pipeline
+
+Technical documentation for the CI/CD pipeline and deployment infrastructure.
+
+> **Looking for setup instructions?** See the [Setup Guide](./SETUP.md) for environment configuration and deployment steps.
+
+---
 
 ## Overview
 
-This document describes the CI/CD pipeline and deployment configuration for the Twines and Straps e-commerce platform.
+The deployment pipeline ensures code quality and reliable deployments through:
+1. **GitHub Actions** — Automated testing on every push/PR
+2. **Netlify** — Automated builds and deployments
+3. **Health Checks** — Post-deployment validation
 
-## Pipeline Components
+---
 
-### 1. GitHub Actions CI/CD
+## GitHub Actions Workflows
 
-#### Continuous Integration (`.github/workflows/ci.yml`)
+### Continuous Integration (`ci.yml`)
 
-Runs on every push to `main` or `develop` branches and on pull requests.
+Runs on pushes to `main`/`develop` and on pull requests.
 
-**Jobs:**
-- **Lint Check**: Validates code style and catches potential issues with ESLint
-- **Type Check**: Ensures TypeScript type safety across the codebase
-- **Build Test**: Verifies the application builds successfully
-- **Config Validation**: Validates configuration file syntax
+| Job | Purpose |
+|-----|---------|
+| Lint Check | ESLint validation for code quality |
+| Type Check | TypeScript type safety verification |
+| Build Test | Ensures the application compiles |
+| Config Validation | Validates `netlify.toml` and `package.json` |
 
-**Benefits:**
-- Catches errors before deployment
-- Ensures code quality standards
-- Validates that changes don't break the build
-- Provides fast feedback to developers
-
-#### Deployment Health Check (`.github/workflows/deployment-health.yml`)
+### Deployment Health Check (`deployment-health.yml`)
 
 Runs automatically after Netlify deployment completes.
 
-**Checks:**
-- Deployment URL accessibility
-- HTTP response code validation
-- Basic error detection
-- Application startup verification
+| Check | Purpose |
+|-------|---------|
+| URL Accessibility | Verifies deployment is reachable |
+| HTTP Response | Validates status codes |
+| Error Detection | Checks for common deployment errors |
 
-**Benefits:**
-- Early detection of deployment issues
-- Automatic rollback triggers (can be configured)
-- Deployment confidence
+### Required GitHub Secrets
 
-### 2. Netlify Configuration
+Configure in **Settings → Secrets and variables → Actions**:
 
-The `netlify.toml` file configures:
+| Secret | Where to Find |
+|--------|---------------|
+| `NETLIFY_SITE_ID` | Netlify → Site Settings → General → Site ID |
+| `NETLIFY_AUTH_TOKEN` | Netlify → User Settings → Applications → Personal access tokens |
 
-#### Build Configuration
-- **Command**: `npm run lint && npm run build`
-  - Runs linting before build to catch issues early
-  - Generates Prisma client
-  - Runs custom migration script (`tsx scripts/migrate-production.ts`) that intelligently handles database state before running `prisma migrate deploy`
-  - Builds Next.js application
-- **Publish Directory**: `.next` (Next.js build output)
-- **Plugin**: `@netlify/plugin-nextjs` for optimal Next.js support
-- **Node Version**: 18 (LTS)
+---
 
-#### Context-Specific Builds
+## Netlify Configuration
 
-Different build commands for different deployment contexts:
+The `netlify.toml` file configures all build and deployment settings.
 
-- **Production**: Full lint + build
-- **Deploy Preview**: Full lint + build (for PR previews)
-- **Branch Deploy**: Build only (faster for feature branches)
+### Build Pipeline
 
-#### Security Headers
+```
+1. npm run lint        # ESLint validation
+2. prisma generate     # Generate Prisma client
+3. tsx scripts/migrate-production.ts  # Apply migrations
+4. next build          # Build Next.js app
+```
 
-Automatically applied to all responses:
+### Context-Specific Builds
 
-- `X-Frame-Options: DENY` - Prevents clickjacking
-- `X-Content-Type-Options: nosniff` - Prevents MIME type sniffing
-- `X-XSS-Protection: 1; mode=block` - XSS protection
-- `Referrer-Policy: strict-origin-when-cross-origin` - Controls referrer information
-- `Permissions-Policy` - Restricts browser features (camera, microphone, geolocation)
+| Context | Command | Use Case |
+|---------|---------|----------|
+| Production | `npm run lint && npm run build` | Live site |
+| Deploy Preview | `npm run lint && npm run build` | PR previews |
+| Branch Deploy | `npm run build` | Feature branches (faster) |
 
-#### Performance Optimization
+### Security Headers
 
-- **Static Asset Caching**: `/_next/static/*` assets cached for 1 year (immutable)
-- **Automatic compression**: Netlify handles gzip/brotli compression
-- **CDN distribution**: Global CDN for fast access worldwide
+Applied automatically to all responses:
 
-#### Redirect Rules
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `X-Frame-Options` | `DENY` | Prevents clickjacking |
+| `X-Content-Type-Options` | `nosniff` | Prevents MIME sniffing |
+| `X-XSS-Protection` | `1; mode=block` | XSS protection |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Controls referrer info |
+| `Permissions-Policy` | Restricted | Limits browser features |
 
-- **www to non-www**: Canonical URL enforcement for SEO
+### Performance Optimization
 
-## Testing in the Pipeline
+- **Static Asset Caching** — `/_next/static/*` cached for 1 year (immutable)
+- **Automatic Compression** — gzip/brotli handled by Netlify
+- **Global CDN** — Fast access worldwide
+- **www Redirect** — Canonical URL enforcement
 
-### Pre-Deployment Tests
-
-1. **Linting** (`npm run lint`)
-   - ESLint checks for code quality
-   - Runs in both GitHub Actions and Netlify
-
-2. **Type Checking** (GitHub Actions)
-   - TypeScript compiler validation
-   - Catches type errors before deployment
-
-3. **Build Verification**
-   - Ensures application compiles successfully
-   - Tests Prisma client generation
-   - Validates environment setup
-
-### Post-Deployment Tests
-
-1. **Health Check**
-   - Verifies deployment URL responds
-   - Checks for error pages
-   - Validates HTTP status codes
-
-## Environment Variables
-
-### Required Environment Variables
-
-Configure these in your Netlify dashboard (Site settings → Build & deploy → Environment variables):
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string (from Neon or Supabase) |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Yes | WhatsApp Business number for quote requests |
-
-### Optional Environment Variables (AI Image Generation)
-
-| Variable | Description |
-|----------|-------------|
-| `AZURE_AI_ENDPOINT` | Azure AI Foundry endpoint URL |
-| `AZURE_AI_API_KEY` | Azure AI Foundry API key |
-| `AZURE_AI_DEPLOYMENT_NAME` | Model deployment name (e.g., dall-e-3) |
-
-### GitHub Actions Secrets
-
-Configure these as GitHub repository secrets (Settings → Secrets and variables → Actions):
-
-| Secret | Description |
-|--------|-------------|
-| `NETLIFY_SITE_ID` | Your Netlify site ID (from Site Settings → General → Site ID) |
-| `NETLIFY_AUTH_TOKEN` | Personal access token (from User Settings → Applications → Personal access tokens) |
-
-### How to Obtain Credentials
-
-**Database Connection String (PostgreSQL):**
-
-The project uses PostgreSQL by default. Choose one of these providers:
-
-1. **Neon** (Recommended) - https://neon.tech/
-   - Sign up for a free account
-   - Create a new project
-   - Copy the connection string (format: `postgresql://user:password@host.neon.tech/dbname?sslmode=require`)
-
-2. **Supabase** - https://supabase.com/
-   - Sign up for a free account
-   - Create a new project
-   - Go to Settings → Database → Connection string
-   - Copy the URI (format: `postgresql://user:password@host.supabase.co:5432/postgres`)
-
-**WhatsApp Business Number:**
-- Format: Country code + number (e.g., 27821234567 for South Africa)
-- No spaces or + symbol
-
-**Azure AI Foundry (Optional):**
-1. Go to [Azure Portal](https://portal.azure.com/)
-2. Navigate to Azure AI Foundry or visit [ai.azure.com](https://ai.azure.com/)
-3. Create a new resource with your subscription
-4. Find credentials in "Keys and Endpoint" section
-5. Deploy DALL-E 3 model for image generation
-
-**Netlify Credentials:**
-1. Log in to [Netlify](https://app.netlify.com/)
-2. Site ID: Site dashboard → Site Settings → General → Site ID
-3. Deploy Token: User Settings → Applications → Personal access tokens → New access token
+---
 
 ## Rendering Strategy
 

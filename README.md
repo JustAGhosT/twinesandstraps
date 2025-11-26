@@ -1,195 +1,104 @@
-# Twines and Straps SA E-Commerce Platform
+# Twines and Straps SA
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/27ce6415-e0b4-4dd5-abdd-def736b7f6b4/deploy-status)](https://app.netlify.com/projects/twinesandstraps/deploys)
 
-This repository contains the source code for the Twines and Straps SA e-commerce platform, a combined B2C/B2B solution built with Next.js, TypeScript, and Tailwind CSS.
+**An e-commerce platform for South Africa's premier industrial twines and ropes manufacturer.**
 
-## Deployment URLs
+🌐 **Live Site:** [twinesandstraps.netlify.app](https://twinesandstraps.netlify.app)
 
-| Environment | URL |
-|-------------|-----|
-| Production | [https://twinesandstraps.netlify.app](https://twinesandstraps.netlify.app) |
+---
 
-## Project Overview
+## What We Do
 
-The goal of this project is to create a modern, reliable, and user-friendly online storefront for both retail and business customers. The platform will feature direct online sales, a streamlined request-for-quote (RFQ) flow for B2B buyers, and a powerful admin portal for non-technical staff to manage products and content.
+Twines and Straps SA manufactures and supplies high-quality industrial twines, ropes, and strapping solutions to businesses across South Africa. This platform serves as our digital storefront, enabling:
 
-For full details, please see the [Product Requirements Document](./docs/PRD.md).
+- **Easy Product Discovery** — Browse our complete catalog of industrial twines, ropes, and straps with detailed specifications
+- **Request for Quote** — Get personalized pricing for bulk orders via our WhatsApp integration
+- **Self-Service for Businesses** — B2B buyers can explore products, compare specifications, and request quotes 24/7
 
-## Features
+## Who It's For
 
-### AI-Generated Product Images (Optional)
+| Customer Type | How We Help |
+|---------------|-------------|
+| **Retail Buyers** | Browse products, view prices, and request quotes for smaller orders |
+| **Business Buyers (B2B)** | Explore bulk options, compare specs, and get personalized quotes for large orders |
+| **Procurement Teams** | Access technical specifications, product datasheets, and streamlined quote requests |
 
-Products can have AI-generated images automatically created during the database seeding process using Azure AI Foundry's DALL-E model. This feature:
+## Key Features
 
-- Automatically generates professional product photos during `npm run seed`
-- Creates contextually appropriate images based on product name, description, material, and category
-- Saves generated image URLs to the database
-- Requires Azure AI Foundry credentials (configured via environment variables)
+### 🛒 Product Catalog
+- **Comprehensive listings** with technical specifications (material, diameter, length, strength rating)
+- **Category-based browsing** for easy navigation
+- **Stock availability** at a glance
+- **South African pricing** in ZAR with VAT support
 
-To generate images for products:
-1. Set up Azure AI Foundry credentials (see [Environment Variables](#environment-variables) section below)
-2. Run `npm run seed` to create products with AI-generated images
+### 💬 Quote-Based Purchasing
+- **WhatsApp integration** for instant quote requests
+- **Cart functionality** to collect items and request bulk quotes
+- **No commitment checkout** — just easy communication with our sales team
 
-**Note:** If Azure AI credentials are not configured, the seed script will use placeholder images from Unsplash.
+### ⚙️ Admin Portal
+- **Product management** — add, edit, and organize your catalog
+- **Category management** — create and maintain product categories
+- **Feature flags** — toggle site features without code changes
+- **No technical knowledge required** — designed for non-technical staff
 
-## Getting Started
+### 📱 Mobile-First Design
+- Fully responsive across all devices
+- Touch-friendly interface
+- Fast loading times
 
-### Prerequisites
+## Industries We Serve
 
-- Node.js (v18 or later)
-- npm
+- Agriculture & Farming
+- Marine & Boating
+- Construction & Scaffolding
+- Recycling & Waste Management
+- Transport & Logistics
+- Mining & Manufacturing
 
-### Installation
+---
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd twines-and-straps
-   ```
-3. Install the dependencies:
-   ```bash
-   npm install
-   ```
-
-### Running the Development Server
-
-To start the development server, run the following command:
+## Quick Start
 
 ```bash
+# Clone the repository
+git clone https://github.com/JustAGhosT/twinesandstraps.git
+cd twinesandstraps
+
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-## Deployment
+## Documentation
 
-### Netlify Deployment
+| Document | Description |
+|----------|-------------|
+| [Setup Guide](./docs/SETUP.md) | Environment setup, database configuration, and deployment |
+| [Product Requirements](./docs/PRD.md) | Full product vision and business requirements |
+| [Feature Flags](./docs/FEATURE_FLAGS.md) | Toggle features on/off without code changes |
+| [API Reference](./docs/API.md) | REST API documentation for developers |
+| [All Documentation](./docs/README.md) | Complete documentation index |
 
-This project is configured for deployment on Netlify with the following setup:
+## Tech Stack
 
-#### Prerequisites
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Database:** PostgreSQL via Prisma ORM
+- **Styling:** Tailwind CSS
+- **Hosting:** Netlify
 
-1. A Netlify account
-2. The repository connected to Netlify
-3. **A PostgreSQL database** from Neon (recommended) or Supabase
+---
 
-> ℹ️ **Database Configuration**
-> 
-> This project uses **PostgreSQL** by default, which is compatible with [Neon](https://neon.tech/) and [Supabase](https://supabase.com/) (both offer free tiers).
-> 
-> You must configure a cloud database before deploying to production.
+## Contributing
 
-#### Environment Variables
+We welcome contributions! Please see our documentation for development guidelines.
 
-The following environment variables must be configured in your Netlify dashboard (Site settings → Build & deploy → Environment variables):
+## License
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | **Yes** | PostgreSQL connection string from Neon or Supabase |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | Yes | WhatsApp Business number for quote requests (format: 27XXXXXXXXX) |
-| `AZURE_AI_ENDPOINT` | No | Azure AI Foundry endpoint URL |
-| `AZURE_AI_API_KEY` | No | Azure AI Foundry API key |
-| `AZURE_AI_DEPLOYMENT_NAME` | No | Azure AI model deployment name (e.g., dall-e-3) |
-
-##### How to Get Your Keys and Secrets
-
-**Database (Required)**
-
-The project uses PostgreSQL. Follow these steps to set up your database:
-
-1. Sign up for a PostgreSQL provider:
-   - [Neon](https://neon.tech/) - **Recommended** - Free tier, serverless Postgres
-   - [Supabase](https://supabase.com/) - Free tier, Postgres with extras
-   - [Turso](https://turso.tech/) - Edge SQLite (requires schema change)
-2. Create a new database/project
-3. Copy the connection string from the dashboard
-4. Add the `DATABASE_URL` to Netlify environment variables
-5. Database migrations are automatically applied during the Netlify build process via a custom migration script
-   > **Note:** The build command runs `prisma generate && tsx scripts/migrate-production.ts && next build`. The migration script intelligently handles various database states (e.g., existing tables, failed migrations) before running `prisma migrate deploy`.
-
-Example connection strings:
-```
-# Neon (Postgres) - Recommended
-DATABASE_URL="postgresql://user:password@host.neon.tech/dbname?sslmode=require"
-
-# Supabase (Postgres)
-DATABASE_URL="postgresql://user:password@host.supabase.co:5432/postgres"
-
-# Turso (requires changing prisma/schema.prisma provider to "sqlite")
-DATABASE_URL="libsql://your-db.turso.io?authToken=your-token"
-```
-
-**WhatsApp Business (Required)**
-1. Download WhatsApp Business from your app store
-2. Register with your business phone number
-3. Use format: country code + number (e.g., 27821234567 for South Africa)
-
-**Azure AI Foundry (Optional - for AI-generated images)**
-1. Go to [Azure Portal](https://portal.azure.com/)
-2. Search for "Azure AI Foundry" or visit [ai.azure.com](https://ai.azure.com/)
-3. Create a new resource:
-   - Select your subscription
-   - Create or select a resource group
-   - Choose a region (e.g., East US, West Europe)
-4. Go to "Keys and Endpoint" in your resource:
-   - Copy "KEY 1" for `AZURE_AI_API_KEY`
-   - Copy "Endpoint" for `AZURE_AI_ENDPOINT`
-5. Deploy DALL-E 3 model and copy deployment name for `AZURE_AI_DEPLOYMENT_NAME`
-
-For detailed Azure AI setup, see: [Azure AI Foundry Quickstart](https://learn.microsoft.com/en-us/azure/ai-services/openai/quickstart)
-
-#### Deployment Configuration
-
-The project includes a `netlify.toml` file that configures:
-- **Build command**: `npm run lint && npm run build` (includes linting in CI/CD)
-- **Publish directory**: `.next`
-- **Next.js runtime plugin**: `@netlify/plugin-nextjs`
-- **Node.js version**: 18
-- **Security headers**: X-Frame-Options, X-Content-Type-Options, CSP, etc.
-- **Context-specific builds**: Different commands for production, preview, and branch deployments
-- **Static asset caching**: Optimized cache headers for `/_next/static/*` assets
-- **Redirect rules**: www to non-www redirects
-
-#### CI/CD Pipeline
-
-The repository includes GitHub Actions workflows for continuous integration:
-
-**Continuous Integration Workflow** (`.github/workflows/ci.yml`):
-- **Lint Check**: Runs ESLint on all code
-- **Type Check**: Validates TypeScript types
-- **Build Test**: Ensures the application builds successfully
-- **Config Validation**: Validates `netlify.toml` and `package.json` syntax
-
-**Deployment Health Check** (`.github/workflows/deployment-health.yml`):
-- Automatically runs after Netlify deployment completes
-- Verifies deployment URL is accessible
-- Checks for common deployment errors
-- Validates HTTP response codes
-
-These workflows run automatically on:
-- Push to `main` or `develop` branches
-- Pull requests to `main` or `develop` branches
-- After Netlify deployment completion
-
-#### Rendering Strategy
-
-The application uses **dynamic rendering** for database-driven pages:
-- Pages fetch data at request time (not at build time)
-- Compatible with Netlify's serverless architecture
-- Ensures fresh data on every request
-- No database required during the build process
-
-This allows the build to succeed without a populated database, while still providing dynamic, database-driven content at runtime.
-
-#### Manual Deployment Steps
-
-1. Push your code to the connected Git repository
-2. Netlify will automatically detect changes and trigger a build
-3. Set the required environment variables in Netlify dashboard
-4. The site will be deployed automatically
-
-For more information on Netlify deployments, visit [Netlify Documentation](https://docs.netlify.com/).
+This project is proprietary software for Twines and Straps SA.
