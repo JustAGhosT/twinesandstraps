@@ -351,9 +351,11 @@ export default function AIAssistantPanel({
             <div>
               <h3 className="font-semibold">AI Business Assistant</h3>
               <p className="text-sm text-white/80">
-                {aiStatus?.configured 
+                {aiStatus?.configured && aiStatus.provider
                   ? `Ready (${aiStatus.provider === 'azure' ? 'Azure OpenAI' : 'OpenAI'})` 
-                  : 'Checking status...'}
+                  : aiStatus?.configured
+                    ? 'Ready'
+                    : 'Checking status...'}
               </p>
             </div>
           </div>
