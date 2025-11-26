@@ -19,34 +19,62 @@ function AdminSidebar() {
   const pathname = usePathname();
   const { logout } = useAdminAuth();
 
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
-    <aside className="w-64 bg-secondary-900 text-white min-h-screen flex flex-col">
+    <aside
+      className="w-64 bg-secondary-900 text-white min-h-screen flex flex-col"
+      role="navigation"
+      aria-label="Admin navigation"
+    >
       <div className="p-4 border-b border-secondary-700">
-        <Link href="/admin" className="flex items-center gap-2">
+        <Link
+          href="/admin"
+          className="flex items-center gap-2"
+          aria-label="TASSA Admin Dashboard"
+        >
           <div className="w-8 h-8 rounded-full border-2 border-primary-500 flex items-center justify-center bg-white">
-            <span className="text-primary-600 font-bold text-xs">TS</span>
+            <span className="text-primary-600 font-bold text-xs" aria-hidden="true">TS</span>
           </div>
           <span className="font-bold">TASSA Admin</span>
         </Link>
       </div>
 
-      <nav className="flex-1 p-4 space-y-1">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded"
+      >
+        Skip to main content
+      </a>
+
+      <nav className="flex-1 p-4 space-y-1" aria-label="Admin menu">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-secondary-900 ${
                 isActive
                   ? 'bg-primary-600 text-white'
                   : 'text-gray-300 hover:bg-secondary-800 hover:text-white'
               }`}
+              aria-current={isActive ? 'page' : undefined}
+              aria-label={item.label}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
               </svg>
-              {item.label}
+              <span>{item.label}</span>
             </Link>
           );
         })}
@@ -55,21 +83,35 @@ function AdminSidebar() {
       <div className="p-4 border-t border-secondary-700 space-y-2">
         <Link
           href="/"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-secondary-800 hover:text-white transition-colors"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-secondary-800 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-secondary-900"
+          aria-label="View public website"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
           </svg>
-          View Site
+          <span>View Site</span>
         </Link>
         <button
-          onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-colors"
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-secondary-900"
+          aria-label="Logout from admin panel"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          Logout
+          <span>Logout</span>
         </button>
       </div>
     </aside>
@@ -77,35 +119,33 @@ function AdminSidebar() {
 }
 
 function AdminLoginForm() {
-  const { login } = useAdminAuth();
+  const { login, error: authError } = useAdminAuth();
   const [password, setPassword] = React.useState('');
-  const [error, setError] = React.useState('');
   const [loading, setLoading] = React.useState(false);
+  const errorId = React.useId();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-
-    const success = await login(password);
-    if (!success) {
-      setError('Invalid password');
-    }
+    await login(password);
     setLoading(false);
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md" role="main">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-full border-4 border-primary-600 flex items-center justify-center bg-white mx-auto mb-4">
+          <div
+            className="w-16 h-16 rounded-full border-4 border-primary-600 flex items-center justify-center bg-white mx-auto mb-4"
+            aria-hidden="true"
+          >
             <span className="text-primary-600 font-bold text-xl">TS</span>
           </div>
           <h1 className="text-2xl font-bold text-secondary-900">Admin Login</h1>
           <p className="text-gray-500 mt-2">Enter your password to access the admin panel</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Password
@@ -113,32 +153,47 @@ function AdminLoginForm() {
             <input
               type="password"
               id="password"
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
+                authError ? 'border-red-500' : 'border-gray-300'
+              }`}
               placeholder="Enter admin password"
               required
+              autoComplete="current-password"
+              aria-invalid={authError ? 'true' : 'false'}
+              aria-describedby={authError ? errorId : undefined}
             />
           </div>
 
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-              {error}
+          {authError && (
+            <div
+              id={errorId}
+              className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm"
+              role="alert"
+              aria-live="polite"
+            >
+              {authError}
             </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
+            className="w-full py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            aria-busy={loading}
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          <Link href="/" className="text-primary-600 hover:text-primary-700">
-            &larr; Back to website
+          <Link
+            href="/"
+            className="text-primary-600 hover:text-primary-700 focus:outline-none focus:underline"
+          >
+            ← Back to website
           </Link>
         </p>
       </div>
@@ -151,8 +206,13 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div
+        className="min-h-screen bg-gray-100 flex items-center justify-center"
+        role="status"
+        aria-label="Loading admin panel"
+      >
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" aria-hidden="true"></div>
+        <span className="sr-only">Loading...</span>
       </div>
     );
   }
@@ -164,7 +224,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <AdminSidebar />
-      <main className="flex-1 p-8 overflow-auto">
+      <main id="main-content" className="flex-1 p-8 overflow-auto" role="main">
         {children}
       </main>
     </div>

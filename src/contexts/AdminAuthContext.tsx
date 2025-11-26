@@ -5,26 +5,35 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 interface AdminAuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
+  error: string | null;
   login: (password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  getAuthHeaders: () => Record<string, string>;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
 const ADMIN_SESSION_KEY = 'tassa_admin_session';
-const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
+interface SessionData {
+  token: string;
+  expiry: number;
+}
 
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
 
   // Check for existing session on mount
   useEffect(() => {
     try {
-      const session = localStorage.getItem(ADMIN_SESSION_KEY);
-      if (session) {
-        const { expiry } = JSON.parse(session);
-        if (new Date().getTime() < expiry) {
+      const sessionStr = localStorage.getItem(ADMIN_SESSION_KEY);
+      if (sessionStr) {
+        const session: SessionData = JSON.parse(sessionStr);
+        if (new Date().getTime() < session.expiry && session.token) {
+          setSessionToken(session.token);
           setIsAuthenticated(true);
         } else {
           localStorage.removeItem(ADMIN_SESSION_KEY);
@@ -37,32 +46,80 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   }, []);
 
   const login = useCallback(async (password: string): Promise<boolean> => {
+    setError(null);
     try {
       const response = await fetch('/api/admin/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
+        credentials: 'include', // Include cookies
       });
 
-      if (response.ok) {
-        const expiry = new Date().getTime() + SESSION_DURATION;
-        localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ expiry }));
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Store token in localStorage for API calls
+        const sessionData: SessionData = {
+          token: data.token,
+          expiry: data.expiry,
+        };
+        localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(sessionData));
+        setSessionToken(data.token);
         setIsAuthenticated(true);
         return true;
       }
+
+      // Handle specific error cases
+      if (response.status === 429) {
+        setError(`Too many login attempts. Please try again in ${data.retryAfter} seconds.`);
+      } else if (response.status === 503) {
+        setError('Admin access is not configured. Please contact the administrator.');
+      } else {
+        setError(data.error || 'Invalid password');
+      }
       return false;
-    } catch {
+    } catch (err) {
+      setError('Network error. Please check your connection.');
+      console.error('Login error:', err);
       return false;
     }
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      // Call logout endpoint to invalidate server-side session
+      await fetch('/api/admin/auth', {
+        method: 'DELETE',
+        headers: sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {},
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+
+    // Clear local session regardless of server response
     localStorage.removeItem(ADMIN_SESSION_KEY);
+    setSessionToken(null);
     setIsAuthenticated(false);
-  }, []);
+    setError(null);
+  }, [sessionToken]);
+
+  const getAuthHeaders = useCallback((): Record<string, string> => {
+    if (!sessionToken) return {};
+    return { Authorization: `Bearer ${sessionToken}` };
+  }, [sessionToken]);
 
   return (
-    <AdminAuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+    <AdminAuthContext.Provider
+      value={{
+        isAuthenticated,
+        isLoading,
+        error,
+        login,
+        logout,
+        getAuthHeaders,
+      }}
+    >
       {children}
     </AdminAuthContext.Provider>
   );

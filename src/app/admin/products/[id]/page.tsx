@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -51,14 +51,7 @@ export default function ProductEditPage() {
     category_id: '',
   });
 
-  useEffect(() => {
-    fetchCategories();
-    if (!isNew) {
-      fetchProduct();
-    }
-  }, [isNew, params.id]);
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const res = await fetch('/api/categories');
       if (res.ok) {
@@ -68,9 +61,9 @@ export default function ProductEditPage() {
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
-  };
+  }, []);
 
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       const res = await fetch(`/api/products/${params.id}`);
       if (res.ok) {
@@ -99,7 +92,14 @@ export default function ProductEditPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.id]);
+
+  useEffect(() => {
+    fetchCategories();
+    if (!isNew) {
+      fetchProduct();
+    }
+  }, [isNew, fetchCategories, fetchProduct]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
