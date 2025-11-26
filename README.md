@@ -2,6 +2,12 @@
 
 This repository contains the source code for the Twines and Straps SA e-commerce platform, a combined B2C/B2B solution built with Next.js, TypeScript, and Tailwind CSS.
 
+## Deployment URLs
+
+| Environment | URL |
+|-------------|-----|
+| Production | [https://twinesandstraps.netlify.app](https://twinesandstraps.netlify.app) |
+
 ## Project Overview
 
 The goal of this project is to create a modern, reliable, and user-friendly online storefront for both retail and business customers. The platform will feature direct online sales, a streamlined request-for-quote (RFQ) flow for B2B buyers, and a powerful admin portal for non-technical staff to manage products and content.
@@ -100,7 +106,11 @@ The project uses PostgreSQL. Follow these steps to set up your database:
 2. Create a new database/project
 3. Copy the connection string from the dashboard
 4. Add the `DATABASE_URL` to Netlify environment variables
-5. Run database migrations: `npx prisma db push`
+5. Sync the database schema by running the following command locally with your production DATABASE_URL:
+   ```bash
+   DATABASE_URL="your-production-connection-string" npx prisma db push
+   ```
+   > **Note:** This step must be run manually whenever you make schema changes. It cannot run during the build process as the build environment doesn't have access to the production database.
 
 Example connection strings:
 ```
