@@ -132,7 +132,7 @@ export default function ComparePage() {
                 <tr key={attr.key} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
                   <td className="p-4 font-medium text-gray-700">{attr.label}</td>
                   {items.map((product) => {
-                    const value = (product as Record<string, unknown>)[attr.key];
+                    const value = (product as unknown as Record<string, unknown>)[attr.key];
                     return (
                       <td key={product.id} className="p-4 text-center">
                         <span className={attr.key === 'price' ? 'font-bold text-primary-600' : ''}>

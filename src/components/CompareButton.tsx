@@ -2,9 +2,7 @@
 
 import React from 'react';
 import { useCompare } from '@/contexts/CompareContext';
-import type { Product, Category } from '@prisma/client';
-
-type ProductWithCategory = Product & { category?: Category };
+import type { ProductWithCategory } from '@/types/database';
 
 interface CompareButtonProps {
   product: ProductWithCategory;

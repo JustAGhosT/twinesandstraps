@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import type { Product } from '@prisma/client';
+import type { Product } from '@/types/database';
 import { useCart } from '@/contexts/CartContext';
 
 interface RecommendedProductsProps {

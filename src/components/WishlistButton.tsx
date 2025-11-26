@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useWishlist } from '@/contexts/WishlistContext';
-import type { Product } from '@prisma/client';
+import type { Product } from '@/types/database';
 
 interface WishlistButtonProps {
   product: Product;

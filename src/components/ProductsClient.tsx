@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import type { Product, Category } from '@prisma/client';
+import type { Product, Category } from '@/types/database';
 import ProductCard from '@/components/ProductCard';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';

@@ -3,10 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import type { Product, Category } from '@prisma/client';
+import type { Product, ProductWithCategory } from '@/types/database';
 import { useCart } from '@/contexts/CartContext';
-
-type ProductWithCategory = Product & { category?: Category };
 
 interface RelatedProductsProps {
   products: ProductWithCategory[];

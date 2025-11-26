@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import type { Product } from '@prisma/client';
+import type { Product } from '@/types/database';
 import { useCart } from '@/contexts/CartContext';
 import Image from 'next/image';
 import WishlistButton from '@/components/WishlistButton';

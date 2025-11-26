@@ -5,6 +5,7 @@ import ProductCard from '@/components/ProductCard';
 import Testimonials from '@/components/Testimonials';
 import TrustBadges from '@/components/TrustBadges';
 import { featureFlags } from '@/config/featureFlags';
+import type { Product, Category } from '@/types/database';
 
 // Force dynamic rendering - data is fetched at request time
 export const dynamic = 'force-dynamic';
@@ -221,7 +222,7 @@ export default async function Home() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center text-secondary-900">Shop by Category</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {categories.map((category) => {
+            {categories.map((category: Category) => {
               // Category-specific images and icons
               const categoryData: Record<string, { image: string; icon: string; description: string }> = {
                 'twines': {
@@ -292,7 +293,7 @@ export default async function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-            {featuredProducts.map((product) => (
+            {featuredProducts.map((product: Product) => (
               <Link href={`/products/${product.id}`} key={product.id}>
                 <ProductCard product={product} />
               </Link>
