@@ -1,21 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useCart } from '@/contexts/CartContext';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
-import { redirect } from 'next/navigation';
 
 export default function WishlistPage() {
+  const router = useRouter();
   const { items, removeFromWishlist, clearWishlist } = useWishlist();
   const { addToCart } = useCart();
   const isEnabled = useFeatureFlag('wishlist');
 
   // Redirect if feature is disabled
+  useEffect(() => {
+    if (!isEnabled) {
+      router.push('/');
+    }
+  }, [isEnabled, router]);
+
+  // Show nothing while redirecting
   if (!isEnabled) {
-    redirect('/');
+    return null;
   }
 
   const handleMoveToCart = (product: typeof items[0]) => {

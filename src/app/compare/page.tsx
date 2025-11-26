@@ -1,20 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useCompare } from '@/contexts/CompareContext';
 import { useCart } from '@/contexts/CartContext';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
-import { redirect } from 'next/navigation';
 
 export default function ComparePage() {
+  const router = useRouter();
   const { items, removeFromCompare, clearCompare } = useCompare();
   const { addToCart } = useCart();
   const isEnabled = useFeatureFlag('compareProducts');
 
+  // Redirect if feature is disabled
+  useEffect(() => {
+    if (!isEnabled) {
+      router.push('/');
+    }
+  }, [isEnabled, router]);
+
+  // Show nothing while redirecting
   if (!isEnabled) {
-    redirect('/');
+    return null;
   }
 
   if (items.length < 2) {
