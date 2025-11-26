@@ -26,23 +26,54 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [error, setError] = useState<string | null>(null);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
 
-  // Check for existing session on mount
+  // Check for existing session on mount - verify with server
   useEffect(() => {
-    try {
-      const sessionStr = localStorage.getItem(ADMIN_SESSION_KEY);
-      if (sessionStr) {
+    const verifySession = async () => {
+      try {
+        const sessionStr = localStorage.getItem(ADMIN_SESSION_KEY);
+        if (!sessionStr) {
+          setIsLoading(false);
+          return;
+        }
+
         const session: SessionData = JSON.parse(sessionStr);
-        if (new Date().getTime() < session.expiry && session.token) {
-          setSessionToken(session.token);
-          setIsAuthenticated(true);
+        
+        // First check if locally expired
+        if (new Date().getTime() >= session.expiry || !session.token) {
+          localStorage.removeItem(ADMIN_SESSION_KEY);
+          setIsLoading(false);
+          return;
+        }
+
+        // Verify session with server
+        const response = await fetch('/api/admin/auth', {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${session.token}` },
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.valid) {
+            setSessionToken(session.token);
+            setIsAuthenticated(true);
+          } else {
+            // Server says session is invalid - clear local storage
+            localStorage.removeItem(ADMIN_SESSION_KEY);
+          }
         } else {
+          // Session not valid on server - clear local storage
           localStorage.removeItem(ADMIN_SESSION_KEY);
         }
+      } catch (err) {
+        // On error, clear session for security but log for debugging
+        console.error('Session verification failed:', err);
+        localStorage.removeItem(ADMIN_SESSION_KEY);
       }
-    } catch {
-      localStorage.removeItem(ADMIN_SESSION_KEY);
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+
+    verifySession();
   }, []);
 
   const login = useCallback(async (password: string): Promise<boolean> => {
