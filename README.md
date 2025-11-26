@@ -2,6 +2,12 @@
 
 This repository contains the source code for the Twines and Straps SA e-commerce platform, a combined B2C/B2B solution built with Next.js, TypeScript, and Tailwind CSS.
 
+## Deployment URLs
+
+| Environment | URL |
+|-------------|-----|
+| Production | [https://twinesandstraps.netlify.app](https://twinesandstraps.netlify.app) |
+
 ## Project Overview
 
 The goal of this project is to create a modern, reliable, and user-friendly online storefront for both retail and business customers. The platform will feature direct online sales, a streamlined request-for-quote (RFQ) flow for B2B buyers, and a powerful admin portal for non-technical staff to manage products and content.
