@@ -31,12 +31,12 @@ const defaultSettings: SiteSettings = {
   socialLinkedIn: '',
 };
 
-const SETTINGS_KEY = 'tassa_site_settings';
-
 export default function SettingsPage() {
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   
   // Logo state
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -46,19 +46,33 @@ export default function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Load settings from localStorage (or API in production)
-    const stored = localStorage.getItem(SETTINGS_KEY);
-    if (stored) {
-      try {
-        setSettings({ ...defaultSettings, ...JSON.parse(stored) });
-      } catch (e) {
-        console.error('Error loading settings:', e);
-      }
-    }
+    // Load settings from API (database)
+    loadSettings();
     
     // Check if a custom logo exists
     checkLogoStatus();
   }, []);
+
+  const loadSettings = async () => {
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const res = await fetch('/api/admin/settings');
+      if (res.ok) {
+        const data = await res.json();
+        setSettings({ ...defaultSettings, ...data });
+      } else if (res.status === 401) {
+        setLoadError('Session expired. Please log in again.');
+      } else {
+        console.warn('Failed to load settings, using defaults');
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+      setLoadError('Failed to load settings. Please refresh the page.');
+    } finally {
+      setLoading(false);
+    }
+  };
   
   const checkLogoStatus = async () => {
     try {
@@ -170,10 +184,7 @@ export default function SettingsPage() {
     setSaving(true);
 
     try {
-      // Save to localStorage for demo (use API in production)
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-
-      // Also try to save via API
+      // Save settings to database via API
       const res = await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -181,20 +192,63 @@ export default function SettingsPage() {
       });
 
       if (!res.ok) {
-        console.warn('API save failed, settings saved locally only');
+        const data = await res.json();
+        if (res.status === 401) {
+          setLoadError('Session expired. Please log in again.');
+          return;
+        }
+        throw new Error(data.error || 'Failed to save settings');
       }
 
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
       console.error('Error saving settings:', error);
-      // Still show success since localStorage save succeeded
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      alert(error instanceof Error ? error.message : 'Failed to save settings. Please try again.');
     } finally {
       setSaving(false);
     }
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-secondary-900">Site Settings</h1>
+          <p className="text-gray-500 mt-1">Manage your website configuration</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+          <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (loadError) {
+    return (
+      <div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-secondary-900">Site Settings</h1>
+          <p className="text-gray-500 mt-1">Manage your website configuration</p>
+        </div>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
+          <svg className="w-12 h-12 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <p className="text-red-700 font-medium mb-4">{loadError}</p>
+          <button
+            onClick={() => window.location.href = '/admin/login'}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -471,11 +525,11 @@ export default function SettingsPage() {
         </div>
       </form>
 
-      <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h3 className="font-medium text-blue-800 mb-2">Note</h3>
-        <p className="text-sm text-blue-700">
-          Some settings like WhatsApp number also require updating environment variables.
-          Contact your developer to update <code className="bg-blue-100 px-1 rounded">NEXT_PUBLIC_WHATSAPP_NUMBER</code> in your deployment settings.
+      <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-lg">
+        <h3 className="font-medium text-green-800 mb-2">Settings Storage</h3>
+        <p className="text-sm text-green-700">
+          All settings are saved to the database and will persist across deployments.
+          Changes to contact information like WhatsApp number, email, and phone will be immediately available to website visitors.
         </p>
       </div>
     </div>

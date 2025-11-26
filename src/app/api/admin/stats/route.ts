@@ -4,7 +4,7 @@ import { requireAdminAuth } from '@/lib/admin-auth';
 
 export async function GET(request: NextRequest) {
   // Verify admin authentication
-  const authError = requireAdminAuth(request);
+  const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
   try {

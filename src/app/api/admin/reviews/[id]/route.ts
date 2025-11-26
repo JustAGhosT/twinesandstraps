@@ -17,7 +17,7 @@ interface RouteParams {
  * GET /api/admin/reviews/[id] - Get a single review
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  const authError = requireAdminAuth(request);
+  const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
   try {
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * PATCH /api/admin/reviews/[id] - Update review status or promote to testimonial
  */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
-  const authError = requireAdminAuth(request);
+  const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
   try {
@@ -147,7 +147,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/admin/reviews/[id] - Delete a review
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  const authError = requireAdminAuth(request);
+  const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
   try {

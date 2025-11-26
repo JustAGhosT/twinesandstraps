@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 
 export default function QuotePage() {
   const { items, getTotalItems, getTotalPrice } = useCart();
+  const { settings } = useSiteSettings();
   const hasItems = getTotalItems() > 0;
 
   const [formData, setFormData] = useState({
@@ -25,9 +27,9 @@ export default function QuotePage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+    const whatsappNumber = settings.whatsappNumber;
     if (!whatsappNumber || whatsappNumber === '27XXXXXXXXX') {
-      alert('WhatsApp number not configured. Please contact us at info@twinesandstraps.co.za');
+      alert(`WhatsApp number not configured. Please contact us at ${settings.email}`);
       setIsSubmitting(false);
       return;
     }

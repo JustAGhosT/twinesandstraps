@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import NewsletterSignup from '@/components/NewsletterSignup';
 import { featureFlags } from '@/config/featureFlags';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 
 const Footer: React.FC = () => {
   const router = useRouter();
+  const { settings } = useSiteSettings();
   const [clickCount, setClickCount] = useState(0);
   const [lastClickTime, setLastClickTime] = useState(0);
 
@@ -47,12 +49,12 @@ const Footer: React.FC = () => {
               <h3 className="text-lg font-semibold">TASSA</h3>
             </button>
             <p className="text-gray-400 text-sm mb-2">
-              Twines and Straps SA (Pty) Ltd
+              {settings.companyName}
             </p>
             <p className="text-gray-400 text-sm">
               Your trusted supplier of quality ropes, twines, and straps for both retail and business customers.
             </p>
-            <p className="text-primary-600 mt-3 italic text-sm">&quot;Boundless Strength, Endless Solutions!&quot;</p>
+            <p className="text-primary-600 mt-3 italic text-sm">&quot;{settings.tagline}&quot;</p>
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
@@ -82,9 +84,9 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
             <ul className="space-y-2 text-gray-400 text-sm">
-              <li>Email: info@twinesandstraps.co.za</li>
-              <li>Phone: +27 (0) 11 234 5678</li>
-              <li>Business Hours: Mon-Fri 8:00-17:00</li>
+              <li>Email: {settings.email}</li>
+              <li>Phone: {settings.phone}</li>
+              <li>Business Hours: {settings.businessHours}</li>
             </ul>
             <div className="mt-4 flex gap-2">
               <span className="inline-block px-2 py-1 bg-primary-600/20 text-primary-500 rounded text-xs">🏭 Local Manufacturing</span>
@@ -98,7 +100,7 @@ const Footer: React.FC = () => {
           )}
         </div>
         <div className="border-t border-secondary-700 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>&copy; {new Date().getFullYear()} Twines and Straps SA (Pty) Ltd. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {settings.companyName}. All rights reserved.</p>
         </div>
       </div>
     </footer>

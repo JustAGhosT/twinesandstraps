@@ -190,3 +190,30 @@ model Review {
   product Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
   user    User?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
 }
+
+// Admin session tokens stored in database for serverless environments
+model AdminSession {
+  id         Int      @id @default(autoincrement())
+  token      String   @unique
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  @@index([expires_at])
+}
+
+// Site settings stored in database - singleton pattern (only one row)
+model SiteSetting {
+  id              Int      @id @default(1)
+  company_name    String   @default("Twines and Straps SA (Pty) Ltd")
+  tagline         String   @default("Boundless Strength, Endless Solutions!")
+  email           String   @default("info@twinesandstraps.co.za")
+  phone           String   @default("+27 (0) 11 234 5678")
+  whatsapp_number String   @default("27XXXXXXXXX")
+  address         String   @default("")
+  business_hours  String   @default("Mon-Fri 8:00-17:00")
+  vat_rate        String   @default("15")
+  social_facebook String   @default("")
+  social_instagram String  @default("")
+  social_linkedin  String  @default("")
+  updated_at      DateTime @updatedAt
+}

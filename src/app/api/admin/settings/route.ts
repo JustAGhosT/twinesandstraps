@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, readFile, mkdir } from 'fs/promises';
-import path from 'path';
+import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { siteSettingsSchema, validateBody, formatZodErrors } from '@/lib/validations';
-
-const SETTINGS_FILE = path.join(process.cwd(), 'data', 'settings.json');
 
 const DEFAULT_SETTINGS = {
   companyName: 'Twines and Straps SA (Pty) Ltd',
@@ -20,29 +17,90 @@ const DEFAULT_SETTINGS = {
   socialLinkedIn: '',
 };
 
-async function ensureDataDir() {
-  const dataDir = path.join(process.cwd(), 'data');
-  await mkdir(dataDir, { recursive: true });
+// Helper to convert database fields to API format
+function dbToApiFormat(dbSettings: {
+  company_name: string;
+  tagline: string;
+  email: string;
+  phone: string;
+  whatsapp_number: string;
+  address: string;
+  business_hours: string;
+  vat_rate: string;
+  social_facebook: string;
+  social_instagram: string;
+  social_linkedin: string;
+}) {
+  return {
+    companyName: dbSettings.company_name,
+    tagline: dbSettings.tagline,
+    email: dbSettings.email,
+    phone: dbSettings.phone,
+    whatsappNumber: dbSettings.whatsapp_number,
+    address: dbSettings.address,
+    businessHours: dbSettings.business_hours,
+    vatRate: dbSettings.vat_rate,
+    socialFacebook: dbSettings.social_facebook,
+    socialInstagram: dbSettings.social_instagram,
+    socialLinkedIn: dbSettings.social_linkedin,
+  };
+}
+
+// Helper to convert API format to database fields
+function apiToDbFormat(apiSettings: {
+  companyName?: string;
+  tagline?: string;
+  email?: string;
+  phone?: string;
+  whatsappNumber?: string;
+  address?: string;
+  businessHours?: string;
+  vatRate?: string;
+  socialFacebook?: string;
+  socialInstagram?: string;
+  socialLinkedIn?: string;
+}) {
+  const dbData: Record<string, string> = {};
+  if (apiSettings.companyName !== undefined) dbData.company_name = apiSettings.companyName;
+  if (apiSettings.tagline !== undefined) dbData.tagline = apiSettings.tagline;
+  if (apiSettings.email !== undefined) dbData.email = apiSettings.email;
+  if (apiSettings.phone !== undefined) dbData.phone = apiSettings.phone;
+  if (apiSettings.whatsappNumber !== undefined) dbData.whatsapp_number = apiSettings.whatsappNumber;
+  if (apiSettings.address !== undefined) dbData.address = apiSettings.address;
+  if (apiSettings.businessHours !== undefined) dbData.business_hours = apiSettings.businessHours;
+  if (apiSettings.vatRate !== undefined) dbData.vat_rate = apiSettings.vatRate;
+  if (apiSettings.socialFacebook !== undefined) dbData.social_facebook = apiSettings.socialFacebook;
+  if (apiSettings.socialInstagram !== undefined) dbData.social_instagram = apiSettings.socialInstagram;
+  if (apiSettings.socialLinkedIn !== undefined) dbData.social_linkedin = apiSettings.socialLinkedIn;
+  return dbData;
 }
 
 export async function GET(request: NextRequest) {
   // Verify admin authentication
-  const authError = requireAdminAuth(request);
+  const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
   try {
-    await ensureDataDir();
-    const data = await readFile(SETTINGS_FILE, 'utf-8');
-    return NextResponse.json(JSON.parse(data));
-  } catch {
-    // Return default settings if file doesn't exist
+    // Try to get settings from database (singleton with id=1)
+    const settings = await prisma.siteSetting.findUnique({
+      where: { id: 1 },
+    });
+
+    if (settings) {
+      return NextResponse.json(dbToApiFormat(settings));
+    }
+
+    // Return default settings if not found in database
+    return NextResponse.json(DEFAULT_SETTINGS);
+  } catch (error) {
+    console.error('Error fetching settings:', error);
     return NextResponse.json(DEFAULT_SETTINGS);
   }
 }
 
 export async function POST(request: NextRequest) {
   // Verify admin authentication
-  const authError = requireAdminAuth(request);
+  const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
   try {
@@ -57,21 +115,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await ensureDataDir();
+    // Convert to database format
+    const dbData = apiToDbFormat(validation.data);
 
-    // Merge with existing settings
-    let existingSettings = DEFAULT_SETTINGS;
-    try {
-      const data = await readFile(SETTINGS_FILE, 'utf-8');
-      existingSettings = { ...DEFAULT_SETTINGS, ...JSON.parse(data) };
-    } catch {
-      // Use defaults if file doesn't exist
-    }
+    // Upsert settings (create if doesn't exist, update if exists)
+    const updatedSettings = await prisma.siteSetting.upsert({
+      where: { id: 1 },
+      create: {
+        id: 1,
+        ...dbData,
+      },
+      update: dbData,
+    });
 
-    const updatedSettings = { ...existingSettings, ...validation.data };
-    await writeFile(SETTINGS_FILE, JSON.stringify(updatedSettings, null, 2));
-
-    return NextResponse.json({ success: true, settings: updatedSettings });
+    return NextResponse.json({ 
+      success: true, 
+      settings: dbToApiFormat(updatedSettings) 
+    });
   } catch (error) {
     console.error('Error saving settings:', error);
     return NextResponse.json(
