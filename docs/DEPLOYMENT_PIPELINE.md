@@ -47,6 +47,7 @@ The `netlify.toml` file configures:
 - **Command**: `npm run lint && npm run build`
   - Runs linting before build to catch issues early
   - Generates Prisma client
+  - Applies pending database migrations via `prisma migrate deploy`
   - Builds Next.js application
 - **Publish Directory**: `.next` (Next.js build output)
 - **Plugin**: `@netlify/plugin-nextjs` for optimal Next.js support
@@ -267,10 +268,12 @@ You must configure a cloud database for production. The CI/CD pipeline now valid
    - Redeploy the application
 
 5. **Run migrations** on your production database:
+   > **Note:** With the latest pipeline configuration, migrations are automatically applied during Netlify builds via `prisma migrate deploy`. However, you can also run them manually if needed:
    ```bash
-   npx prisma db push
-   # or
-   npx prisma migrate deploy
+   # For production deployments (applies migration files)
+   DATABASE_URL="your-prod-url" npx prisma migrate deploy
+   # For local development (creates and applies migrations interactively)
+   npx prisma migrate dev
    ```
 
 ### "Unauthorized: could not retrieve project" Error

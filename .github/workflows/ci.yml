@@ -77,15 +77,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Create .env file for build
-        # Placeholder URL for Prisma client generation (no actual DB connection needed at build time)
-        run: echo "DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder" > .env
-        
       - name: Generate Prisma Client
         run: npx prisma generate
         
       - name: Build Next.js app
-        run: npm run build
+        # Skip prisma migrate deploy in CI build test - migrations run on actual deploy
+        run: npx next build
         env:
           # Placeholder URL for build (dynamic rendering doesn't require DB at build time)
           DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
@@ -170,10 +167,6 @@ jobs:
           
       - name: Install dependencies
         run: npm ci
-        
-      - name: Create .env file for build
-        # Placeholder URL for Prisma client generation during Netlify build
-        run: echo "DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder" > .env
           
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
@@ -183,6 +176,7 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
   
   validate-config:
     name: Validate Configuration Files
