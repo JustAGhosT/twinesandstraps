@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import prisma from '@/lib/prisma';
 import ProductView from '@/components/ProductView';
 import RelatedProducts from '@/components/RelatedProducts';
@@ -7,9 +8,61 @@ import Link from 'next/link';
 // Force dynamic rendering - data is fetched at request time
 export const dynamic = 'force-dynamic';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://twinesandstraps.netlify.app';
+
 interface ProductDetailPageProps {
   params: {
     id: string;
+  };
+}
+
+// Generate dynamic metadata for each product
+export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
+  const productId = parseInt(params.id, 10);
+  if (isNaN(productId) || productId <= 0) {
+    return {
+      title: 'Product Not Found',
+    };
+  }
+
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    include: { category: true },
+  });
+
+  if (!product) {
+    return {
+      title: 'Product Not Found',
+    };
+  }
+
+  const description = `${product.description.slice(0, 150)}${product.description.length > 150 ? '...' : ''} - R${product.price.toFixed(2)}`;
+
+  return {
+    title: product.name,
+    description,
+    openGraph: {
+      title: `${product.name} | TASSA`,
+      description,
+      url: `${siteUrl}/products/${product.id}`,
+      siteName: 'TASSA - Twines and Straps SA',
+      images: product.image_url ? [
+        {
+          url: product.image_url,
+          width: 800,
+          height: 600,
+          alt: product.name,
+        },
+      ] : [],
+      locale: 'en_ZA',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${product.name} | TASSA`,
+      description,
+      images: product.image_url ? [product.image_url] : [],
+    },
   };
 }
 
@@ -74,8 +127,51 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   // Fetch related products from the same category
   const relatedProducts = await getRelatedProducts(product.id, product.category_id);
 
+  // JSON-LD structured data for product
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description,
+    sku: product.sku,
+    image: product.image_url || undefined,
+    brand: {
+      '@type': 'Brand',
+      name: 'TASSA',
+    },
+    manufacturer: {
+      '@type': 'Organization',
+      name: 'Twines and Straps SA',
+      url: siteUrl,
+    },
+    offers: {
+      '@type': 'Offer',
+      url: `${siteUrl}/products/${product.id}`,
+      priceCurrency: 'ZAR',
+      price: product.price,
+      availability: product.stock_status === 'OUT_OF_STOCK'
+        ? 'https://schema.org/OutOfStock'
+        : product.stock_status === 'LOW_STOCK'
+        ? 'https://schema.org/LimitedAvailability'
+        : 'https://schema.org/InStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'Twines and Straps SA',
+      },
+    },
+    category: product.category.name,
+    ...(product.material && { material: product.material }),
+  };
+
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <>
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <div className="bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumbs */}
         <nav className="mb-6 text-sm">
@@ -113,5 +209,6 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         </div>
       </div>
     </div>
+    </>
   );
 }
