@@ -169,7 +169,7 @@ export default function CategoriesPage() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="">None (Top-level)</option>
-                  {categories.map(cat => (
+                  {categories.filter(cat => cat.id !== editingId).map(cat => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>

@@ -98,8 +98,8 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In production, send to API
-    console.log('Review submitted for product', productId, ':', newReview);
+    // TODO: In production, send to API endpoint
+    // await fetch('/api/reviews', { method: 'POST', body: JSON.stringify({ productId, ...newReview }) });
     setSubmitted(true);
     setShowForm(false);
     setNewReview({ rating: 0, title: '', content: '', author: '' });
