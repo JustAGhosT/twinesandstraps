@@ -59,6 +59,10 @@ Key models:
 Required:
 - `DATABASE_URL`: Neon PostgreSQL connection string
 
+Optional (but recommended for production):
+- `NEXT_PUBLIC_WHATSAPP_NUMBER`: WhatsApp Business number for quote requests
+- `ADMIN_PASSWORD`: Secure password for admin panel access (min 8 characters)
+
 ## Common Tasks
 
 ### Adding a new product field
@@ -72,12 +76,49 @@ Required:
 2. Add `page.tsx` with Server Component
 3. Use `'use client'` only for interactive parts
 
-## Testing
+## Testing and Verification
 
-- Run `npm run lint` before committing
-- Ensure `npm run build` passes
+Before submitting changes, always run these commands:
+
+```bash
+# Lint the code
+npm run lint
+
+# Type check
+npx tsc --noEmit
+
+# Build the application (skipping production migration for local testing)
+npx prisma generate && DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder" npx next build
+```
+
+Note: The build command requires a DATABASE_URL. For CI/testing purposes, use a placeholder URL as shown above since the app uses dynamic rendering. The actual `npm run build` command also runs production migrations, which should only run in deployment environments.
+
+## Security Considerations
+
+- Never commit secrets or credentials to the repository
+- Use environment variables for sensitive data
+- The `ADMIN_PASSWORD` must be set securely in production
+- Always validate user input on both client and server
+
+## Additional Guidelines
+
+### Error Handling
+- Always wrap database operations in try/catch blocks
+- Provide meaningful error messages for API responses
+- Use appropriate HTTP status codes
+
+### API Routes
+- Place API routes in `src/app/api/` directory
+- Use Next.js route handlers with proper HTTP methods
+- Return consistent JSON response formats
+
+### Components
+- Keep components small and focused
+- Extract reusable logic into custom hooks in `src/hooks/`
+- Use TypeScript interfaces for component props
 
 ## Deployment
 
 - Migrations run automatically during Netlify builds via `prisma migrate deploy`
 - Environment variables must be set in Netlify dashboard
+- CI/CD pipeline runs lint, type-check, and build on every PR
