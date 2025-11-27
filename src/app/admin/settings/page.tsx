@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useRef, useMemo } from 'react';
 import Image from 'next/image';
+import { useToast } from '@/components/Toast';
+import { useConfirm } from '@/components/ConfirmModal';
 
 interface SiteSettings {
   companyName: string;
@@ -47,7 +49,9 @@ export default function SettingsPage() {
   const [saveResult, setSaveResult] = useState<SaveResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
-  
+  const { error: showError, success: showSuccess } = useToast();
+  const confirm = useConfirm();
+
   // Logo state - now derived from settings.logoUrl
   const [logoLoading, setLogoLoading] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
@@ -74,11 +78,11 @@ export default function SettingsPage() {
   
   // Helper to get input class with modified state indicator
   const getInputClassName = (fieldName: keyof SiteSettings): string => {
-    const baseClass = 'w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500';
+    const baseClass = 'w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white';
     if (isFieldModified(fieldName)) {
-      return `${baseClass} border-amber-400 bg-amber-50`;
+      return `${baseClass} border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-900/20`;
     }
-    return `${baseClass} border-gray-300`;
+    return `${baseClass} border-gray-300 dark:border-secondary-600`;
   };
 
   useEffect(() => {
@@ -166,10 +170,14 @@ export default function SettingsPage() {
   };
   
   const handleLogoRemove = async () => {
-    if (!confirm('Are you sure you want to remove the custom logo? The default logo will be used instead.')) {
-      return;
-    }
-    
+    const confirmed = await confirm({
+      title: 'Remove Logo',
+      message: 'Are you sure you want to remove the custom logo? The default logo will be used instead.',
+      confirmText: 'Remove Logo',
+      variant: 'warning',
+    });
+    if (!confirmed) return;
+
     setLogoLoading(true);
     setLogoError(null);
     setLogoSuccess(null);
@@ -244,7 +252,7 @@ export default function SettingsPage() {
       }, 5000);
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert(error instanceof Error ? error.message : 'Failed to save settings. Please try again.');
+      showError(error instanceof Error ? error.message : 'Failed to save settings. Please try again.');
     } finally {
       setSaving(false);
     }

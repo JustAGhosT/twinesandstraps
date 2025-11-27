@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useConfirm } from '@/components/ConfirmModal';
 
 interface Review {
   id: number;
@@ -29,6 +30,7 @@ export default function AdminReviewsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const confirm = useConfirm();
 
   const fetchReviews = useCallback(async () => {
     try {
@@ -82,8 +84,14 @@ export default function AdminReviewsPage() {
   };
 
   const deleteReview = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this review?')) return;
-    
+    const confirmed = await confirm({
+      title: 'Delete Review',
+      message: 'Are you sure you want to delete this review? This action cannot be undone.',
+      confirmText: 'Delete',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
+
     setActionLoading(id);
     try {
       const res = await fetch(`/api/admin/reviews/${id}`, {

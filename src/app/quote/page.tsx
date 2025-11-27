@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 import { useSiteSettings } from '@/contexts/SiteSettingsContext';
+import { useToast } from '@/components/Toast';
 
 export default function QuotePage() {
   const { items, getTotalItems, getTotalPrice } = useCart();
   const { settings } = useSiteSettings();
+  const { warning } = useToast();
   const hasItems = getTotalItems() > 0;
 
   const [formData, setFormData] = useState({
@@ -29,7 +31,7 @@ export default function QuotePage() {
 
     const whatsappNumber = settings.whatsappNumber;
     if (!whatsappNumber || whatsappNumber === '27XXXXXXXXX') {
-      alert(`WhatsApp number not configured. Please contact us at ${settings.email}`);
+      warning(`WhatsApp not configured. Please contact us at ${settings.email}`);
       setIsSubmitting(false);
       return;
     }

@@ -2,15 +2,17 @@
 
 import React, { useState } from 'react';
 import { useSiteSettings } from '@/contexts/SiteSettingsContext';
+import { useToast } from '@/components/Toast';
 
 const WhatsAppButton: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
   const { settings } = useSiteSettings();
+  const { warning } = useToast();
   const whatsappNumber = settings.whatsappNumber || '27XXXXXXXXX';
 
   const handleClick = () => {
     if (whatsappNumber === '27XXXXXXXXX') {
-      alert(`WhatsApp number not configured. Please contact us at ${settings.email}`);
+      warning(`WhatsApp not configured. Please contact us at ${settings.email}`);
       return;
     }
     const message = encodeURIComponent('Hi! I would like to inquire about your products.');
