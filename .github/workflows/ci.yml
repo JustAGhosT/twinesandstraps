@@ -167,6 +167,14 @@ jobs:
           
       - name: Install dependencies
         run: npm ci
+        
+      - name: Generate Prisma Client
+        run: npx prisma generate
+        
+      - name: Run database migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           
       - name: Install Netlify CLI
         run: npm install -g netlify-cli

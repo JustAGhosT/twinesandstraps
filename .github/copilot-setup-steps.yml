@@ -1,0 +1,16 @@
+# This file defines the setup steps for GitHub Copilot coding agent.
+# It tells Copilot how to configure the development environment for this repository.
+# See: https://gh.io/copilot-coding-agent-tips
+
+name: "Copilot Setup Steps"
+
+# These steps run when Copilot starts working on an issue or PR
+steps:
+  - name: "Install dependencies"
+    run: npm ci
+
+  - name: "Generate Prisma Client"
+    run: npx prisma generate
+
+  - name: "Validate TypeScript"
+    run: npx tsc --noEmit

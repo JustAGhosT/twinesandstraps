@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import Link from 'next/link';
@@ -8,9 +8,37 @@ import Link from 'next/link';
 function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login, isLoading, error: authError } = useAdminAuth();
+  const { login, isLoading, isAuthenticated, error: authError } = useAdminAuth();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  // Redirect away from login page if already authenticated
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      const from = searchParams.get('from') || '/admin';
+      router.push(from);
+    }
+  }, [isLoading, isAuthenticated, router, searchParams]);
+
+  // Show loading while checking authentication status
+  if (isLoading) {
+    return (
+      <div className="max-w-md w-full mx-4">
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 rounded-full border-4 border-primary-600 flex items-center justify-center bg-white mx-auto mb-4">
+              <span className="text-primary-600 font-bold text-xl">TS</span>
+            </div>
+            <h1 className="text-2xl font-bold text-secondary-900">Admin Login</h1>
+            <p className="text-gray-500 mt-2">Checking authentication...</p>
+          </div>
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
