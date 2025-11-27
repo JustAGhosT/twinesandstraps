@@ -7,18 +7,20 @@ import { useCart } from '@/contexts/CartContext';
 import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import RecommendedProducts from '@/components/RecommendedProducts';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { useToast } from '@/components/Toast';
 
 export default function CartPage() {
   const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
   const { settings } = useSiteSettings();
   const showRecommendedProducts = useFeatureFlag('recommendedProducts');
+  const { warning } = useToast();
 
   const handleSendToWhatsApp = () => {
     const whatsappNumber = settings.whatsappNumber;
-    
+
     // Validate WhatsApp number is configured
     if (!whatsappNumber || whatsappNumber === '27XXXXXXXXX') {
-      alert(`WhatsApp number not configured. Please contact us at ${settings.email}`);
+      warning(`WhatsApp not configured. Please contact us at ${settings.email}`);
       return;
     }
 

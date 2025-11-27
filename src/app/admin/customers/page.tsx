@@ -88,18 +88,18 @@ export default function AdminCustomersPage() {
     <div>
       <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900">Customers</h1>
-          <p className="text-gray-500 mt-1">Manage customer accounts</p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Customers</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage customer accounts</p>
         </div>
         {pagination && (
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             {pagination.total} total customer{pagination.total !== 1 ? 's' : ''}
           </div>
         )}
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+      <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-4 mb-6">
         <form onSubmit={handleSearch}>
           <div className="relative">
             <input
@@ -107,7 +107,7 @@ export default function AdminCustomersPage() {
               placeholder="Search by name, email or phone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
             />
             <svg
               className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
@@ -122,62 +122,62 @@ export default function AdminCustomersPage() {
       </div>
 
       {/* Customers Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
           </div>
         ) : customers.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
+          <div className="p-8 text-center text-gray-500 dark:text-gray-400">
             No customers found
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-secondary-700">
                 <tr>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-secondary-600"
                     onClick={() => handleSort('name')}
                   >
                     Customer {getSortIcon('name')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Contact
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Orders
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Total Spent
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-secondary-600"
                     onClick={() => handleSort('created_at')}
                   >
                     Joined {getSortIcon('created_at')}
                   </th>
                   <th
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-secondary-600"
                     onClick={() => handleSort('last_login')}
                   >
                     Last Active {getSortIcon('last_login')}
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {customers.map((customer) => (
-                  <tr key={customer.id} className="hover:bg-gray-50">
+                  <tr key={customer.id} className="hover:bg-gray-50 dark:hover:bg-secondary-700">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-semibold">
+                        <div className="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center text-primary-600 dark:text-primary-400 font-semibold">
                           {customer.name.charAt(0).toUpperCase()}
                         </div>
                         <div className="ml-3">
-                          <div className="font-medium text-secondary-900">{customer.name}</div>
+                          <div className="font-medium text-secondary-900 dark:text-white">{customer.name}</div>
                           {customer.role === 'ADMIN' && (
                             <span className="inline-flex px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
                               Admin
@@ -187,9 +187,9 @@ export default function AdminCustomersPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">{customer.email}</div>
+                      <div className="text-sm text-gray-900 dark:text-gray-200">{customer.email}</div>
                       {customer.phone && (
-                        <div className="text-sm text-gray-500">{customer.phone}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{customer.phone}</div>
                       )}
                       {customer.marketing_consent && (
                         <span className="inline-flex items-center text-xs text-green-600 mt-1">
@@ -201,22 +201,22 @@ export default function AdminCustomersPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-secondary-900">{customer._count.orders}</div>
-                      <div className="text-xs text-gray-500">{customer._count.addresses} address{customer._count.addresses !== 1 ? 'es' : ''}</div>
+                      <div className="text-sm font-medium text-secondary-900 dark:text-white">{customer._count.orders}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{customer._count.addresses} address{customer._count.addresses !== 1 ? 'es' : ''}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-semibold text-secondary-900">
+                      <div className="font-semibold text-secondary-900 dark:text-white">
                         R {customer.total_spent.toFixed(2)}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {new Date(customer.created_at).toLocaleDateString('en-ZA', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
                       })}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {customer.last_login
                         ? new Date(customer.last_login).toLocaleDateString('en-ZA', {
                             year: 'numeric',
@@ -242,8 +242,8 @@ export default function AdminCustomersPage() {
 
         {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-500">
+          <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
               Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
               {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
               {pagination.total} customers
@@ -252,14 +252,14 @@ export default function AdminCustomersPage() {
               <button
                 onClick={() => fetchCustomers(pagination.page - 1)}
                 disabled={pagination.page === 1}
-                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-secondary-700 text-gray-700 dark:text-gray-300"
               >
                 Previous
               </button>
               <button
                 onClick={() => fetchCustomers(pagination.page + 1)}
                 disabled={pagination.page === pagination.totalPages}
-                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-secondary-700 text-gray-700 dark:text-gray-300"
               >
                 Next
               </button>

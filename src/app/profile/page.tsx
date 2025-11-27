@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useUserAuth } from '@/contexts/UserAuthContext';
+import { useToast } from '@/components/Toast';
+import { useConfirm } from '@/components/ConfirmModal';
 
 interface UserProfile {
   id: number;
@@ -59,6 +61,8 @@ type Tab = 'overview' | 'orders' | 'addresses' | 'history' | 'settings';
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading: authLoading, logout } = useUserAuth();
+  const { error: showError } = useToast();
+  const confirm = useConfirm();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -151,7 +155,13 @@ export default function ProfilePage() {
   };
 
   const handleDeleteAddress = async (addressId: number) => {
-    if (!confirm('Are you sure you want to delete this address?')) return;
+    const confirmed = await confirm({
+      title: 'Delete Address',
+      message: 'Are you sure you want to delete this address? This action cannot be undone.',
+      confirmText: 'Delete',
+      variant: 'danger',
+    });
+    if (!confirmed) return;
 
     try {
       const res = await fetch(`/api/user/addresses/${addressId}`, {
@@ -161,10 +171,10 @@ export default function ProfilePage() {
         fetchAddresses();
       } else {
         const data = await res.json();
-        alert(data.error || 'Failed to delete address');
+        showError(data.error || 'Failed to delete address');
       }
     } catch {
-      alert('Failed to delete address');
+      showError('Failed to delete address');
     }
   };
 
@@ -199,7 +209,13 @@ export default function ProfilePage() {
   };
 
   const handleClearHistory = async () => {
-    if (!confirm('Are you sure you want to clear your view history?')) return;
+    const confirmed = await confirm({
+      title: 'Clear View History',
+      message: 'Are you sure you want to clear your view history? This action cannot be undone.',
+      confirmText: 'Clear History',
+      variant: 'warning',
+    });
+    if (!confirmed) return;
 
     try {
       const res = await fetch('/api/user/view-history', { method: 'DELETE' });
@@ -207,7 +223,7 @@ export default function ProfilePage() {
         setViewHistory([]);
       }
     } catch {
-      alert('Failed to clear history');
+      showError('Failed to clear history');
     }
   };
 

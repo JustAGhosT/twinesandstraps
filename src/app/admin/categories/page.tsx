@@ -121,8 +121,8 @@ export default function CategoriesPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900">Categories</h1>
-          <p className="text-gray-500 mt-1">Organize your products into categories</p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Categories</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Organize your products into categories</p>
         </div>
         <button
           onClick={startNew}
@@ -137,36 +137,36 @@ export default function CategoriesPage() {
 
       {/* New Category Form */}
       {showNew && (
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold text-secondary-900 mb-4">New Category</h2>
+        <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">New Category</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name *</label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={handleNameChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug *</label>
                 <input
                   type="text"
                   value={form.slug}
                   onChange={(e) => setForm(prev => ({ ...prev, slug: e.target.value }))}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Parent Category</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Parent Category</label>
                 <select
                   value={form.parent_id}
                   onChange={(e) => setForm(prev => ({ ...prev, parent_id: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                 >
                   <option value="">None (Top-level)</option>
                   {categories.filter(cat => cat.id !== editingId).map(cat => (
@@ -186,7 +186,7 @@ export default function CategoriesPage() {
               <button
                 type="button"
                 onClick={cancelEdit}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-secondary-700 transition-colors"
               >
                 Cancel
               </button>
@@ -196,28 +196,28 @@ export default function CategoriesPage() {
       )}
 
       {/* Categories Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
           </div>
         ) : categories.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
+          <div className="p-8 text-center text-gray-500 dark:text-gray-400">
             No categories found. Create your first category above.
           </div>
         ) : (
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-gray-50 dark:bg-secondary-700 border-b border-gray-200 dark:border-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Products</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Slug</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Products</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {categories.map((category) => (
-                <tr key={category.id} className="hover:bg-gray-50">
+                <tr key={category.id} className="hover:bg-gray-50 dark:hover:bg-secondary-700">
                   {editingId === category.id ? (
                     <td colSpan={4} className="px-6 py-4">
                       <form onSubmit={handleSubmit} className="flex items-center gap-4">
@@ -226,14 +226,14 @@ export default function CategoriesPage() {
                           value={form.name}
                           onChange={handleNameChange}
                           required
-                          className="flex-1 px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                          className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                         />
                         <input
                           type="text"
                           value={form.slug}
                           onChange={(e) => setForm(prev => ({ ...prev, slug: e.target.value }))}
                           required
-                          className="flex-1 px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                          className="flex-1 px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                         />
                         <button
                           type="submit"
@@ -245,7 +245,7 @@ export default function CategoriesPage() {
                         <button
                           type="button"
                           onClick={cancelEdit}
-                          className="px-3 py-1 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-secondary-700 transition-colors"
                         >
                           Cancel
                         </button>
@@ -253,14 +253,14 @@ export default function CategoriesPage() {
                     </td>
                   ) : (
                     <>
-                      <td className="px-6 py-4 font-medium text-secondary-900">{category.name}</td>
-                      <td className="px-6 py-4 text-gray-500">{category.slug}</td>
-                      <td className="px-6 py-4 text-gray-500">{category._count?.products || 0}</td>
+                      <td className="px-6 py-4 font-medium text-secondary-900 dark:text-white">{category.name}</td>
+                      <td className="px-6 py-4 text-gray-500 dark:text-gray-400">{category.slug}</td>
+                      <td className="px-6 py-4 text-gray-500 dark:text-gray-400">{category._count?.products || 0}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => startEdit(category)}
-                            className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 hover:bg-gray-100 dark:hover:bg-secondary-600 rounded-lg transition-colors"
                             title="Edit"
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,7 +280,7 @@ export default function CategoriesPage() {
                               </button>
                               <button
                                 onClick={() => setDeleteConfirm(null)}
-                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-secondary-600 rounded-lg transition-colors"
                                 title="Cancel"
                               >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -291,7 +291,7 @@ export default function CategoriesPage() {
                           ) : (
                             <button
                               onClick={() => setDeleteConfirm(category.id)}
-                              className="p-2 text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded-lg transition-colors"
+                              className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-secondary-600 rounded-lg transition-colors"
                               title="Delete"
                             >
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

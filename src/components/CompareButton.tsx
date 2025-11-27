@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useCompare } from '@/contexts/CompareContext';
+import { useToast } from '@/components/Toast';
 import type { ProductWithCategory } from '@/types/database';
 
 interface CompareButtonProps {
@@ -16,6 +17,7 @@ const CompareButton: React.FC<CompareButtonProps> = ({
   className = '',
 }) => {
   const { addToCompare, removeFromCompare, isInCompare, canAddMore } = useCompare();
+  const { warning } = useToast();
   const isComparing = isInCompare(product.id);
 
   const handleClick = (e: React.MouseEvent) => {
@@ -25,7 +27,7 @@ const CompareButton: React.FC<CompareButtonProps> = ({
       removeFromCompare(product.id);
     } else {
       if (!canAddMore()) {
-        alert('You can compare up to 4 products at a time. Remove a product to add another.');
+        warning('You can compare up to 4 products. Remove one to add another.');
         return;
       }
       addToCompare(product);

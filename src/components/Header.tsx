@@ -8,6 +8,7 @@ import { useUserAuth } from '@/contexts/UserAuthContext';
 import SearchBar from '@/components/SearchBar';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { useCustomLogo } from '@/hooks/useCustomLogo';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const Header: React.FC = () => {
   const { getTotalItems } = useCart();
@@ -87,6 +88,9 @@ const Header: React.FC = () => {
             {/* Search */}
             {showSearchBar && <SearchBar />}
 
+            {/* Theme Toggle */}
+            <ThemeToggle variant="icon" className="text-white/90 hover:text-white hover:bg-white/10" />
+
             {/* CTA Button - Desktop only */}
             <Link
               href="/quote"
@@ -114,39 +118,39 @@ const Header: React.FC = () => {
                   </svg>
                 </button>
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
-                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-secondary-800 rounded-lg shadow-lg py-2 z-50 border border-secondary-200 dark:border-secondary-700">
+                    <div className="px-4 py-2 border-b border-secondary-100 dark:border-secondary-700">
+                      <p className="text-sm font-medium text-secondary-900 dark:text-white truncate">{user?.name}</p>
+                      <p className="text-xs text-secondary-500 dark:text-secondary-400 truncate">{user?.email}</p>
                     </div>
                     <Link
                       href="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700"
                       onClick={() => setUserMenuOpen(false)}
                     >
                       My Profile
                     </Link>
                     <Link
                       href="/profile?tab=orders"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700"
                       onClick={() => setUserMenuOpen(false)}
                     >
                       My Orders
                     </Link>
                     <Link
                       href="/wishlist"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700"
                       onClick={() => setUserMenuOpen(false)}
                     >
                       My Wishlist
                     </Link>
-                    <hr className="my-1" />
+                    <hr className="my-1 border-secondary-200 dark:border-secondary-700" />
                     <button
                       onClick={() => {
                         logout();
                         setUserMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-secondary-100 dark:hover:bg-secondary-700"
                     >
                       Sign Out
                     </button>
