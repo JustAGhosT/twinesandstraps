@@ -5,10 +5,9 @@
  * 1. The database already has tables but the migration history is not synced
  * 2. A previous migration attempt failed and left the database in an inconsistent state
  * 
- * It checks the init migration status and resolves issues before running migrate deploy:
+ * It resolves failed migrations before running migrate deploy:
  * - If init migration is not recorded but tables exist: baselines it as applied
- * - If init migration is marked as failed but tables exist: marks it as applied
- * - If init migration is marked as failed and tables don't exist: marks it as rolled back for retry
+ * - If any migration is marked as failed: marks it as rolled back for retry
  * 
  * Usage: tsx scripts/migrate-production.ts
  */
@@ -25,7 +24,7 @@ async function main() {
   console.log('Starting production migration...');
 
   try {
-    // Check if the _prisma_migrations table exists and has the init migration
+    // First, check if we need to baseline the init migration
     const initMigrationStatus = await getInitMigrationStatus();
 
     if (initMigrationStatus === 'not_found') {
@@ -49,26 +48,41 @@ async function main() {
       const tablesExist = await checkTablesExist();
       
       if (tablesExist) {
-        console.log('Tables exist despite failed status. Marking migration as applied...');
+        console.log('Tables exist despite failed status. Marking init migration as applied...');
         
-        // Mark the failed migration as applied since the tables exist
+        // Mark the failed init migration as applied since the tables exist
         execSync(`npx prisma migrate resolve --applied ${INIT_MIGRATION_NAME}`, {
           stdio: 'inherit',
         });
         
-        console.log('Failed migration marked as applied successfully.');
+        console.log('Failed init migration marked as applied successfully.');
       } else {
-        console.log('Tables do not exist. Marking migration as rolled back for retry...');
+        console.log('Tables do not exist. Marking init migration as rolled back for retry...');
         
-        // Mark the failed migration as rolled back so it can be retried
+        // Mark the failed init migration as rolled back so it can be retried
         execSync(`npx prisma migrate resolve --rolled-back ${INIT_MIGRATION_NAME}`, {
           stdio: 'inherit',
         });
         
-        console.log('Failed migration marked as rolled back.');
+        console.log('Failed init migration marked as rolled back.');
       }
-    } else {
-      console.log('Init migration already recorded. Proceeding with normal deploy...');
+    }
+
+    // Then, check for ANY other failed migrations and mark them as rolled back for retry
+    // (excluding init which was already handled above)
+    const failedMigrations = await getFailedMigrations();
+    
+    if (failedMigrations.length > 0) {
+      console.log(`Found ${failedMigrations.length} failed migration(s). Marking as rolled back for retry...`);
+      
+      for (const migrationName of failedMigrations) {
+        console.log(`  Marking migration as rolled back: ${migrationName}`);
+        execSync(`npx prisma migrate resolve --rolled-back ${migrationName}`, {
+          stdio: 'inherit',
+        });
+      }
+      
+      console.log('Failed migrations marked as rolled back successfully.');
     }
 
     // Now run the normal migrate deploy
@@ -141,6 +155,30 @@ async function checkTablesExist(): Promise<boolean> {
     return result[0].exists;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Gets all failed migrations from the _prisma_migrations table,
+ * excluding the init migration which is handled separately.
+ * A migration is considered "failed" if:
+ * - It has a record in the table
+ * - finished_at is null (never completed successfully)
+ * - rolled_back_at is null (hasn't been marked for rollback yet)
+ */
+async function getFailedMigrations(): Promise<string[]> {
+  try {
+    const result = await prisma.$queryRaw<MigrationRecord[]>`
+      SELECT migration_name, finished_at, rolled_back_at FROM "_prisma_migrations" 
+      WHERE finished_at IS NULL 
+        AND rolled_back_at IS NULL
+        AND migration_name != ${INIT_MIGRATION_NAME}
+    `;
+    
+    return result.map(r => r.migration_name);
+  } catch {
+    // Table doesn't exist or query failed - no failed migrations to recover
+    return [];
   }
 }
 
