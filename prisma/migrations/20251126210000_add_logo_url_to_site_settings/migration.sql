@@ -14,6 +14,5 @@ CREATE TABLE IF NOT EXISTS "SiteSetting" (
     "social_instagram" TEXT NOT NULL DEFAULT '',
     "social_linkedin" TEXT NOT NULL DEFAULT '',
     "updated_at" TIMESTAMP(3) NOT NULL,
-
     CONSTRAINT "SiteSetting_pkey" PRIMARY KEY ("id")
 );
