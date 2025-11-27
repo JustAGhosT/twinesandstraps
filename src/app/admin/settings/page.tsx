@@ -263,12 +263,12 @@ export default function SettingsPage() {
     return (
       <div>
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-secondary-900">Site Settings</h1>
-          <p className="text-gray-500 mt-1">Manage your website configuration</p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Site Settings</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your website configuration</p>
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+        <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-8 text-center">
           <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading settings...</p>
+          <p className="text-gray-600 dark:text-gray-300">Loading settings...</p>
         </div>
       </div>
     );
@@ -279,14 +279,14 @@ export default function SettingsPage() {
     return (
       <div>
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-secondary-900">Site Settings</h1>
-          <p className="text-gray-500 mt-1">Manage your website configuration</p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Site Settings</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your website configuration</p>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center">
-          <svg className="w-12 h-12 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-8 text-center">
+          <svg className="w-12 h-12 text-red-500 dark:text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <p className="text-red-700 font-medium mb-4">{loadError}</p>
+          <p className="text-red-700 dark:text-red-400 font-medium mb-4">{loadError}</p>
           <button
             onClick={() => window.location.href = '/admin/login'}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -301,22 +301,22 @@ export default function SettingsPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-secondary-900">Site Settings</h1>
-        <p className="text-gray-500 mt-1">Manage your website configuration</p>
+        <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Site Settings</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your website configuration</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Logo Upload Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-secondary-900 mb-4">Site Logo</h2>
-          <p className="text-sm text-gray-500 mb-4">
+        <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Site Logo</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             Upload a custom logo for your site. Only SVG format is accepted (recommended for crisp display at all sizes).
           </p>
           
           <div className="flex items-start gap-6">
             {/* Logo Preview */}
             <div className="flex-shrink-0">
-              <div className="w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 overflow-hidden">
+              <div className="w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center bg-gray-50 dark:bg-secondary-700 overflow-hidden">
                 {settings.logoUrl ? (
                   <Image
                     src={settings.logoUrl}
@@ -327,7 +327,7 @@ export default function SettingsPage() {
                     unoptimized
                   />
                 ) : (
-                  <div className="text-center text-gray-400">
+                  <div className="text-center text-gray-400 dark:text-gray-500">
                     <svg className="w-8 h-8 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
@@ -336,7 +336,7 @@ export default function SettingsPage() {
                 )}
               </div>
             </div>
-            
+
             {/* Upload Controls */}
             <div className="flex-1">
               <input
@@ -350,7 +350,7 @@ export default function SettingsPage() {
               <div className="flex flex-wrap gap-2">
                 <label
                   htmlFor="logo-upload"
-                  className={`inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer transition-colors ${logoLoading ? 'opacity-50 pointer-events-none' : ''}`}
+                  className={`inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-secondary-700 hover:bg-gray-50 dark:hover:bg-secondary-600 cursor-pointer transition-colors ${logoLoading ? 'opacity-50 pointer-events-none' : ''}`}
                 >
                   {logoLoading ? (
                     <>
@@ -375,7 +375,7 @@ export default function SettingsPage() {
                     type="button"
                     onClick={handleLogoRemove}
                     disabled={logoLoading}
-                    className="inline-flex items-center gap-2 px-4 py-2 border border-red-300 rounded-lg text-sm font-medium text-red-600 bg-white hover:bg-red-50 transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-2 px-4 py-2 border border-red-300 dark:border-red-700 rounded-lg text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-secondary-700 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -385,18 +385,18 @@ export default function SettingsPage() {
                 )}
               </div>
               
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 Maximum file size: 512KB. SVG format ensures your logo looks crisp on all devices.
               </p>
-              
+
               {logoError && (
-                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
                   {logoError}
                 </div>
               )}
-              
+
               {logoSuccess && (
-                <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-lg text-sm text-green-600">
+                <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg text-sm text-green-600 dark:text-green-400">
                   {logoSuccess}
                 </div>
               )}
@@ -405,13 +405,13 @@ export default function SettingsPage() {
         </div>
 
         {/* Company Information */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-secondary-900 mb-4">Company Information</h2>
+        <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Company Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Company Name
-                {isFieldModified('companyName') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+                {isFieldModified('companyName') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
               </label>
               <input
                 type="text"
@@ -422,9 +422,9 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Tagline
-                {isFieldModified('tagline') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+                {isFieldModified('tagline') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
               </label>
               <input
                 type="text"
@@ -435,9 +435,9 @@ export default function SettingsPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Address
-                {isFieldModified('address') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+                {isFieldModified('address') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
               </label>
               <textarea
                 name="address"
@@ -452,13 +452,13 @@ export default function SettingsPage() {
         </div>
 
         {/* Contact Information */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-secondary-900 mb-4">Contact Information</h2>
+        <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Contact Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Email Address
-                {isFieldModified('email') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+                {isFieldModified('email') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
               </label>
               <input
                 type="email"
@@ -469,9 +469,9 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Phone Number
-                {isFieldModified('phone') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+                {isFieldModified('phone') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
               </label>
               <input
                 type="text"
@@ -482,9 +482,9 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 WhatsApp Number
-                {isFieldModified('whatsappNumber') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+                {isFieldModified('whatsappNumber') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
               </label>
               <input
                 type="text"
@@ -494,12 +494,12 @@ export default function SettingsPage() {
                 placeholder="e.g. 27821234567"
                 className={getInputClassName('whatsappNumber')}
               />
-              <p className="text-xs text-gray-500 mt-1">Include country code without + sign</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Include country code without + sign</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Business Hours
-                {isFieldModified('businessHours') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+                {isFieldModified('businessHours') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
               </label>
               <input
                 type="text"
@@ -514,13 +514,13 @@ export default function SettingsPage() {
         </div>
 
         {/* Business Settings */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-secondary-900 mb-4">Business Settings</h2>
+        <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Business Settings</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 VAT Rate (%)
-                {isFieldModified('vatRate') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+                {isFieldModified('vatRate') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
               </label>
               <input
                 type="number"
@@ -537,13 +537,13 @@ export default function SettingsPage() {
         </div>
 
         {/* Social Media */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-secondary-900 mb-4">Social Media Links</h2>
+        <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Social Media Links</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Facebook
-                {isFieldModified('socialFacebook') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+                {isFieldModified('socialFacebook') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
               </label>
               <input
                 type="url"
@@ -555,9 +555,9 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Instagram
-                {isFieldModified('socialInstagram') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+                {isFieldModified('socialInstagram') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
               </label>
               <input
                 type="url"
@@ -569,9 +569,9 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 LinkedIn
-                {isFieldModified('socialLinkedIn') && <span className="ml-2 text-xs text-amber-600">(modified)</span>}
+                {isFieldModified('socialLinkedIn') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
               </label>
               <input
                 type="url"
@@ -587,14 +587,14 @@ export default function SettingsPage() {
 
         {/* Unsaved Changes Banner */}
         {hasUnsavedChanges && !saved && (
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg">
             <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-amber-500 dark:text-amber-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <div>
-                <h3 className="font-medium text-amber-800">You have unsaved changes</h3>
-                <p className="text-sm text-amber-700 mt-1">
+                <h3 className="font-medium text-amber-800 dark:text-amber-400">You have unsaved changes</h3>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
                   {modifiedFields.length} field{modifiedFields.length !== 1 ? 's' : ''} modified. Click &quot;Save Settings&quot; to apply your changes.
                 </p>
               </div>
@@ -605,33 +605,33 @@ export default function SettingsPage() {
         <div className="flex items-center justify-between">
           <div className="flex-1">
             {saved && saveResult && (
-              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
                 <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-green-500 dark:text-green-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <div>
-                    <h3 className="font-medium text-green-800">Settings saved successfully!</h3>
+                    <h3 className="font-medium text-green-800 dark:text-green-400">Settings saved successfully!</h3>
                     {saveResult.changeCount > 0 ? (
                       <div className="mt-1">
-                        <p className="text-sm text-green-700">
+                        <p className="text-sm text-green-700 dark:text-green-300">
                           Updated {saveResult.changeCount} field{saveResult.changeCount !== 1 ? 's' : ''}:
                         </p>
-                        <ul className="mt-1 text-sm text-green-600 list-disc list-inside">
+                        <ul className="mt-1 text-sm text-green-600 dark:text-green-400 list-disc list-inside">
                           {saveResult.changedFieldLabels.map((label, index) => (
                             <li key={index}>{label}</li>
                           ))}
                         </ul>
                       </div>
                     ) : (
-                      <p className="text-sm text-green-700 mt-1">No changes detected.</p>
+                      <p className="text-sm text-green-700 dark:text-green-300 mt-1">No changes detected.</p>
                     )}
                   </div>
                 </div>
               </div>
             )}
             {saved && !saveResult && (
-              <span className="text-green-600 flex items-center gap-2">
+              <span className="text-green-600 dark:text-green-400 flex items-center gap-2">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
@@ -649,9 +649,9 @@ export default function SettingsPage() {
         </div>
       </form>
 
-      <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-lg">
-        <h3 className="font-medium text-green-800 mb-2">Settings Storage</h3>
-        <p className="text-sm text-green-700">
+      <div className="mt-8 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg">
+        <h3 className="font-medium text-green-800 dark:text-green-400 mb-2">Settings Storage</h3>
+        <p className="text-sm text-green-700 dark:text-green-300">
           All settings are saved to the database and will persist across deployments.
           Changes to contact information like WhatsApp number, email, and phone will be immediately available to website visitors.
         </p>
