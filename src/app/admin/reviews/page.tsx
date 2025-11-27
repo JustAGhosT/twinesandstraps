@@ -154,8 +154,8 @@ export default function AdminReviewsPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900">Customer Reviews</h1>
-          <p className="text-gray-500 mt-1">Manage and moderate customer feedback</p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Customer Reviews</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage and moderate customer feedback</p>
         </div>
         <Link
           href="/admin/testimonials"
@@ -169,19 +169,19 @@ export default function AdminReviewsPage() {
       </div>
 
       {message && (
-        <div className={`mb-4 p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+        <div className={`mb-4 p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800'}`}>
           {message.text}
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+      <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-4 mb-6">
         <div className="flex items-center gap-4">
-          <label className="text-sm font-medium text-gray-700">Filter by Status:</label>
+          <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by Status:</label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
           >
             <option value="">All Reviews</option>
             <option value="PENDING">Pending</option>
@@ -193,8 +193,8 @@ export default function AdminReviewsPage() {
 
       {/* Reviews List */}
       {reviews.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">
-          <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-8 text-center text-gray-500 dark:text-gray-400">
+          <svg className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
           </svg>
           <p className="text-lg font-medium">No reviews found</p>
@@ -203,32 +203,32 @@ export default function AdminReviewsPage() {
       ) : (
         <div className="space-y-4">
           {reviews.map((review) => (
-            <div key={review.id} className="bg-white rounded-xl shadow-sm p-6">
+            <div key={review.id} className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
               <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2 mb-2">
                     {renderStars(review.rating)}
                     {getStatusBadge(review.status)}
                     {review.verified_purchase && (
-                      <span className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded">
+                      <span className="px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 rounded">
                         Verified Purchase
                       </span>
                     )}
                     {review.promoted_to_testimonial && (
-                      <span className="px-2 py-1 text-xs font-medium text-purple-700 bg-purple-100 rounded">
+                      <span className="px-2 py-1 text-xs font-medium text-purple-700 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/50 rounded">
                         Promoted to Testimonial
                       </span>
                     )}
                   </div>
-                  
+
                   {review.title && (
-                    <h3 className="font-semibold text-secondary-900 mb-1">{review.title}</h3>
+                    <h3 className="font-semibold text-secondary-900 dark:text-white mb-1">{review.title}</h3>
                   )}
-                  
-                  <p className="text-gray-600 mb-3">&quot;{review.content}&quot;</p>
-                  
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                    <span className="font-medium text-gray-700">{review.author_name}</span>
+
+                  <p className="text-gray-600 dark:text-gray-300 mb-3">&quot;{review.content}&quot;</p>
+
+                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">{review.author_name}</span>
                     {review.company && <span>at {review.company}</span>}
                     {review.role && <span>• {review.role}</span>}
                     {review.product && (
@@ -291,9 +291,9 @@ export default function AdminReviewsPage() {
         </div>
       )}
 
-      <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h3 className="font-medium text-blue-800 mb-2">About Customer Reviews</h3>
-        <ul className="text-sm text-blue-700 space-y-1">
+      <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <h3 className="font-medium text-blue-800 dark:text-blue-400 mb-2">About Customer Reviews</h3>
+        <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
           <li>• Reviews submitted by customers are set to &quot;Pending&quot; and require approval</li>
           <li>• Approved reviews are displayed publicly on product pages</li>
           <li>• You can promote high-quality reviews to Testimonials for the homepage</li>

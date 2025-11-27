@@ -1,239 +1,157 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useTheme, presetThemes, defaultBrandColors, type BrandColors } from '@/contexts/ThemeContext';
+import { useToast } from '@/components/Toast';
+import ThemeToggle from '@/components/ThemeToggle';
 
-interface ThemeColors {
-  primary: string;
-  primaryLight: string;
-  primaryDark: string;
-  secondary: string;
-  secondaryLight: string;
-  secondaryDark: string;
-  accent: string;
-}
-
-const defaultColors: ThemeColors = {
-  primary: '#ea580c', // orange-600
-  primaryLight: '#f97316', // orange-500
-  primaryDark: '#c2410c', // orange-700
-  secondary: '#1c1917', // stone-900
-  secondaryLight: '#44403c', // stone-700
-  secondaryDark: '#0c0a09', // stone-950
-  accent: '#16a34a', // green-600
-};
-
-const presetThemes = [
-  { name: 'Default Orange', colors: defaultColors },
-  {
-    name: 'Blue Professional',
-    colors: {
-      primary: '#2563eb',
-      primaryLight: '#3b82f6',
-      primaryDark: '#1d4ed8',
-      secondary: '#1e293b',
-      secondaryLight: '#334155',
-      secondaryDark: '#0f172a',
-      accent: '#10b981',
-    },
-  },
-  {
-    name: 'Green Nature',
-    colors: {
-      primary: '#16a34a',
-      primaryLight: '#22c55e',
-      primaryDark: '#15803d',
-      secondary: '#1c1917',
-      secondaryLight: '#44403c',
-      secondaryDark: '#0c0a09',
-      accent: '#ea580c',
-    },
-  },
-  {
-    name: 'Purple Premium',
-    colors: {
-      primary: '#7c3aed',
-      primaryLight: '#8b5cf6',
-      primaryDark: '#6d28d9',
-      secondary: '#18181b',
-      secondaryLight: '#3f3f46',
-      secondaryDark: '#09090b',
-      accent: '#f59e0b',
-    },
-  },
-  {
-    name: 'Red Bold',
-    colors: {
-      primary: '#dc2626',
-      primaryLight: '#ef4444',
-      primaryDark: '#b91c1c',
-      secondary: '#1c1917',
-      secondaryLight: '#44403c',
-      secondaryDark: '#0c0a09',
-      accent: '#0891b2',
-    },
-  },
+const colorFields: { key: keyof BrandColors; label: string; description: string }[] = [
+  { key: 'primary', label: 'Primary Color', description: 'Main brand color for buttons, links, and accents' },
+  { key: 'primaryLight', label: 'Primary Light', description: 'Lighter shade for hover states' },
+  { key: 'primaryDark', label: 'Primary Dark', description: 'Darker shade for active states' },
+  { key: 'secondary', label: 'Secondary Color', description: 'Dark color for text and headers' },
+  { key: 'secondaryLight', label: 'Secondary Light', description: 'Lighter shade for secondary elements' },
+  { key: 'secondaryDark', label: 'Secondary Dark', description: 'Darkest shade for backgrounds' },
+  { key: 'accent', label: 'Accent Color', description: 'Highlight color for special elements' },
 ];
 
-const THEME_KEY = 'tassa_theme_colors';
-
 export default function ThemePage() {
-  const [colors, setColors] = useState<ThemeColors>(defaultColors);
-  const [saved, setSaved] = useState(false);
+  const { mode, colors, setColor, applyPreset, resetColors, saveToServer, isSaving } = useTheme();
+  const { success, error } = useToast();
 
-  useEffect(() => {
-    const stored = localStorage.getItem(THEME_KEY);
-    if (stored) {
-      try {
-        setColors({ ...defaultColors, ...JSON.parse(stored) });
-      } catch (e) {
-        console.error('Error loading theme:', e);
-      }
+  const handleSave = async () => {
+    const saved = await saveToServer();
+    if (saved) {
+      success('Theme colors saved successfully!');
+    } else {
+      error('Failed to save theme colors. Please try again.');
     }
-  }, []);
-
-  const handleColorChange = (key: keyof ThemeColors, value: string) => {
-    setColors(prev => ({ ...prev, [key]: value }));
-    setSaved(false);
-
-    // Live preview
-    document.documentElement.style.setProperty(`--color-${key}`, value);
   };
 
-  const applyPreset = (preset: typeof presetThemes[0]) => {
-    setColors(preset.colors);
-    setSaved(false);
-
-    // Live preview
-    Object.entries(preset.colors).forEach(([key, value]) => {
-      document.documentElement.style.setProperty(`--color-${key}`, value);
-    });
+  const handleColorChange = (key: keyof BrandColors, value: string) => {
+    setColor(key, value);
   };
 
-  const handleSave = () => {
-    localStorage.setItem(THEME_KEY, JSON.stringify(colors));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  const handlePresetClick = (preset: typeof presetThemes[0]) => {
+    applyPreset(preset);
   };
 
   const handleReset = () => {
-    setColors(defaultColors);
-    localStorage.removeItem(THEME_KEY);
-
-    // Reset CSS variables
-    Object.entries(defaultColors).forEach(([key, value]) => {
-      document.documentElement.style.setProperty(`--color-${key}`, value);
-    });
-
-    setSaved(false);
+    resetColors();
   };
 
-  const colorFields: { key: keyof ThemeColors; label: string; description: string }[] = [
-    { key: 'primary', label: 'Primary Color', description: 'Main brand color for buttons, links, and accents' },
-    { key: 'primaryLight', label: 'Primary Light', description: 'Lighter shade for hover states' },
-    { key: 'primaryDark', label: 'Primary Dark', description: 'Darker shade for active states' },
-    { key: 'secondary', label: 'Secondary Color', description: 'Dark color for text and headers' },
-    { key: 'secondaryLight', label: 'Secondary Light', description: 'Lighter shade for secondary elements' },
-    { key: 'secondaryDark', label: 'Secondary Dark', description: 'Darkest shade for backgrounds' },
-    { key: 'accent', label: 'Accent Color', description: 'Highlight color for special elements' },
-  ];
+  // Check if current colors match default
+  const isDefault = JSON.stringify(colors) === JSON.stringify(defaultBrandColors);
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900">Theme & Colors</h1>
-          <p className="text-gray-500 mt-1">Customize your website colors</p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Theme & Colors</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Customize your website appearance</p>
         </div>
         <div className="flex items-center gap-3">
-          {saved && (
-            <span className="text-green-600 flex items-center gap-2">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              Saved!
-            </span>
-          )}
           <button
             onClick={handleReset}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            disabled={isDefault}
+            className="px-4 py-2 border border-gray-300 dark:border-secondary-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-secondary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Reset to Default
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+            disabled={isSaving}
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50"
           >
-            Save Changes
+            {isSaving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Color Pickers */}
+        {/* Left column - Mode and Colors */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-secondary-900 mb-4">Brand Colors</h2>
+          {/* Dark/Light Mode */}
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Display Mode</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Choose how the site appears to you. Users can select their own preference.
+            </p>
+            <div className="flex items-center gap-4">
+              <ThemeToggle variant="buttons" />
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                Current: <span className="font-medium capitalize">{mode}</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Brand Colors */}
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Brand Colors</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {colorFields.map(field => (
-                <div key={field.key} className="p-4 bg-gray-50 rounded-lg">
+                <div key={field.key} className="p-4 bg-gray-50 dark:bg-secondary-700 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <label className="font-medium text-secondary-900">{field.label}</label>
+                    <label className="font-medium text-secondary-900 dark:text-white">{field.label}</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="color"
                         value={colors[field.key]}
                         onChange={(e) => handleColorChange(field.key, e.target.value)}
-                        className="w-10 h-10 rounded cursor-pointer border-0"
+                        className="w-10 h-10 rounded cursor-pointer border-0 bg-transparent"
                       />
                       <input
                         type="text"
                         value={colors[field.key]}
                         onChange={(e) => handleColorChange(field.key, e.target.value)}
-                        className="w-24 px-2 py-1 text-sm border border-gray-300 rounded font-mono"
+                        className="w-24 px-2 py-1 text-sm border border-gray-300 dark:border-secondary-600 rounded font-mono bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white"
                       />
                     </div>
                   </div>
-                  <p className="text-sm text-gray-500">{field.description}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{field.description}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Preset Themes */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-secondary-900 mb-4">Preset Themes</h2>
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Preset Themes</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Quick-apply a preset color scheme
+            </p>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {presetThemes.map(preset => (
                 <button
                   key={preset.name}
-                  onClick={() => applyPreset(preset)}
-                  className="p-3 border border-gray-200 rounded-lg hover:border-primary-500 hover:shadow-md transition-all text-center"
+                  onClick={() => handlePresetClick(preset)}
+                  className="p-3 border border-gray-200 dark:border-secondary-600 rounded-lg hover:border-primary-500 hover:shadow-md transition-all text-center bg-white dark:bg-secondary-700"
                 >
                   <div className="flex gap-1 justify-center mb-2">
                     <div
-                      className="w-6 h-6 rounded-full"
+                      className="w-6 h-6 rounded-full border border-gray-200 dark:border-secondary-500"
                       style={{ backgroundColor: preset.colors.primary }}
                     />
                     <div
-                      className="w-6 h-6 rounded-full"
+                      className="w-6 h-6 rounded-full border border-gray-200 dark:border-secondary-500"
                       style={{ backgroundColor: preset.colors.secondary }}
                     />
                     <div
-                      className="w-6 h-6 rounded-full"
+                      className="w-6 h-6 rounded-full border border-gray-200 dark:border-secondary-500"
                       style={{ backgroundColor: preset.colors.accent }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-secondary-900">{preset.name}</span>
+                  <span className="text-sm font-medium text-secondary-900 dark:text-white">{preset.name}</span>
                 </button>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Preview */}
+        {/* Right column - Preview */}
         <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-secondary-900 mb-4">Preview</h2>
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Live Preview</h2>
 
             {/* Button Preview */}
             <div className="space-y-3 mb-6">
@@ -259,11 +177,14 @@ export default function ThemePage() {
 
             {/* Text Preview */}
             <div className="space-y-2 mb-6">
-              <h3 style={{ color: colors.secondary }} className="text-xl font-bold">
+              <h3 style={{ color: colors.secondary }} className="text-xl font-bold dark:hidden">
                 Heading Text
               </h3>
-              <p style={{ color: colors.secondaryLight }} className="text-sm">
-                This is secondary text color for descriptions and captions.
+              <h3 className="text-xl font-bold hidden dark:block text-white">
+                Heading Text
+              </h3>
+              <p style={{ color: colors.secondaryLight }} className="text-sm dark:text-gray-400">
+                This is secondary text color for descriptions.
               </p>
               <a style={{ color: colors.primary }} className="text-sm font-medium cursor-pointer hover:underline">
                 This is a link
@@ -284,13 +205,13 @@ export default function ThemePage() {
           </div>
 
           {/* Export */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-secondary-900 mb-4">Export</h2>
-            <p className="text-sm text-gray-500 mb-3">
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Export Colors</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
               Copy these values to update your Tailwind config:
             </p>
             <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg text-xs overflow-x-auto">
-{`// tailwind.config.js
+{`// tailwind.config.ts
 colors: {
   primary: {
     500: '${colors.primaryLight}',
@@ -308,16 +229,13 @@ colors: {
         </div>
       </div>
 
-      <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h3 className="font-medium text-blue-800 mb-2">How to Apply Changes Permanently</h3>
-        <p className="text-sm text-blue-700">
-          Changes made here are previewed locally. To apply them permanently across your website:
-        </p>
-        <ol className="text-sm text-blue-700 list-decimal list-inside mt-2 space-y-1">
-          <li>Copy the exported Tailwind config values above</li>
-          <li>Update your <code className="bg-blue-100 px-1 rounded">tailwind.config.ts</code> file</li>
-          <li>Rebuild and deploy your website</li>
-        </ol>
+      <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-2">About Theme Settings</h3>
+        <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
+          <li>• <strong>Display Mode:</strong> Controls light/dark appearance. Each user can set their own preference.</li>
+          <li>• <strong>Brand Colors:</strong> Changes are previewed instantly. Click &quot;Save Changes&quot; to persist.</li>
+          <li>• <strong>Preset Themes:</strong> Quick-apply common color schemes as a starting point.</li>
+        </ul>
       </div>
     </div>
   );

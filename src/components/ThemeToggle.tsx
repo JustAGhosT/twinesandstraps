@@ -9,7 +9,7 @@ interface ThemeToggleProps {
 }
 
 export default function ThemeToggle({ variant = 'dropdown', className = '' }: ThemeToggleProps) {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { mode, setMode, resolvedMode } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -43,8 +43,8 @@ export default function ThemeToggle({ variant = 'dropdown', className = '' }: Th
   );
 
   const getCurrentIcon = () => {
-    if (theme === 'system') return <SystemIcon />;
-    return resolvedTheme === 'dark' ? <MoonIcon /> : <SunIcon />;
+    if (mode === 'system') return <SystemIcon />;
+    return resolvedMode === 'dark' ? <MoonIcon /> : <SunIcon />;
   };
 
   // Simple icon button that cycles through themes
@@ -52,12 +52,12 @@ export default function ThemeToggle({ variant = 'dropdown', className = '' }: Th
     return (
       <button
         onClick={() => {
-          const next = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
-          setTheme(next);
+          const next = mode === 'light' ? 'dark' : mode === 'dark' ? 'system' : 'light';
+          setMode(next);
         }}
         className={`p-2 rounded-lg transition-colors hover:bg-secondary-100 dark:hover:bg-secondary-700 text-secondary-600 dark:text-secondary-300 ${className}`}
-        aria-label={`Current theme: ${theme}. Click to change.`}
-        title={`Theme: ${theme}`}
+        aria-label={`Current theme: ${mode}. Click to change.`}
+        title={`Theme: ${mode}`}
       >
         {getCurrentIcon()}
       </button>
@@ -69,37 +69,37 @@ export default function ThemeToggle({ variant = 'dropdown', className = '' }: Th
     return (
       <div className={`inline-flex rounded-lg border border-secondary-200 dark:border-secondary-700 p-1 bg-secondary-100 dark:bg-secondary-800 ${className}`}>
         <button
-          onClick={() => setTheme('light')}
+          onClick={() => setMode('light')}
           className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-            theme === 'light'
+            mode === 'light'
               ? 'bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white shadow-sm'
               : 'text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white'
           }`}
-          aria-pressed={theme === 'light'}
+          aria-pressed={mode === 'light'}
         >
           <SunIcon />
           <span>Light</span>
         </button>
         <button
-          onClick={() => setTheme('dark')}
+          onClick={() => setMode('dark')}
           className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-            theme === 'dark'
+            mode === 'dark'
               ? 'bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white shadow-sm'
               : 'text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white'
           }`}
-          aria-pressed={theme === 'dark'}
+          aria-pressed={mode === 'dark'}
         >
           <MoonIcon />
           <span>Dark</span>
         </button>
         <button
-          onClick={() => setTheme('system')}
+          onClick={() => setMode('system')}
           className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-            theme === 'system'
+            mode === 'system'
               ? 'bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white shadow-sm'
               : 'text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-white'
           }`}
-          aria-pressed={theme === 'system'}
+          aria-pressed={mode === 'system'}
         >
           <SystemIcon />
           <span>System</span>
@@ -127,48 +127,48 @@ export default function ThemeToggle({ variant = 'dropdown', className = '' }: Th
       {isOpen && (
         <div className="absolute right-0 mt-2 w-40 rounded-lg bg-white dark:bg-secondary-800 shadow-lg border border-secondary-200 dark:border-secondary-700 py-1 z-50 animate-fade-in">
           <button
-            onClick={() => { setTheme('light'); setIsOpen(false); }}
+            onClick={() => { setMode('light'); setIsOpen(false); }}
             className={`flex items-center gap-3 w-full px-4 py-2 text-sm text-left transition-colors ${
-              theme === 'light'
+              mode === 'light'
                 ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
                 : 'text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700'
             }`}
           >
             <SunIcon />
             <span>Light</span>
-            {theme === 'light' && (
+            {mode === 'light' && (
               <svg className="w-4 h-4 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             )}
           </button>
           <button
-            onClick={() => { setTheme('dark'); setIsOpen(false); }}
+            onClick={() => { setMode('dark'); setIsOpen(false); }}
             className={`flex items-center gap-3 w-full px-4 py-2 text-sm text-left transition-colors ${
-              theme === 'dark'
+              mode === 'dark'
                 ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
                 : 'text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700'
             }`}
           >
             <MoonIcon />
             <span>Dark</span>
-            {theme === 'dark' && (
+            {mode === 'dark' && (
               <svg className="w-4 h-4 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             )}
           </button>
           <button
-            onClick={() => { setTheme('system'); setIsOpen(false); }}
+            onClick={() => { setMode('system'); setIsOpen(false); }}
             className={`flex items-center gap-3 w-full px-4 py-2 text-sm text-left transition-colors ${
-              theme === 'system'
+              mode === 'system'
                 ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
                 : 'text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700'
             }`}
           >
             <SystemIcon />
             <span>System</span>
-            {theme === 'system' && (
+            {mode === 'system' && (
               <svg className="w-4 h-4 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
