@@ -42,9 +42,34 @@ async function main() {
         
         console.log('Init migration baselined successfully.');
       }
+    } else if (initMigrationStatus === 'failed') {
+      console.log('Init migration is marked as failed. Checking if tables exist...');
+      
+      const tablesExist = await checkTablesExist();
+      
+      if (tablesExist) {
+        console.log('Tables exist despite failed status. Marking init migration as applied...');
+        
+        // Mark the failed init migration as applied since the tables exist
+        execSync(`npx prisma migrate resolve --applied ${INIT_MIGRATION_NAME}`, {
+          stdio: 'inherit',
+        });
+        
+        console.log('Failed init migration marked as applied successfully.');
+      } else {
+        console.log('Tables do not exist. Marking init migration as rolled back for retry...');
+        
+        // Mark the failed init migration as rolled back so it can be retried
+        execSync(`npx prisma migrate resolve --rolled-back ${INIT_MIGRATION_NAME}`, {
+          stdio: 'inherit',
+        });
+        
+        console.log('Failed init migration marked as rolled back.');
+      }
     }
 
-    // Then, check for ANY failed migrations and mark them as rolled back for retry
+    // Then, check for ANY other failed migrations and mark them as rolled back for retry
+    // (excluding init which was already handled above)
     const failedMigrations = await getFailedMigrations();
     
     if (failedMigrations.length > 0) {
@@ -134,7 +159,8 @@ async function checkTablesExist(): Promise<boolean> {
 }
 
 /**
- * Gets all failed migrations from the _prisma_migrations table.
+ * Gets all failed migrations from the _prisma_migrations table,
+ * excluding the init migration which is handled separately.
  * A migration is considered "failed" if:
  * - It has a record in the table
  * - finished_at is null (never completed successfully)
@@ -144,7 +170,9 @@ async function getFailedMigrations(): Promise<string[]> {
   try {
     const result = await prisma.$queryRaw<MigrationRecord[]>`
       SELECT migration_name, finished_at, rolled_back_at FROM "_prisma_migrations" 
-      WHERE finished_at IS NULL AND rolled_back_at IS NULL
+      WHERE finished_at IS NULL 
+        AND rolled_back_at IS NULL
+        AND migration_name != ${INIT_MIGRATION_NAME}
     `;
     
     return result.map(r => r.migration_name);
