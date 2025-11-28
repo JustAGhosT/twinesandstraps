@@ -214,17 +214,17 @@ export default function ProductEditPage() {
       <div className="flex items-center gap-4 mb-8">
         <Link
           href="/admin/products"
-          className="p-2 text-gray-600 hover:text-secondary-900 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 text-gray-600 dark:text-gray-400 hover:text-secondary-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-secondary-700 rounded-lg transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900">
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">
             {isNew ? 'Add New Product' : 'Edit Product'}
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
             {isNew ? 'Create a new product listing' : 'Update product details'}
           </p>
         </div>
@@ -234,40 +234,40 @@ export default function ProductEditPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Info */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-secondary-900 mb-4">Basic Information</h2>
+            <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Basic Information</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Product Name *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Product Name *</label>
                   <input
                     type="text"
                     name="name"
                     value={form.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">SKU *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SKU *</label>
                     <input
                       type="text"
                       name="sku"
                       value={form.sku}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category *</label>
                     <select
                       name="category_id"
                       value={form.category_id}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                     >
                       <option value="">Select category</option>
                       {categories.map(cat => (
@@ -278,7 +278,7 @@ export default function ProductEditPage() {
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-sm font-medium text-gray-700">Description *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description *</label>
                     <UseAIButton
                       action="enhance-description"
                       label="Enhance"
@@ -297,57 +297,57 @@ export default function ProductEditPage() {
                     onChange={handleChange}
                     required
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-secondary-900 mb-4">Specifications</h2>
+            <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Specifications</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Material</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Material</label>
                   <input
                     type="text"
                     name="material"
                     value={form.material}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                     placeholder="e.g. SISAL, Polypropylene"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Strength Rating</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Strength Rating</label>
                   <input
                     type="text"
                     name="strength_rating"
                     value={form.strength_rating}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                     placeholder="e.g. 500kg"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Diameter (mm)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Diameter (mm)</label>
                   <input
                     type="number"
                     name="diameter"
                     value={form.diameter}
                     onChange={handleChange}
                     step="0.1"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Length (m)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Length (m)</label>
                   <input
                     type="number"
                     name="length"
                     value={form.length}
                     onChange={handleChange}
                     step="0.1"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -356,14 +356,14 @@ export default function ProductEditPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-secondary-900 mb-4">Product Image</h2>
+            <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Product Image</h2>
               <div className="space-y-4">
-                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden relative">
+                <div className="aspect-square bg-gray-100 dark:bg-secondary-700 rounded-lg overflow-hidden relative">
                   {imagePreview ? (
                     <Image src={imagePreview} alt="Preview" fill className="object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
                       No image
                     </div>
                   )}
@@ -374,7 +374,7 @@ export default function ProductEditPage() {
                     type="file"
                     accept="image/*"
                     onChange={handleImageUpload}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                    className="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 dark:file:bg-primary-900/30 file:text-primary-700 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-primary-900/50"
                   />
                 </label>
                 <input
@@ -383,17 +383,17 @@ export default function ProductEditPage() {
                   value={form.image_url}
                   onChange={handleChange}
                   placeholder="Or enter image URL"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white text-sm"
                 />
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-secondary-900 mb-4">Pricing & Stock</h2>
+            <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Pricing & Stock</h2>
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="block text-sm font-medium text-gray-700">Price (ZAR) *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Price (ZAR) *</label>
                     <UseAIButton
                       action="suggest-pricing"
                       label="Suggest"
@@ -411,7 +411,7 @@ export default function ProductEditPage() {
                     />
                   </div>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">R</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">R</span>
                     <input
                       type="number"
                       name="price"
@@ -420,7 +420,7 @@ export default function ProductEditPage() {
                       required
                       min="0"
                       step="0.01"
-                      className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full pl-8 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -431,18 +431,18 @@ export default function ProductEditPage() {
                     name="vat_applicable"
                     checked={form.vat_applicable}
                     onChange={handleChange}
-                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                    className="w-4 h-4 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500"
                   />
-                  <label htmlFor="vat_applicable" className="text-sm text-gray-700">VAT Applicable (15%)</label>
+                  <label htmlFor="vat_applicable" className="text-sm text-gray-700 dark:text-gray-300">VAT Applicable (15%)</label>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Stock Status *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Stock Status *</label>
                   <select
                     name="stock_status"
                     value={form.stock_status}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                   >
                     <option value="IN_STOCK">In Stock</option>
                     <option value="LOW_STOCK">Low Stock</option>
@@ -462,7 +462,7 @@ export default function ProductEditPage() {
         </div>
 
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
+          <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400">
             {error}
           </div>
         )}
@@ -470,7 +470,7 @@ export default function ProductEditPage() {
         <div className="flex items-center justify-end gap-4">
           <Link
             href="/admin/products"
-            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-secondary-700 transition-colors"
           >
             Cancel
           </Link>
