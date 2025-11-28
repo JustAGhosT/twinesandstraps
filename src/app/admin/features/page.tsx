@@ -193,12 +193,12 @@ export default function FeaturesPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900">Feature Flags</h1>
-          <p className="text-gray-500 mt-1">Enable or disable website features</p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Feature Flags</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Enable or disable website features</p>
         </div>
         <div className="flex items-center gap-3">
           {saved && (
-            <span className="text-green-600 flex items-center gap-2">
+            <span className="text-green-600 dark:text-green-400 flex items-center gap-2">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
@@ -207,7 +207,7 @@ export default function FeaturesPage() {
           )}
           <button
             onClick={handleReset}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-secondary-700 transition-colors"
           >
             Reset to Defaults
           </button>
@@ -222,8 +222,8 @@ export default function FeaturesPage() {
 
       <div className="space-y-6">
         {categories.map(category => (
-          <div key={category} className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-secondary-900 mb-4">{category}</h2>
+          <div key={category} className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">{category}</h2>
             <div className="space-y-4">
               {featureConfigs
                 .filter(f => f.category === category)
@@ -233,24 +233,24 @@ export default function FeaturesPage() {
                   return (
                     <div
                       key={feature.key}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                      className="flex items-center justify-between p-4 bg-gray-50 dark:bg-secondary-700 rounded-lg"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-medium text-secondary-900">{feature.name}</h3>
+                          <h3 className="font-medium text-secondary-900 dark:text-white">{feature.name}</h3>
                           {isOverridden && (
-                            <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full">
+                            <span className="text-xs px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded-full">
                               Modified
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">{feature.description}</p>
-                        <code className="text-xs text-gray-400 mt-1 block">{feature.envVar}</code>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{feature.description}</p>
+                        <code className="text-xs text-gray-400 dark:text-gray-500 mt-1 block">{feature.envVar}</code>
                       </div>
                       <button
                         onClick={() => handleToggle(feature.key)}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                          isEnabled ? 'bg-primary-600' : 'bg-gray-300'
+                          isEnabled ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
                         }`}
                       >
                         <span
@@ -267,12 +267,12 @@ export default function FeaturesPage() {
         ))}
       </div>
 
-      <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-        <h3 className="font-medium text-amber-800 mb-2">Important Note</h3>
-        <p className="text-sm text-amber-700">
+      <div className="mt-8 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+        <h3 className="font-medium text-amber-800 dark:text-amber-300 mb-2">Important Note</h3>
+        <p className="text-sm text-amber-700 dark:text-amber-400">
           Changes made here are saved to browser storage for preview purposes.
           For permanent changes that affect all visitors, you need to update the environment variables
-          in your deployment settings. See the <code className="bg-amber-100 px-1 rounded">docs/FEATURE_FLAGS.md</code> file for details.
+          in your deployment settings. See the <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">docs/FEATURE_FLAGS.md</code> file for details.
         </p>
       </div>
     </div>

@@ -24,13 +24,13 @@ function AdminLoginForm() {
   if (isLoading) {
     return (
       <div className="max-w-md w-full mx-4">
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-lg p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-full border-4 border-primary-600 flex items-center justify-center bg-white mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full border-4 border-primary-600 flex items-center justify-center bg-white dark:bg-secondary-700 mx-auto mb-4">
               <span className="text-primary-600 font-bold text-xl">TS</span>
             </div>
-            <h1 className="text-2xl font-bold text-secondary-900">Admin Login</h1>
-            <p className="text-gray-500 mt-2">Checking authentication...</p>
+            <h1 className="text-2xl font-bold text-secondary-900 dark:text-white">Admin Login</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">Checking authentication...</p>
           </div>
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
@@ -61,18 +61,18 @@ function AdminLoginForm() {
 
   return (
     <div className="max-w-md w-full mx-4">
-      <div className="bg-white rounded-xl shadow-lg p-8">
+      <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-lg p-8">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-full border-4 border-primary-600 flex items-center justify-center bg-white mx-auto mb-4">
+          <div className="w-16 h-16 rounded-full border-4 border-primary-600 flex items-center justify-center bg-white dark:bg-secondary-700 mx-auto mb-4">
             <span className="text-primary-600 font-bold text-xl">TS</span>
           </div>
-          <h1 className="text-2xl font-bold text-secondary-900">Admin Login</h1>
-          <p className="text-gray-500 mt-2">Enter your password to access the admin panel</p>
+          <h1 className="text-2xl font-bold text-secondary-900 dark:text-white">Admin Login</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Enter your password to access the admin panel</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Password
             </label>
             <input
@@ -81,7 +81,7 @@ function AdminLoginForm() {
               name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
               placeholder="Enter admin password"
               autoFocus
               autoComplete="current-password"
@@ -89,7 +89,7 @@ function AdminLoginForm() {
           </div>
 
           {(error || authError) && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm" role="alert">
+            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm" role="alert">
               {error || authError}
             </div>
           )}
@@ -104,7 +104,7 @@ function AdminLoginForm() {
         </form>
 
         <div className="mt-6 text-center">
-          <Link href="/" className="text-sm text-gray-500 hover:text-primary-600">
+          <Link href="/" className="text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-500">
             Back to website
           </Link>
         </div>
@@ -116,13 +116,13 @@ function AdminLoginForm() {
 function AdminLoginFallback() {
   return (
     <div className="max-w-md w-full mx-4">
-      <div className="bg-white rounded-xl shadow-lg p-8">
+      <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-lg p-8">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-full border-4 border-primary-600 flex items-center justify-center bg-white mx-auto mb-4">
+          <div className="w-16 h-16 rounded-full border-4 border-primary-600 flex items-center justify-center bg-white dark:bg-secondary-700 mx-auto mb-4">
             <span className="text-primary-600 font-bold text-xl">TS</span>
           </div>
-          <h1 className="text-2xl font-bold text-secondary-900">Admin Login</h1>
-          <p className="text-gray-500 mt-2">Enter your password to access the admin panel</p>
+          <h1 className="text-2xl font-bold text-secondary-900 dark:text-white">Admin Login</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Enter your password to access the admin panel</p>
         </div>
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
@@ -134,7 +134,7 @@ function AdminLoginFallback() {
 
 export default function AdminLoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-secondary-900">
       <Suspense fallback={<AdminLoginFallback />}>
         <AdminLoginForm />
       </Suspense>

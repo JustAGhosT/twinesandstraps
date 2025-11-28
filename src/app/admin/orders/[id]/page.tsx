@@ -147,12 +147,12 @@ export default function AdminOrderDetailPage() {
 
   const getPaymentStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      PENDING: 'bg-yellow-100 text-yellow-800',
-      PAID: 'bg-green-100 text-green-800',
-      FAILED: 'bg-red-100 text-red-800',
-      REFUNDED: 'bg-blue-100 text-blue-800',
+      PENDING: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      PAID: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      FAILED: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      REFUNDED: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   };
 
   if (loading) {
@@ -166,8 +166,8 @@ export default function AdminOrderDetailPage() {
   if (error && !order) {
     return (
       <div className="text-center py-12">
-        <h1 className="text-2xl font-bold text-secondary-900 mb-4">Order Not Found</h1>
-        <p className="text-gray-500 mb-6">{error}</p>
+        <h1 className="text-2xl font-bold text-secondary-900 dark:text-white mb-4">Order Not Found</h1>
+        <p className="text-gray-500 dark:text-gray-400 mb-6">{error}</p>
         <Link href="/admin/orders" className="text-primary-600 hover:text-primary-700 font-medium">
           Back to Orders
         </Link>
@@ -194,8 +194,8 @@ export default function AdminOrderDetailPage() {
         </Link>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-secondary-900">Order #{order.order_number}</h1>
-            <p className="text-gray-500">
+            <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Order #{order.order_number}</h1>
+            <p className="text-gray-500 dark:text-gray-400">
               Placed on {new Date(order.created_at).toLocaleDateString('en-ZA', {
                 year: 'numeric',
                 month: 'long',
@@ -217,7 +217,7 @@ export default function AdminOrderDetailPage() {
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400">
           {error}
         </div>
       )}
@@ -226,14 +226,14 @@ export default function AdminOrderDetailPage() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Order Items */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-secondary-900 mb-4">
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">
               Order Items ({order.items.length})
             </h2>
             <div className="space-y-4">
               {order.items.map((item) => (
-                <div key={item.id} className="flex gap-4 p-4 border border-gray-100 rounded-lg">
-                  <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                <div key={item.id} className="flex gap-4 p-4 border border-gray-100 dark:border-gray-700 rounded-lg">
+                  <div className="w-16 h-16 bg-gray-100 dark:bg-secondary-700 rounded-lg overflow-hidden flex-shrink-0">
                     {item.product.image_url ? (
                       <Image
                         src={item.product.image_url}
@@ -243,7 +243,7 @@ export default function AdminOrderDetailPage() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-xs">
                         No img
                       </div>
                     )}
@@ -251,16 +251,16 @@ export default function AdminOrderDetailPage() {
                   <div className="flex-1">
                     <Link
                       href={`/admin/products/${item.product.id}`}
-                      className="font-medium text-secondary-900 hover:text-primary-600"
+                      className="font-medium text-secondary-900 dark:text-white hover:text-primary-600"
                     >
                       {item.product_name}
                     </Link>
-                    <div className="text-sm text-gray-500">SKU: {item.product_sku}</div>
-                    <div className="text-sm text-gray-500">Qty: {item.quantity}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">SKU: {item.product_sku}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">Qty: {item.quantity}</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-semibold">R {item.total_price.toFixed(2)}</div>
-                    <div className="text-sm text-gray-500">R {item.unit_price.toFixed(2)} each</div>
+                    <div className="font-semibold text-secondary-900 dark:text-white">R {item.total_price.toFixed(2)}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">R {item.unit_price.toFixed(2)} each</div>
                   </div>
                 </div>
               ))}
@@ -268,22 +268,22 @@ export default function AdminOrderDetailPage() {
           </div>
 
           {/* Customer Info */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-secondary-900 mb-4">Customer Information</h2>
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Customer Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="font-medium text-gray-700 mb-2">Contact</h3>
+                <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Contact</h3>
                 <div className="text-sm space-y-1">
-                  <p className="font-medium">{order.user.name}</p>
-                  <p className="text-gray-600">{order.user.email}</p>
-                  {order.user.phone && <p className="text-gray-600">{order.user.phone}</p>}
+                  <p className="font-medium text-secondary-900 dark:text-white">{order.user.name}</p>
+                  <p className="text-gray-600 dark:text-gray-400">{order.user.email}</p>
+                  {order.user.phone && <p className="text-gray-600 dark:text-gray-400">{order.user.phone}</p>}
                 </div>
               </div>
               {order.shipping_address && (
                 <div>
-                  <h3 className="font-medium text-gray-700 mb-2">Shipping Address</h3>
-                  <div className="text-sm text-gray-600">
-                    <p className="font-medium text-secondary-900">{order.shipping_address.label}</p>
+                  <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-2">Shipping Address</h3>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="font-medium text-secondary-900 dark:text-white">{order.shipping_address.label}</p>
                     <p>{order.shipping_address.street_address}</p>
                     <p>{order.shipping_address.city}, {order.shipping_address.province} {order.shipping_address.postal_code}</p>
                     <p>{order.shipping_address.country}</p>
@@ -295,21 +295,21 @@ export default function AdminOrderDetailPage() {
 
           {/* Status History */}
           {order.status_history.length > 0 && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-secondary-900 mb-4">Order Timeline</h2>
+            <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Order Timeline</h2>
               <div className="space-y-4">
                 {order.status_history.map((history, index) => (
                   <div key={history.id} className="flex gap-4">
                     <div className="flex flex-col items-center">
-                      <div className={`w-3 h-3 rounded-full ${index === 0 ? 'bg-primary-600' : 'bg-gray-300'}`} />
+                      <div className={`w-3 h-3 rounded-full ${index === 0 ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'}`} />
                       {index < order.status_history.length - 1 && (
-                        <div className="w-px h-full bg-gray-200 my-1" />
+                        <div className="w-px h-full bg-gray-200 dark:bg-gray-700 my-1" />
                       )}
                     </div>
                     <div className="flex-1 pb-4">
-                      <div className="font-medium text-secondary-900">{history.status}</div>
-                      {history.notes && <div className="text-sm text-gray-500">{history.notes}</div>}
-                      <div className="text-xs text-gray-400 mt-1">
+                      <div className="font-medium text-secondary-900 dark:text-white">{history.status}</div>
+                      {history.notes && <div className="text-sm text-gray-500 dark:text-gray-400">{history.notes}</div>}
+                      <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                         {new Date(history.created_at).toLocaleDateString('en-ZA', {
                           year: 'numeric',
                           month: 'short',
@@ -329,47 +329,47 @@ export default function AdminOrderDetailPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Order Summary */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-secondary-900 mb-4">Order Summary</h2>
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Order Summary</h2>
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Subtotal</span>
-                <span>R {order.subtotal.toFixed(2)}</span>
+                <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
+                <span className="text-secondary-900 dark:text-white">R {order.subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">VAT (15%)</span>
-                <span>R {order.vat_amount.toFixed(2)}</span>
+                <span className="text-gray-500 dark:text-gray-400">VAT (15%)</span>
+                <span className="text-secondary-900 dark:text-white">R {order.vat_amount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Shipping</span>
-                <span>{order.shipping_cost > 0 ? `R ${order.shipping_cost.toFixed(2)}` : 'Free'}</span>
+                <span className="text-gray-500 dark:text-gray-400">Shipping</span>
+                <span className="text-secondary-900 dark:text-white">{order.shipping_cost > 0 ? `R ${order.shipping_cost.toFixed(2)}` : 'Free'}</span>
               </div>
-              <hr />
+              <hr className="border-gray-200 dark:border-gray-700" />
               <div className="flex justify-between font-semibold text-lg">
-                <span>Total</span>
+                <span className="text-secondary-900 dark:text-white">Total</span>
                 <span className="text-primary-600">R {order.total.toFixed(2)}</span>
               </div>
             </div>
             {order.payment_method && (
-              <div className="mt-4 pt-4 border-t">
-                <div className="text-sm text-gray-500">Payment Method</div>
-                <div className="font-medium">{order.payment_method}</div>
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="text-sm text-gray-500 dark:text-gray-400">Payment Method</div>
+                <div className="font-medium text-secondary-900 dark:text-white">{order.payment_method}</div>
               </div>
             )}
           </div>
 
           {/* Update Order */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-secondary-900 mb-4">Update Order</h2>
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Update Order</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Order Status
                 </label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                 >
                   {ORDER_STATUSES.map((status) => (
                     <option key={status} value={status}>{status}</option>
@@ -378,13 +378,13 @@ export default function AdminOrderDetailPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Payment Status
                 </label>
                 <select
                   value={newPaymentStatus}
                   onChange={(e) => setNewPaymentStatus(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                 >
                   {PAYMENT_STATUSES.map((status) => (
                     <option key={status} value={status}>{status}</option>
@@ -393,7 +393,7 @@ export default function AdminOrderDetailPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Tracking Number
                 </label>
                 <input
@@ -401,12 +401,12 @@ export default function AdminOrderDetailPage() {
                   value={trackingNumber}
                   onChange={(e) => setTrackingNumber(e.target.value)}
                   placeholder="Enter tracking number"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Notes (optional)
                 </label>
                 <textarea
@@ -414,7 +414,7 @@ export default function AdminOrderDetailPage() {
                   onChange={(e) => setUpdateNotes(e.target.value)}
                   placeholder="Add notes about this update..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -430,9 +430,9 @@ export default function AdminOrderDetailPage() {
 
           {/* Order Notes */}
           {order.notes && (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-secondary-900 mb-4">Order Notes</h2>
-              <p className="text-sm text-gray-600">{order.notes}</p>
+            <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Order Notes</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{order.notes}</p>
             </div>
           )}
         </div>

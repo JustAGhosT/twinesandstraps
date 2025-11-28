@@ -148,7 +148,7 @@ export default function TestimonialsPage() {
             disabled={!onChange}
           >
             <svg
-              className={`w-5 h-5 ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
+              className={`w-5 h-5 ${star <= rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -164,8 +164,8 @@ export default function TestimonialsPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900">Testimonials</h1>
-          <p className="text-gray-500 mt-1">Manage customer testimonials displayed on your website</p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Testimonials</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage customer testimonials displayed on your website</p>
         </div>
         <button
           onClick={startNew}
@@ -180,54 +180,54 @@ export default function TestimonialsPage() {
 
       {/* New/Edit Form */}
       {(showNew || editingId) && (
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold text-secondary-900 mb-4">
+        <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">
             {editingId ? 'Edit Testimonial' : 'New Testimonial'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Customer Name *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Customer Name *</label>
                 <input
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company</label>
                 <input
                   type="text"
                   value={form.company}
                   onChange={(e) => setForm(prev => ({ ...prev, company: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role/Title</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role/Title</label>
                 <input
                   type="text"
                   value={form.role}
                   onChange={(e) => setForm(prev => ({ ...prev, role: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Testimonial Content *</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Testimonial Content *</label>
               <textarea
                 value={form.content}
                 onChange={(e) => setForm(prev => ({ ...prev, content: e.target.value }))}
                 required
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
               />
             </div>
             <div className="flex flex-wrap items-center gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rating</label>
                 {renderStars(form.rating, (rating) => setForm(prev => ({ ...prev, rating })))}
               </div>
               <div className="flex items-center gap-2">
@@ -236,9 +236,9 @@ export default function TestimonialsPage() {
                   id="featured"
                   checked={form.featured}
                   onChange={(e) => setForm(prev => ({ ...prev, featured: e.target.checked }))}
-                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  className="w-4 h-4 text-primary-600 border-gray-300 dark:border-gray-600 rounded focus:ring-primary-500"
                 />
-                <label htmlFor="featured" className="text-sm text-gray-700">Featured on homepage</label>
+                <label htmlFor="featured" className="text-sm text-gray-700 dark:text-gray-300">Featured on homepage</label>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -251,7 +251,7 @@ export default function TestimonialsPage() {
               <button
                 type="button"
                 onClick={cancelEdit}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-secondary-700 transition-colors"
               >
                 Cancel
               </button>
@@ -263,37 +263,37 @@ export default function TestimonialsPage() {
       {/* Testimonials List */}
       <div className="space-y-4">
         {testimonials.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-500">
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-8 text-center text-gray-500 dark:text-gray-400">
             No testimonials yet. Add your first testimonial above.
           </div>
         ) : (
           testimonials.map(testimonial => (
-            <div key={testimonial.id} className="bg-white rounded-xl shadow-sm p-6">
+            <div key={testimonial.id} className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-secondary-900">{testimonial.name}</h3>
+                    <h3 className="font-semibold text-secondary-900 dark:text-white">{testimonial.name}</h3>
                     {testimonial.featured && (
-                      <span className="text-xs px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full">
+                      <span className="text-xs px-2 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full">
                         Featured
                       </span>
                     )}
                   </div>
                   {(testimonial.company || testimonial.role) && (
-                    <p className="text-sm text-gray-500 mb-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                       {testimonial.role}{testimonial.role && testimonial.company ? ' at ' : ''}{testimonial.company}
                     </p>
                   )}
                   <div className="mb-3">{renderStars(testimonial.rating)}</div>
-                  <p className="text-gray-700 italic">&quot;{testimonial.content}&quot;</p>
+                  <p className="text-gray-700 dark:text-gray-300 italic">&quot;{testimonial.content}&quot;</p>
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   <button
                     onClick={() => toggleFeatured(testimonial.id)}
                     className={`p-2 rounded-lg transition-colors ${
                       testimonial.featured
-                        ? 'text-primary-600 bg-primary-50 hover:bg-primary-100'
-                        : 'text-gray-400 hover:text-primary-600 hover:bg-gray-100'
+                        ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/30 hover:bg-primary-100 dark:hover:bg-primary-900/50'
+                        : 'text-gray-400 dark:text-gray-500 hover:text-primary-600 hover:bg-gray-100 dark:hover:bg-secondary-700'
                     }`}
                     title={testimonial.featured ? 'Remove from featured' : 'Add to featured'}
                   >
@@ -303,7 +303,7 @@ export default function TestimonialsPage() {
                   </button>
                   <button
                     onClick={() => startEdit(testimonial)}
-                    className="p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 hover:bg-gray-100 dark:hover:bg-secondary-700 rounded-lg transition-colors"
                     title="Edit"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,7 +323,7 @@ export default function TestimonialsPage() {
                       </button>
                       <button
                         onClick={() => setDeleteConfirm(null)}
-                        className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-secondary-700 rounded-lg transition-colors"
                         title="Cancel"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -334,7 +334,7 @@ export default function TestimonialsPage() {
                   ) : (
                     <button
                       onClick={() => setDeleteConfirm(testimonial.id)}
-                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-gray-600 dark:text-gray-400 hover:text-red-600 hover:bg-gray-100 dark:hover:bg-secondary-700 rounded-lg transition-colors"
                       title="Delete"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -349,9 +349,9 @@ export default function TestimonialsPage() {
         )}
       </div>
 
-      <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h3 className="font-medium text-blue-800 mb-2">Note</h3>
-        <p className="text-sm text-blue-700">
+      <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-2">Note</h3>
+        <p className="text-sm text-blue-700 dark:text-blue-400">
           Testimonials marked as &quot;Featured&quot; will appear on the homepage. Changes are saved to browser storage for preview.
           For production use, these should be stored in the database.
         </p>
