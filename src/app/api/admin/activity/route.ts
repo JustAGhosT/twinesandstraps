@@ -2,6 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import prisma from '@/lib/prisma';
 
+// Constants for input validation
+const MAX_LIMIT = 100;
+const DEFAULT_LIMIT = 50;
+
+// Helper to validate date strings
+function isValidDate(dateStr: string): boolean {
+  const date = new Date(dateStr);
+  return isFinite(date.getTime());
+}
+
 // GET - Fetch activity logs with pagination and filters
 export async function GET(request: NextRequest) {
   const authError = await requireAdminAuth(request);
@@ -9,12 +19,33 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    
+    // Parse and validate page
+    const rawPage = Number(searchParams.get('page') || '1');
+    const page = Math.max(1, Math.floor(isNaN(rawPage) ? 1 : rawPage));
+    
+    // Parse and validate limit
+    const rawLimit = Number(searchParams.get('limit') || String(DEFAULT_LIMIT));
+    const limit = Math.min(MAX_LIMIT, Math.max(1, Math.floor(isNaN(rawLimit) ? DEFAULT_LIMIT : rawLimit)));
+    
     const entityType = searchParams.get('entity_type');
     const action = searchParams.get('action');
     const startDate = searchParams.get('start_date');
     const endDate = searchParams.get('end_date');
+
+    // Validate date parameters if provided
+    if (startDate && !isValidDate(startDate)) {
+      return NextResponse.json(
+        { error: 'Invalid start_date format. Use ISO 8601 format.' },
+        { status: 400 }
+      );
+    }
+    if (endDate && !isValidDate(endDate)) {
+      return NextResponse.json(
+        { error: 'Invalid end_date format. Use ISO 8601 format.' },
+        { status: 400 }
+      );
+    }
 
     const skip = (page - 1) * limit;
 

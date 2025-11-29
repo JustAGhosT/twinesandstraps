@@ -119,6 +119,17 @@ export default function ActivityLogPage() {
     return formatDate(dateString);
   };
 
+  // Safely parse JSON metadata with fallback
+  const safeParseMetadata = (metadata: string): string => {
+    try {
+      const parsed = JSON.parse(metadata);
+      return JSON.stringify(parsed, null, 2);
+    } catch {
+      // Return raw string if JSON parsing fails
+      return metadata;
+    }
+  };
+
   const clearFilters = () => {
     setEntityTypeFilter('');
     setActionFilter('');
@@ -238,7 +249,7 @@ export default function ActivityLogPage() {
                           View details
                         </summary>
                         <pre className="mt-1 p-2 bg-gray-100 dark:bg-secondary-700 rounded text-xs overflow-x-auto">
-                          {JSON.stringify(JSON.parse(log.metadata), null, 2)}
+                          {safeParseMetadata(log.metadata)}
                         </pre>
                       </details>
                     )}
