@@ -201,6 +201,23 @@ model AdminSession {
   @@index([expires_at])
 }
 
+// Admin activity log for tracking all admin actions
+model AdminActivityLog {
+  id          Int      @id @default(autoincrement())
+  action      String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, etc.
+  entity_type String   // PRODUCT, ORDER, CUSTOMER, CATEGORY, SETTINGS, etc.
+  entity_id   Int?     // ID of the affected entity (nullable for general actions)
+  description String   // Human-readable description
+  metadata    String?  // JSON string for additional data
+  ip_address  String?
+  user_agent  String?
+  created_at  DateTime @default(now())
+
+  @@index([entity_type])
+  @@index([action])
+  @@index([created_at])
+}
+
 // Site settings stored in database - singleton pattern (only one row)
 model SiteSetting {
   id              Int      @id @default(1)

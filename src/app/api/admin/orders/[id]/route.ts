@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { Prisma } from '@prisma/client';
+import { logActivity, getRequestInfo } from '@/lib/activity-log';
 
 export async function GET(
   request: NextRequest,
@@ -148,6 +149,23 @@ export async function PUT(
       }
 
       return updated;
+    });
+
+    // Log the activity
+    const { ipAddress, userAgent } = getRequestInfo(request);
+    const changes: string[] = [];
+    if (status && status !== order.status) changes.push(`status: ${status}`);
+    if (payment_status && payment_status !== order.payment_status) changes.push(`payment: ${payment_status}`);
+    if (tracking_number !== undefined && tracking_number !== order.tracking_number) changes.push('tracking updated');
+
+    await logActivity({
+      action: 'UPDATE',
+      entityType: 'ORDER',
+      entityId: orderId,
+      description: `Updated order #${order.order_number} (${changes.join(', ')})`,
+      metadata: { order_number: order.order_number, changes },
+      ipAddress,
+      userAgent,
     });
 
     return NextResponse.json({
