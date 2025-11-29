@@ -7,6 +7,7 @@ import Image from 'next/image';
 import WishlistButton from '@/components/WishlistButton';
 import CompareButton from '@/components/CompareButton';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { STOCK_STATUS, STOCK_STATUS_LABELS, ROUTES, TIMEOUTS, SUCCESS_MESSAGES } from '@/constants';
 
 interface ProductViewProps {
   product: Product;
@@ -25,23 +26,23 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const handleAddToCart = () => {
     addToCart(product, quantity);
     setShowAddedToCart(true);
-    setTimeout(() => setShowAddedToCart(false), 3000);
+    setTimeout(() => setShowAddedToCart(false), TIMEOUTS.STATUS_MESSAGE_DURATION);
   };
 
   const getStockBadge = () => {
     switch (product.stock_status) {
-      case 'IN_STOCK':
-        return <span className="inline-block px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded">In Stock</span>;
-      case 'LOW_STOCK':
-        return <span className="inline-block px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100 rounded">Low Stock</span>;
-      case 'OUT_OF_STOCK':
-        return <span className="inline-block px-3 py-1 text-sm font-semibold text-red-800 bg-red-100 rounded">Out of Stock</span>;
+      case STOCK_STATUS.IN_STOCK:
+        return <span className="inline-block px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded">{STOCK_STATUS_LABELS.IN_STOCK}</span>;
+      case STOCK_STATUS.LOW_STOCK:
+        return <span className="inline-block px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100 rounded">{STOCK_STATUS_LABELS.LOW_STOCK}</span>;
+      case STOCK_STATUS.OUT_OF_STOCK:
+        return <span className="inline-block px-3 py-1 text-sm font-semibold text-red-800 bg-red-100 rounded">{STOCK_STATUS_LABELS.OUT_OF_STOCK}</span>;
       default:
         return null;
     }
   };
 
-  const isOutOfStock = product.stock_status === 'OUT_OF_STOCK';
+  const isOutOfStock = product.stock_status === STOCK_STATUS.OUT_OF_STOCK;
 
   return (
     <>
@@ -115,7 +116,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
         ) : (
           <div className="mb-6">
             <a
-              href="/quote"
+              href={ROUTES.QUOTE}
               className="inline-block px-6 py-2 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-lg font-semibold hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors"
             >
               Request Quote for Pricing
@@ -173,7 +174,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
               </button>
             )}
             <a
-              href="/quote"
+              href={ROUTES.QUOTE}
               className={`${showPrices ? 'flex-1' : 'w-full'} py-3 px-6 rounded-lg font-semibold border-2 border-primary-600 dark:border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors text-center`}
             >
               Request Quote
@@ -188,7 +189,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
           )}
           {showAddedToCart && (
             <div className="mt-3 p-3 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-lg text-sm font-semibold">
-              ✓ Added to cart successfully!
+              {SUCCESS_MESSAGES.ADDED_TO_CART}
             </div>
           )}
         </div>

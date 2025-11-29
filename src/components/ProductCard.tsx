@@ -5,6 +5,7 @@ import type { Product, Category } from '@/types/database';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { STOCK_STATUS, STOCK_STATUS_LABELS, ROUTES, TIMEOUTS } from '@/constants';
 
 interface ProductCardProps {
   product: Product & { category?: Category };
@@ -21,7 +22,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (product.stock_status === 'OUT_OF_STOCK') return;
+    if (product.stock_status === STOCK_STATUS.OUT_OF_STOCK) return;
 
     setIsAdding(true);
     addToCart(product, quantity);
@@ -29,7 +30,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
       setIsAdding(false);
       setShowAdded(true);
       setQuantity(1);
-      setTimeout(() => setShowAdded(false), 1500);
+      setTimeout(() => setShowAdded(false), TIMEOUTS.QUICK_ACTION_FEEDBACK);
     }, 200);
   };
 
@@ -47,15 +48,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
     setQuantity(quantity + 1);
   };
 
-  const isOutOfStock = product.stock_status === 'OUT_OF_STOCK';
+  const isOutOfStock = product.stock_status === STOCK_STATUS.OUT_OF_STOCK;
   const getStockBadge = () => {
     switch (product.stock_status) {
-      case 'IN_STOCK':
-        return <span className="px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded">In Stock</span>;
-      case 'LOW_STOCK':
-        return <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-amber-100 rounded">Low Stock</span>;
-      case 'OUT_OF_STOCK':
-        return <span className="px-2 py-0.5 text-xs font-medium text-red-700 bg-red-100 rounded">Out of Stock</span>;
+      case STOCK_STATUS.IN_STOCK:
+        return <span className="px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded">{STOCK_STATUS_LABELS.IN_STOCK}</span>;
+      case STOCK_STATUS.LOW_STOCK:
+        return <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-amber-100 rounded">{STOCK_STATUS_LABELS.LOW_STOCK}</span>;
+      case STOCK_STATUS.OUT_OF_STOCK:
+        return <span className="px-2 py-0.5 text-xs font-medium text-red-700 bg-red-100 rounded">{STOCK_STATUS_LABELS.OUT_OF_STOCK}</span>;
       default:
         return null;
     }
@@ -135,7 +136,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
             </div>
           ) : (
             <a
-              href="/quote"
+              href={ROUTES.QUOTE}
               className="text-sm font-medium text-primary-600 dark:text-primary-500 hover:text-primary-700 dark:hover:text-primary-400 hover:underline"
             >
               Request Quote

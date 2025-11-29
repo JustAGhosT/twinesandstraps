@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { STOCK_STATUS } from '@/constants';
 
 /**
  * Product validation schemas
@@ -13,7 +14,7 @@ export const createProductSchema = z.object({
   strength_rating: z.string().max(50).nullable().optional(),
   price: z.number().positive('Price must be positive'),
   vat_applicable: z.boolean().default(true),
-  stock_status: z.enum(['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK']).default('IN_STOCK'),
+  stock_status: z.enum([STOCK_STATUS.IN_STOCK, STOCK_STATUS.LOW_STOCK, STOCK_STATUS.OUT_OF_STOCK]).default(STOCK_STATUS.IN_STOCK),
   image_url: z.string().url('Invalid image URL').nullable().optional(),
   category_id: z.number().int().positive('Valid category is required'),
 });
@@ -120,7 +121,7 @@ export const paginationSchema = z.object({
   limit: z.coerce.number().int().positive().max(100).default(20),
   search: z.string().optional(),
   category: z.string().optional(),
-  status: z.enum(['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK']).optional(),
+  status: z.enum([STOCK_STATUS.IN_STOCK, STOCK_STATUS.LOW_STOCK, STOCK_STATUS.OUT_OF_STOCK]).optional(),
   sort: z.enum(['name', 'price', 'created_at', 'updated_at']).default('created_at'),
   order: z.enum(['asc', 'desc']).default('desc'),
 });
@@ -202,7 +203,7 @@ export const productImportRowSchema = z.object({
   category_id: z.coerce.number().int().positive().optional(),
   category_name: z.string().optional(), // Alternative to category_id - will be matched
   image_url: z.string().url().nullable().optional(),
-  stock_status: z.enum(['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK']).default('IN_STOCK'),
+  stock_status: z.enum([STOCK_STATUS.IN_STOCK, STOCK_STATUS.LOW_STOCK, STOCK_STATUS.OUT_OF_STOCK]).default(STOCK_STATUS.IN_STOCK),
 });
 
 export type ProductImportRow = z.infer<typeof productImportRowSchema>;
