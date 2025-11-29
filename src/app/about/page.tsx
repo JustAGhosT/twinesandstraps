@@ -23,37 +23,37 @@ export default function AboutPage() {
       </section>
 
       {/* About Us */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-secondary-900">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="border-l-4 border-primary-600 pl-6 mb-12">
-              <h2 className="text-3xl font-bold text-secondary-900 mb-6">About Us</h2>
-              <p className="text-lg text-accent-600 leading-relaxed">
-                Twines and Straps SA (TASSA) is a leading local manufacturer specializing in the production of high-quality 
-                twines and ropes. Founded in 2016, we have steadily grown into a full-scale production facility, dedicated 
-                to providing premium products. Our carefully selected manufacturing equipment ensures consistency, durability, 
+              <h2 className="text-3xl font-bold text-secondary-900 dark:text-white mb-6">About Us</h2>
+              <p className="text-lg text-accent-600 dark:text-gray-300 leading-relaxed">
+                Twines and Straps SA (TASSA) is a leading local manufacturer specializing in the production of high-quality
+                twines and ropes. Founded in 2016, we have steadily grown into a full-scale production facility, dedicated
+                to providing premium products. Our carefully selected manufacturing equipment ensures consistency, durability,
                 and excellence in every roll.
               </p>
             </div>
 
             <div className="border-l-4 border-primary-600 pl-6 mb-12">
-              <h2 className="text-3xl font-bold text-secondary-900 mb-6">Our Expertise</h2>
-              <p className="text-lg text-accent-600 leading-relaxed mb-4">
-                At TASSA, we pride ourselves on our highly skilled and motivated workforce. Our management and advisory team 
-                collectively boast over <strong className="text-secondary-900">70 years of experience</strong> in manufacturing 
+              <h2 className="text-3xl font-bold text-secondary-900 dark:text-white mb-6">Our Expertise</h2>
+              <p className="text-lg text-accent-600 dark:text-gray-300 leading-relaxed mb-4">
+                At TASSA, we pride ourselves on our highly skilled and motivated workforce. Our management and advisory team
+                collectively boast over <strong className="text-secondary-900 dark:text-white">70 years of experience</strong> in manufacturing
                 and the plastics industry.
               </p>
-              <p className="text-lg text-accent-600 leading-relaxed">
-                Through continuous research and development, we have perfected a proprietary manufacturing process, allowing us 
-                to produce some of the <strong className="text-secondary-900">highest-quality twines and ropes in South Africa</strong>.
+              <p className="text-lg text-accent-600 dark:text-gray-300 leading-relaxed">
+                Through continuous research and development, we have perfected a proprietary manufacturing process, allowing us
+                to produce some of the <strong className="text-secondary-900 dark:text-white">highest-quality twines and ropes in South Africa</strong>.
               </p>
             </div>
 
             <div className="border-l-4 border-primary-600 pl-6 mb-12">
-              <h2 className="text-3xl font-bold text-secondary-900 mb-6">Our Customers</h2>
-              <p className="text-lg text-accent-600 leading-relaxed mb-4">
-                We are committed to <strong className="text-secondary-900">customer satisfaction</strong>, ensuring our products 
-                consistently meet your expectations. We work closely with clients across various industries, tailoring solutions 
+              <h2 className="text-3xl font-bold text-secondary-900 dark:text-white mb-6">Our Customers</h2>
+              <p className="text-lg text-accent-600 dark:text-gray-300 leading-relaxed mb-4">
+                We are committed to <strong className="text-secondary-900 dark:text-white">customer satisfaction</strong>, ensuring our products
+                consistently meet your expectations. We work closely with clients across various industries, tailoring solutions
                 to specific requirements.
               </p>
               <div className="bg-primary-600 text-white py-4 px-6 rounded-lg inline-block mt-4">
@@ -65,39 +65,39 @@ export default function AboutPage() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 dark:bg-secondary-800">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-secondary-900 text-center mb-12">Why Choose Us?</h2>
+          <h2 className="text-3xl font-bold text-secondary-900 dark:text-white text-center mb-12">Why Choose Us?</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="bg-white p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
-              <div className="text-primary-600 text-3xl mb-4">✓</div>
-              <h3 className="text-xl font-bold text-secondary-900 mb-3">Premium Quality</h3>
-              <p className="text-accent-600">Strict quality control ensures superior products.</p>
+            <div className="bg-white dark:bg-secondary-900 p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
+              <div className="text-primary-600 dark:text-primary-500 text-3xl mb-4">✓</div>
+              <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-3">Premium Quality</h3>
+              <p className="text-accent-600 dark:text-gray-400">Strict quality control ensures superior products.</p>
             </div>
-            <div className="bg-white p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
-              <div className="text-primary-600 text-3xl mb-4">✓</div>
-              <h3 className="text-xl font-bold text-secondary-900 mb-3">Customization Available</h3>
-              <p className="text-accent-600">We tailor solutions to meet specific customer needs.</p>
+            <div className="bg-white dark:bg-secondary-900 p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
+              <div className="text-primary-600 dark:text-primary-500 text-3xl mb-4">✓</div>
+              <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-3">Customization Available</h3>
+              <p className="text-accent-600 dark:text-gray-400">We tailor solutions to meet specific customer needs.</p>
             </div>
-            <div className="bg-white p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
-              <div className="text-primary-600 text-3xl mb-4">✓</div>
-              <h3 className="text-xl font-bold text-secondary-900 mb-3">Reliable Supply Chain</h3>
-              <p className="text-accent-600">Consistent and timely delivery.</p>
+            <div className="bg-white dark:bg-secondary-900 p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
+              <div className="text-primary-600 dark:text-primary-500 text-3xl mb-4">✓</div>
+              <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-3">Reliable Supply Chain</h3>
+              <p className="text-accent-600 dark:text-gray-400">Consistent and timely delivery.</p>
             </div>
-            <div className="bg-white p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
-              <div className="text-primary-600 text-3xl mb-4">✓</div>
-              <h3 className="text-xl font-bold text-secondary-900 mb-3">Proudly South African</h3>
-              <p className="text-accent-600">Supporting local manufacturing and job creation.</p>
+            <div className="bg-white dark:bg-secondary-900 p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
+              <div className="text-primary-600 dark:text-primary-500 text-3xl mb-4">✓</div>
+              <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-3">Proudly South African</h3>
+              <p className="text-accent-600 dark:text-gray-400">Supporting local manufacturing and job creation.</p>
             </div>
-            <div className="bg-white p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
-              <div className="text-primary-600 text-3xl mb-4">✓</div>
-              <h3 className="text-xl font-bold text-secondary-900 mb-3">Climate & UV Resistant</h3>
-              <p className="text-accent-600">Built to last in harsh conditions.</p>
+            <div className="bg-white dark:bg-secondary-900 p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
+              <div className="text-primary-600 dark:text-primary-500 text-3xl mb-4">✓</div>
+              <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-3">Climate & UV Resistant</h3>
+              <p className="text-accent-600 dark:text-gray-400">Built to last in harsh conditions.</p>
             </div>
-            <div className="bg-white p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
-              <div className="text-primary-600 text-3xl mb-4">✓</div>
-              <h3 className="text-xl font-bold text-secondary-900 mb-3">Industry Experience</h3>
-              <p className="text-accent-600">Over 70 years of combined expertise.</p>
+            <div className="bg-white dark:bg-secondary-900 p-8 rounded-xl shadow-sm border-l-4 border-primary-600">
+              <div className="text-primary-600 dark:text-primary-500 text-3xl mb-4">✓</div>
+              <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-3">Industry Experience</h3>
+              <p className="text-accent-600 dark:text-gray-400">Over 70 years of combined expertise.</p>
             </div>
           </div>
         </div>
@@ -128,25 +128,25 @@ export default function AboutPage() {
       </section>
 
       {/* Certifications */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-secondary-900">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-secondary-900 mb-8">Our Commitment</h2>
+          <h2 className="text-3xl font-bold text-secondary-900 dark:text-white mb-8">Our Commitment</h2>
           <div className="flex flex-wrap justify-center gap-8">
-            <div className="bg-gray-50 p-6 rounded-xl">
+            <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
               <div className="text-4xl mb-3">🏭</div>
-              <p className="font-semibold text-secondary-900">Local Manufacturing</p>
+              <p className="font-semibold text-secondary-900 dark:text-white">Local Manufacturing</p>
             </div>
-            <div className="bg-gray-50 p-6 rounded-xl">
+            <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
               <div className="text-4xl mb-3">♻️</div>
-              <p className="font-semibold text-secondary-900">Recyclable Materials</p>
+              <p className="font-semibold text-secondary-900 dark:text-white">Recyclable Materials</p>
             </div>
-            <div className="bg-gray-50 p-6 rounded-xl">
+            <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
               <div className="text-4xl mb-3">☀️</div>
-              <p className="font-semibold text-secondary-900">UV Stabilized</p>
+              <p className="font-semibold text-secondary-900 dark:text-white">UV Stabilized</p>
             </div>
-            <div className="bg-gray-50 p-6 rounded-xl">
+            <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
               <div className="text-4xl mb-3">✅</div>
-              <p className="font-semibold text-secondary-900">Quality Assured</p>
+              <p className="font-semibold text-secondary-900 dark:text-white">Quality Assured</p>
             </div>
           </div>
         </div>

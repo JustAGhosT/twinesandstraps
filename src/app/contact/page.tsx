@@ -29,23 +29,23 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Cards */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-secondary-900">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-secondary-900 text-center mb-12">Reach Out to Our Team</h2>
-            
+            <h2 className="text-3xl font-bold text-secondary-900 dark:text-white text-center mb-12">Reach Out to Our Team</h2>
+
             <div className="grid md:grid-cols-3 gap-6 mb-12">
               {contacts.map((contact) => (
-                <div key={contact.name} className="bg-gray-50 p-6 rounded-xl text-center hover:shadow-lg transition-shadow border-t-4 border-primary-600">
-                  <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div key={contact.name} className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl text-center hover:shadow-lg transition-shadow border-t-4 border-primary-600">
+                  <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-primary-600 dark:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-secondary-900 mb-2">{contact.name}</h3>
-                  <a 
+                  <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-2">{contact.name}</h3>
+                  <a
                     href={`tel:${contact.phone.replace(/\s/g, '')}`}
-                    className="text-lg text-primary-600 hover:text-primary-700 font-semibold"
+                    className="text-lg text-primary-600 dark:text-primary-500 hover:text-primary-700 dark:hover:text-primary-400 font-semibold"
                   >
                     {contact.phone}
                   </a>
@@ -115,15 +115,15 @@ export default function ContactPage() {
       </section>
 
       {/* Location Note */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-12 bg-gray-50 dark:bg-secondary-800">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-2xl mx-auto">
-            <div className="flex items-center justify-center gap-2 text-secondary-900 mb-4">
+            <div className="flex items-center justify-center gap-2 text-secondary-900 dark:text-white mb-4">
               <span className="text-3xl">🇿🇦</span>
               <h3 className="text-2xl font-bold">Proudly South African</h3>
             </div>
-            <p className="text-accent-600">
-              TASSA is a local manufacturer supporting South African industry and job creation. 
+            <p className="text-accent-600 dark:text-gray-300">
+              TASSA is a local manufacturer supporting South African industry and job creation.
               All our products are manufactured locally with pride.
             </p>
           </div>
@@ -131,26 +131,26 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ or Additional Info */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-secondary-900">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-secondary-900 text-center mb-12">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-bold text-secondary-900 dark:text-white text-center mb-12">Frequently Asked Questions</h2>
             <div className="space-y-6">
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="font-bold text-secondary-900 mb-2">Do you offer bulk pricing?</h3>
-                <p className="text-accent-600">Yes! We offer competitive bulk pricing for business customers. Contact us for a personalized quote based on your requirements.</p>
+              <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
+                <h3 className="font-bold text-secondary-900 dark:text-white mb-2">Do you offer bulk pricing?</h3>
+                <p className="text-accent-600 dark:text-gray-300">Yes! We offer competitive bulk pricing for business customers. Contact us for a personalized quote based on your requirements.</p>
               </div>
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="font-bold text-secondary-900 mb-2">What is the lead time for orders?</h3>
-                <p className="text-accent-600">Standard orders are typically fulfilled within 3-5 business days. Large or custom orders may require additional time.</p>
+              <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
+                <h3 className="font-bold text-secondary-900 dark:text-white mb-2">What is the lead time for orders?</h3>
+                <p className="text-accent-600 dark:text-gray-300">Standard orders are typically fulfilled within 3-5 business days. Large or custom orders may require additional time.</p>
               </div>
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="font-bold text-secondary-900 mb-2">Do you offer custom products?</h3>
-                <p className="text-accent-600">Yes, we offer customization options to meet specific customer needs. Contact our team to discuss your requirements.</p>
+              <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
+                <h3 className="font-bold text-secondary-900 dark:text-white mb-2">Do you offer custom products?</h3>
+                <p className="text-accent-600 dark:text-gray-300">Yes, we offer customization options to meet specific customer needs. Contact our team to discuss your requirements.</p>
               </div>
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="font-bold text-secondary-900 mb-2">What payment methods do you accept?</h3>
-                <p className="text-accent-600">We accept EFT, credit card, and other payment methods. For business accounts, we offer 30-day terms upon approval.</p>
+              <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
+                <h3 className="font-bold text-secondary-900 dark:text-white mb-2">What payment methods do you accept?</h3>
+                <p className="text-accent-600 dark:text-gray-300">We accept EFT, credit card, and other payment methods. For business accounts, we offer 30-day terms upon approval.</p>
               </div>
             </div>
           </div>
