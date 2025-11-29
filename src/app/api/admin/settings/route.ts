@@ -19,6 +19,8 @@ const DEFAULT_SETTINGS = {
   socialFacebook: '',
   socialInstagram: '',
   socialLinkedIn: '',
+  socialTwitter: '',
+  socialYoutube: '',
 };
 
 // Type for database format fields
@@ -35,6 +37,8 @@ interface DbSettingsUpdate {
   social_facebook?: string;
   social_instagram?: string;
   social_linkedin?: string;
+  social_twitter?: string;
+  social_youtube?: string;
 }
 
 // Helper to convert database fields to API format
@@ -51,6 +55,8 @@ function dbToApiFormat(dbSettings: {
   social_facebook: string;
   social_instagram: string;
   social_linkedin: string;
+  social_twitter: string;
+  social_youtube: string;
 }) {
   return {
     companyName: dbSettings.company_name,
@@ -65,6 +71,8 @@ function dbToApiFormat(dbSettings: {
     socialFacebook: dbSettings.social_facebook,
     socialInstagram: dbSettings.social_instagram,
     socialLinkedIn: dbSettings.social_linkedin,
+    socialTwitter: dbSettings.social_twitter,
+    socialYoutube: dbSettings.social_youtube,
   };
 }
 
@@ -82,6 +90,8 @@ function apiToDbFormat(apiSettings: {
   socialFacebook?: string;
   socialInstagram?: string;
   socialLinkedIn?: string;
+  socialTwitter?: string;
+  socialYoutube?: string;
 }): DbSettingsUpdate {
   const dbData: DbSettingsUpdate = {};
   if (apiSettings.companyName !== undefined) dbData.company_name = apiSettings.companyName;
@@ -96,6 +106,8 @@ function apiToDbFormat(apiSettings: {
   if (apiSettings.socialFacebook !== undefined) dbData.social_facebook = apiSettings.socialFacebook;
   if (apiSettings.socialInstagram !== undefined) dbData.social_instagram = apiSettings.socialInstagram;
   if (apiSettings.socialLinkedIn !== undefined) dbData.social_linkedin = apiSettings.socialLinkedIn;
+  if (apiSettings.socialTwitter !== undefined) dbData.social_twitter = apiSettings.socialTwitter;
+  if (apiSettings.socialYoutube !== undefined) dbData.social_youtube = apiSettings.socialYoutube;
   return dbData;
 }
 
@@ -136,6 +148,8 @@ interface ApiSettings {
   socialFacebook: string;
   socialInstagram: string;
   socialLinkedIn: string;
+  socialTwitter: string;
+  socialYoutube: string;
 }
 
 // Field labels for human-readable change messages
@@ -152,6 +166,8 @@ const FIELD_LABELS: Record<keyof ApiSettings, string> = {
   socialFacebook: 'Facebook URL',
   socialInstagram: 'Instagram URL',
   socialLinkedIn: 'LinkedIn URL',
+  socialTwitter: 'X (Twitter) URL',
+  socialYoutube: 'YouTube URL',
 };
 
 // Helper to detect which fields changed (type-safe version)

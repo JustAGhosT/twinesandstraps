@@ -25,6 +25,113 @@ const productImages: Record<string, string> = {
   'Cotton Rope': 'https://images.unsplash.com/photo-1558171813-4c088753af8f?w=800&q=80',
 };
 
+// Default admin setup tasks for store onboarding
+const defaultSetupTasks = [
+  {
+    task_key: 'upload_logo',
+    title: 'Upload Company Logo',
+    description: 'Add your company logo to personalize your store and build brand recognition.',
+    category: 'BRANDING',
+    priority: 1,
+    is_required: true,
+    link_url: '/admin/settings#branding',
+    link_text: 'Upload Logo',
+  },
+  {
+    task_key: 'add_social_links',
+    title: 'Add Social Media Links',
+    description: 'Connect your social media profiles to help customers find and follow you online.',
+    category: 'BRANDING',
+    priority: 2,
+    is_required: false,
+    link_url: '/admin/settings#social',
+    link_text: 'Add Social Links',
+  },
+  {
+    task_key: 'add_product_images',
+    title: 'Add Product Images',
+    description: 'Upload high-quality images for your products to improve customer engagement and sales.',
+    category: 'PRODUCTS',
+    priority: 1,
+    is_required: true,
+    link_url: '/admin/products',
+    link_text: 'Manage Products',
+  },
+  {
+    task_key: 'update_contact_info',
+    title: 'Update Contact Information',
+    description: 'Ensure your email, phone, and business hours are accurate for customer inquiries.',
+    category: 'SETTINGS',
+    priority: 1,
+    is_required: true,
+    link_url: '/admin/settings#contact',
+    link_text: 'Update Contact Info',
+  },
+  {
+    task_key: 'set_business_address',
+    title: 'Set Business Address',
+    description: 'Add your physical address to build trust and enable local customers to find you.',
+    category: 'SETTINGS',
+    priority: 2,
+    is_required: false,
+    link_url: '/admin/settings#contact',
+    link_text: 'Add Address',
+  },
+  {
+    task_key: 'configure_vat',
+    title: 'Configure VAT Settings',
+    description: 'Set the correct VAT rate for your business to ensure accurate pricing.',
+    category: 'SETTINGS',
+    priority: 1,
+    is_required: true,
+    link_url: '/admin/settings#tax',
+    link_text: 'Configure VAT',
+  },
+  {
+    task_key: 'add_categories',
+    title: 'Organize Product Categories',
+    description: 'Create and organize product categories to help customers find what they need.',
+    category: 'PRODUCTS',
+    priority: 2,
+    is_required: false,
+    link_url: '/admin/categories',
+    link_text: 'Manage Categories',
+  },
+  {
+    task_key: 'review_products',
+    title: 'Review Product Details',
+    description: 'Ensure all product descriptions, prices, and specifications are accurate.',
+    category: 'PRODUCTS',
+    priority: 2,
+    is_required: false,
+    link_url: '/admin/products',
+    link_text: 'Review Products',
+  },
+];
+
+async function seedSetupTasks() {
+  console.log('\nSeeding admin setup tasks...');
+
+  for (const task of defaultSetupTasks) {
+    await prisma.adminSetupTask.upsert({
+      where: { task_key: task.task_key },
+      update: {
+        title: task.title,
+        description: task.description,
+        category: task.category,
+        priority: task.priority,
+        is_required: task.is_required,
+        link_url: task.link_url,
+        link_text: task.link_text,
+      },
+      create: task,
+    });
+    console.log(`Upserted setup task: ${task.title}`);
+  }
+
+  console.log(`Created ${defaultSetupTasks.length} setup tasks.`);
+}
+
 async function main() {
   console.log('Seeding database with products...');
 
@@ -252,6 +359,9 @@ async function main() {
   console.log('- Anti-static options available');
   console.log('- Approximate measurements apply');
   console.log('- Terms & Conditions Apply. Prices are subject to change and exclude VAT.');
+
+  // Seed admin setup tasks
+  await seedSetupTasks();
 }
 
 main()

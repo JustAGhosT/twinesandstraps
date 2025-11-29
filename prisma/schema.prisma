@@ -230,8 +230,30 @@ model SiteSetting {
   business_hours  String   @default("Mon-Fri 8:00-17:00")
   vat_rate        String   @default("15")
   logo_url        String   @default("")
-  social_facebook String   @default("")
+  social_facebook  String  @default("")
   social_instagram String  @default("")
   social_linkedin  String  @default("")
+  social_twitter   String  @default("")
+  social_youtube   String  @default("")
   updated_at      DateTime @updatedAt
+}
+
+// Admin setup checklist - tracks onboarding tasks for store setup
+model AdminSetupTask {
+  id          Int       @id @default(autoincrement())
+  task_key    String    @unique // Unique identifier for the task
+  title       String
+  description String
+  category    String    // BRANDING, PRODUCTS, SETTINGS, CONTENT
+  priority    Int       @default(1) // 1=High, 2=Medium, 3=Low
+  is_required Boolean   @default(false)
+  completed   Boolean   @default(false)
+  completed_at DateTime?
+  link_url    String?   // Admin page to complete the task
+  link_text   String?   // Button text
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  @@index([category])
+  @@index([completed])
 }

@@ -92,6 +92,8 @@ export const siteSettingsSchema = z.object({
   socialFacebook: z.string().url().or(z.literal('')).optional(),
   socialInstagram: z.string().url().or(z.literal('')).optional(),
   socialLinkedIn: z.string().url().or(z.literal('')).optional(),
+  socialTwitter: z.string().url().or(z.literal('')).optional(),
+  socialYoutube: z.string().url().or(z.literal('')).optional(),
 });
 
 export type SiteSettingsInput = z.infer<typeof siteSettingsSchema>;
