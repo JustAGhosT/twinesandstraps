@@ -120,7 +120,8 @@ export default function ActivityLogPage() {
   };
 
   // Safely parse JSON metadata with fallback
-  const safeParseMetadata = (metadata: string): string => {
+  const safeParseMetadata = (metadata: string | null | undefined): string => {
+    if (!metadata) return '';
     try {
       const parsed = JSON.parse(metadata);
       return JSON.stringify(parsed, null, 2);

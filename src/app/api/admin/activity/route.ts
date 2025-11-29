@@ -6,8 +6,18 @@ import prisma from '@/lib/prisma';
 const MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 50;
 
-// Helper to validate date strings
+// Helper to parse and validate positive integers with bounds
+function parsePositiveInt(value: string | null, defaultValue: number, max?: number): number {
+  if (!value) return defaultValue;
+  const parsed = Number(value);
+  if (isNaN(parsed)) return defaultValue;
+  const bounded = Math.max(1, Math.floor(parsed));
+  return max ? Math.min(max, bounded) : bounded;
+}
+
+// Helper to validate date strings - must be non-empty and produce a valid date
 function isValidDate(dateStr: string): boolean {
+  if (!dateStr || dateStr.trim() === '') return false;
   const date = new Date(dateStr);
   return isFinite(date.getTime());
 }
@@ -20,13 +30,9 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     
-    // Parse and validate page
-    const rawPage = Number(searchParams.get('page') || '1');
-    const page = Math.max(1, Math.floor(isNaN(rawPage) ? 1 : rawPage));
-    
-    // Parse and validate limit
-    const rawLimit = Number(searchParams.get('limit') || String(DEFAULT_LIMIT));
-    const limit = Math.min(MAX_LIMIT, Math.max(1, Math.floor(isNaN(rawLimit) ? DEFAULT_LIMIT : rawLimit)));
+    // Parse and validate page and limit
+    const page = parsePositiveInt(searchParams.get('page'), 1);
+    const limit = parsePositiveInt(searchParams.get('limit'), DEFAULT_LIMIT, MAX_LIMIT);
     
     const entityType = searchParams.get('entity_type');
     const action = searchParams.get('action');
