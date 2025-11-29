@@ -159,3 +159,50 @@ export function formatZodErrors(errors: z.ZodIssue[]): Record<string, string> {
   }
   return formatted;
 }
+
+/**
+ * Supplier validation schemas
+ */
+export const createSupplierSchema = z.object({
+  name: z.string().min(1, 'Supplier name is required').max(255, 'Name too long'),
+  code: z.string()
+    .min(2, 'Code must be at least 2 characters')
+    .max(10, 'Code too long')
+    .regex(/^[A-Z0-9]+$/, 'Code must be uppercase letters and numbers only'),
+  contact_name: z.string().max(100).nullable().optional(),
+  email: z.string().email('Invalid email').nullable().optional(),
+  phone: z.string().max(50).nullable().optional(),
+  website: z.string().url('Invalid URL').nullable().optional(),
+  address: z.string().max(500).nullable().optional(),
+  notes: z.string().max(1000).nullable().optional(),
+  default_markup: z.number().min(0, 'Markup cannot be negative').max(500, 'Markup too high').default(30),
+  is_active: z.boolean().default(true),
+  payment_terms: z.string().max(50).nullable().optional(),
+  lead_time_days: z.number().int().min(0).max(365).nullable().optional(),
+  min_order_value: z.number().min(0).nullable().optional(),
+});
+
+export const updateSupplierSchema = createSupplierSchema.partial();
+
+export type CreateSupplierInput = z.infer<typeof createSupplierSchema>;
+export type UpdateSupplierInput = z.infer<typeof updateSupplierSchema>;
+
+/**
+ * Product import validation schemas
+ */
+export const productImportRowSchema = z.object({
+  name: z.string().min(1, 'Product name is required'),
+  supplier_sku: z.string().min(1, 'Supplier SKU is required'),
+  description: z.string().optional().default(''),
+  material: z.string().nullable().optional(),
+  diameter: z.coerce.number().positive().nullable().optional(),
+  length: z.coerce.number().positive().nullable().optional(),
+  strength_rating: z.string().nullable().optional(),
+  supplier_price: z.coerce.number().positive('Price must be positive'),
+  category_id: z.coerce.number().int().positive().optional(),
+  category_name: z.string().optional(), // Alternative to category_id - will be matched
+  image_url: z.string().url().nullable().optional(),
+  stock_status: z.enum(['IN_STOCK', 'LOW_STOCK', 'OUT_OF_STOCK']).default('IN_STOCK'),
+});
+
+export type ProductImportRow = z.infer<typeof productImportRowSchema>;

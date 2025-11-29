@@ -90,17 +90,17 @@ export default function QuotePage() {
         </div>
       </section>
 
-      <div className="bg-gray-50 py-12">
+      <div className="bg-gray-50 dark:bg-secondary-900 py-12">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Quote Form */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl shadow-sm p-6 md:p-8">
-                <h2 className="text-2xl font-bold text-secondary-900 mb-6">Your Details</h2>
+              <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6 md:p-8">
+                <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-6">Your Details</h2>
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid md:grid-cols-2 gap-5">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Full Name <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -110,12 +110,12 @@ export default function QuotePage() {
                         required
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                        className="w-full px-4 py-2.5 border border-gray-300 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                         placeholder="John Doe"
                       />
                     </div>
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Email Address <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -125,7 +125,7 @@ export default function QuotePage() {
                         required
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                        className="w-full px-4 py-2.5 border border-gray-300 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                         placeholder="john@example.com"
                       />
                     </div>
@@ -133,7 +133,7 @@ export default function QuotePage() {
 
                   <div className="grid md:grid-cols-2 gap-5">
                     <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Phone Number <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -143,12 +143,12 @@ export default function QuotePage() {
                         required
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                        className="w-full px-4 py-2.5 border border-gray-300 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                         placeholder="082 123 4567"
                       />
                     </div>
                     <div>
-                      <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Company Name
                       </label>
                       <input
@@ -157,14 +157,14 @@ export default function QuotePage() {
                         name="company"
                         value={formData.company}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                        className="w-full px-4 py-2.5 border border-gray-300 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                         placeholder="Your Company (optional)"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Additional Requirements
                     </label>
                     <textarea
@@ -173,7 +173,7 @@ export default function QuotePage() {
                       rows={4}
                       value={formData.message}
                       onChange={handleChange}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors resize-none"
+                      className="w-full px-4 py-2.5 border border-gray-300 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-secondary-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors resize-none"
                       placeholder="Tell us about your specific requirements, quantities, delivery location, etc."
                     />
                   </div>
@@ -189,7 +189,7 @@ export default function QuotePage() {
                     {isSubmitting ? 'Opening WhatsApp...' : 'Send Quote Request via WhatsApp'}
                   </button>
 
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
                     By submitting this form, your quote request will be sent to our team via WhatsApp for a faster response.
                   </p>
                 </form>
@@ -198,8 +198,8 @@ export default function QuotePage() {
 
             {/* Cart Summary Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
-                <h3 className="text-lg font-bold text-secondary-900 mb-4">
+              <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6 sticky top-24">
+                <h3 className="text-lg font-bold text-secondary-900 dark:text-white mb-4">
                   {hasItems ? 'Products in Quote' : 'Your Cart'}
                 </h3>
 
@@ -207,35 +207,35 @@ export default function QuotePage() {
                   <>
                     <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
                       {items.map((item) => (
-                        <div key={item.product.id} className="flex justify-between items-start text-sm pb-3 border-b border-gray-100">
+                        <div key={item.product.id} className="flex justify-between items-start text-sm pb-3 border-b border-gray-100 dark:border-secondary-700">
                           <div>
-                            <p className="font-medium text-gray-900">{item.product.name}</p>
-                            <p className="text-gray-500">Qty: {item.quantity}</p>
+                            <p className="font-medium text-gray-900 dark:text-white">{item.product.name}</p>
+                            <p className="text-gray-500 dark:text-gray-400">Qty: {item.quantity}</p>
                           </div>
-                          <p className="font-medium text-gray-900">R{(item.product.price * item.quantity).toFixed(2)}</p>
+                          <p className="font-medium text-gray-900 dark:text-white">R{(item.product.price * item.quantity).toFixed(2)}</p>
                         </div>
                       ))}
                     </div>
-                    <div className="border-t pt-3">
-                      <div className="flex justify-between font-bold text-secondary-900">
+                    <div className="border-t dark:border-secondary-700 pt-3">
+                      <div className="flex justify-between font-bold text-secondary-900 dark:text-white">
                         <span>Subtotal</span>
                         <span>R{getTotalPrice().toFixed(2)}</span>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">VAT to be added to final quote</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">VAT to be added to final quote</p>
                     </div>
                     <Link
                       href="/cart"
-                      className="block w-full text-center mt-4 py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="block w-full text-center mt-4 py-2 px-4 border border-gray-300 dark:border-secondary-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-secondary-700 transition-colors"
                     >
                       Edit Cart
                     </Link>
                   </>
                 ) : (
                   <div className="text-center py-6">
-                    <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
-                    <p className="text-gray-600 mb-4">No products selected</p>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">No products selected</p>
                     <Link
                       href="/products"
                       className="inline-block bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
@@ -246,16 +246,16 @@ export default function QuotePage() {
                 )}
 
                 {/* Contact Info */}
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h4 className="font-semibold text-secondary-900 mb-3">Prefer to call?</h4>
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-secondary-700">
+                  <h4 className="font-semibold text-secondary-900 dark:text-white mb-3">Prefer to call?</h4>
                   <div className="space-y-2 text-sm">
-                    <a href="tel:0741874975" className="flex items-center gap-2 text-gray-600 hover:text-primary-600">
+                    <a href="tel:0741874975" className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
                       074 187 4975
                     </a>
-                    <a href="mailto:info@twinesandstraps.co.za" className="flex items-center gap-2 text-gray-600 hover:text-primary-600">
+                    <a href="mailto:info@twinesandstraps.co.za" className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>

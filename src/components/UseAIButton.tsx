@@ -139,13 +139,13 @@ export default function UseAIButton({
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div 
-            className="fixed inset-0 z-40" 
-            onClick={() => setIsOpen(false)} 
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
           />
-          
+
           {/* Popup */}
-          <div className="absolute z-50 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden right-0">
+          <div className="absolute z-50 mt-2 w-80 bg-white dark:bg-secondary-800 rounded-lg shadow-xl border border-gray-200 dark:border-secondary-700 overflow-hidden right-0">
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-3 text-white">
               <div className="flex items-center justify-between">
@@ -169,38 +169,38 @@ export default function UseAIButton({
 
             {/* Content */}
             <div className="p-4">
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                 {getPromptHint()}
               </p>
 
               {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm">
                   {error}
                 </div>
               )}
 
               {loading ? (
                 <div className="flex items-center justify-center py-6">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
-                  <span className="ml-3 text-sm text-gray-500">AI is thinking...</span>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600 dark:border-purple-400"></div>
+                  <span className="ml-3 text-sm text-gray-500 dark:text-gray-400">AI is thinking...</span>
                 </div>
               ) : result ? (
                 <div className="space-y-3">
                   {action === 'enhance-description' && result.enhanced && (
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-700" style={{ display: '-webkit-box', WebkitLineClamp: MAX_DESCRIPTION_LINES, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <div className="p-3 bg-gray-50 dark:bg-secondary-700 rounded-lg">
+                      <p className="text-sm text-gray-700 dark:text-gray-300" style={{ display: '-webkit-box', WebkitLineClamp: MAX_DESCRIPTION_LINES, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {result.enhanced}
                       </p>
                     </div>
                   )}
-                  
+
                   {action === 'suggest-pricing' && result.suggested && (
-                    <div className="p-3 bg-green-50 rounded-lg">
-                      <div className="text-lg font-bold text-green-600">
+                    <div className="p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                      <div className="text-lg font-bold text-green-600 dark:text-green-400">
                         R{result.suggested.toFixed(2)}
                       </div>
                       {result.range && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           Range: R{result.range.min.toFixed(2)} - R{result.range.max.toFixed(2)}
                         </p>
                       )}
@@ -208,12 +208,12 @@ export default function UseAIButton({
                   )}
 
                   {action === 'analyze' && result.priceSuggestion && (
-                    <div className="p-3 bg-green-50 rounded-lg">
-                      <div className="text-lg font-bold text-green-600">
+                    <div className="p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                      <div className="text-lg font-bold text-green-600 dark:text-green-400">
                         R{result.priceSuggestion.recommended.toFixed(2)}
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {result.priceSuggestion.reasoning.length > MAX_REASONING_LENGTH 
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {result.priceSuggestion.reasoning.length > MAX_REASONING_LENGTH
                           ? `${result.priceSuggestion.reasoning.substring(0, MAX_REASONING_LENGTH)}...`
                           : result.priceSuggestion.reasoning}
                       </p>
@@ -234,7 +234,7 @@ export default function UseAIButton({
                         setResult(null);
                         callAI();
                       }}
-                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="px-3 py-2 border border-gray-300 dark:border-secondary-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-secondary-700 transition-colors"
                     >
                       Retry
                     </button>

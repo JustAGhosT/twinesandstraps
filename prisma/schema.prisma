@@ -41,8 +41,17 @@ model Product {
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 
+  // 3rd party product fields
+  is_third_party    Boolean   @default(false)
+  supplier_id       Int?
+  supplier_sku      String?   // Original SKU from supplier
+  supplier_price    Float?    // Cost from supplier
+  markup_percentage Float?    // Markup applied to supplier price
+  last_synced_at    DateTime? // When product was last synced with supplier
+
   category     Category      @relation(fields: [category_id], references: [id])
   category_id  Int
+  supplier     Supplier?     @relation(fields: [supplier_id], references: [id], onDelete: SetNull)
   order_items  OrderItem[]
   view_history ViewHistory[]
   reviews      Review[]
@@ -256,4 +265,49 @@ model AdminSetupTask {
 
   @@index([category])
   @@index([completed])
+}
+
+// Supplier/Vendor management for 3rd party products
+model Supplier {
+  id                Int       @id @default(autoincrement())
+  name              String
+  code              String    @unique // Short code for SKU prefixing (e.g., "SUP1")
+  contact_name      String?
+  email             String?
+  phone             String?
+  website           String?
+  address           String?
+  notes             String?
+  default_markup    Float     @default(30) // Default markup percentage for this supplier
+  is_active         Boolean   @default(true)
+  payment_terms     String?   // e.g., "NET30", "COD"
+  lead_time_days    Int?      // Average days for delivery
+  min_order_value   Float?    // Minimum order value
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  products Product[]
+
+  @@index([is_active])
+  @@index([code])
+}
+
+// Product import batch - tracks bulk imports from suppliers
+model ProductImportBatch {
+  id              Int       @id @default(autoincrement())
+  supplier_id     Int?
+  filename        String?   // Original filename if CSV upload
+  source          String    // CSV, API, MANUAL
+  total_rows      Int       @default(0)
+  processed_rows  Int       @default(0)
+  successful      Int       @default(0)
+  failed          Int       @default(0)
+  skipped         Int       @default(0)
+  status          String    @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  error_log       String?   // JSON array of errors
+  created_at      DateTime  @default(now())
+  completed_at    DateTime?
+
+  @@index([status])
+  @@index([supplier_id])
 }

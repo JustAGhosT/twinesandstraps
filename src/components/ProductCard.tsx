@@ -65,9 +65,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
     <div className="bg-white dark:bg-secondary-800 border border-gray-200 dark:border-secondary-700 rounded-lg hover:shadow-lg transition-all duration-200 h-full flex flex-col overflow-hidden group">
       {/* Category Label & Stock Badge */}
       <div className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-secondary-900 border-b border-gray-100 dark:border-secondary-700">
-        {product.category && (
-          <span className="text-xs font-medium text-primary-600 dark:text-primary-500">{product.category.name}</span>
-        )}
+        <div className="flex items-center gap-2">
+          {product.category && (
+            <span className="text-xs font-medium text-primary-600 dark:text-primary-500">{product.category.name}</span>
+          )}
+          {product.is_third_party && (
+            <span className="px-1.5 py-0.5 text-xs font-medium text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/30 rounded" title={product.supplier?.name || 'Partner Product'}>
+              Partner
+            </span>
+          )}
+        </div>
         {getStockBadge()}
       </div>
 
