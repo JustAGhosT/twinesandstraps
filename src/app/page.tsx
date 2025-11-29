@@ -221,7 +221,7 @@ export default async function Home() {
       <section className="py-16 bg-gray-50 dark:bg-secondary-800">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-center text-secondary-900 dark:text-white">Shop by Category</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {categories.map((category: Category) => {
               // Category-specific images and icons
               const categoryData: Record<string, { image: string; icon: string; description: string }> = {
@@ -235,10 +235,15 @@ export default async function Home() {
                   icon: '🪢',
                   description: 'Durable ropes for all applications'
                 },
-                'natural-ropes': {
-                  image: 'https://images.unsplash.com/photo-1519638831568-d9897f54ed69?w=400&h=300&fit=crop',
-                  icon: '🌿',
-                  description: 'Eco-friendly natural fiber ropes'
+                'nets': {
+                  image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=300&fit=crop',
+                  icon: '🥅',
+                  description: 'Cargo, safety, and sports nets for every need'
+                },
+                'accessories': {
+                  image: 'https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=400&h=300&fit=crop',
+                  icon: '🔗',
+                  description: 'Hooks, shackles, connectors, and tensioners'
                 }
               };
               const data = categoryData[category.slug] || {
