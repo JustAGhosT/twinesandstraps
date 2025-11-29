@@ -2,6 +2,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import prisma from '@/lib/prisma';
 
+// Constants for input validation
+const MAX_LIMIT = 100;
+const DEFAULT_LIMIT = 50;
+
+// Helper to parse and validate positive integers with bounds
+function parsePositiveInt(value: string | null, defaultValue: number, max?: number): number {
+  if (!value) return defaultValue;
+  const parsed = Number(value);
+  if (isNaN(parsed)) return defaultValue;
+  const bounded = Math.max(1, Math.floor(parsed));
+  return max ? Math.min(max, bounded) : bounded;
+}
+
+// Helper to validate date strings - must be non-empty and produce a valid date
+function isValidDate(dateStr: string): boolean {
+  if (!dateStr || dateStr.trim() === '') return false;
+  const date = new Date(dateStr);
+  return isFinite(date.getTime());
+}
+
 // GET - Fetch activity logs with pagination and filters
 export async function GET(request: NextRequest) {
   const authError = await requireAdminAuth(request);
@@ -9,12 +29,29 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    
+    // Parse and validate page and limit
+    const page = parsePositiveInt(searchParams.get('page'), 1);
+    const limit = parsePositiveInt(searchParams.get('limit'), DEFAULT_LIMIT, MAX_LIMIT);
+    
     const entityType = searchParams.get('entity_type');
     const action = searchParams.get('action');
     const startDate = searchParams.get('start_date');
     const endDate = searchParams.get('end_date');
+
+    // Validate date parameters if provided
+    if (startDate && !isValidDate(startDate)) {
+      return NextResponse.json(
+        { error: 'Invalid start_date format. Use ISO 8601 format.' },
+        { status: 400 }
+      );
+    }
+    if (endDate && !isValidDate(endDate)) {
+      return NextResponse.json(
+        { error: 'Invalid end_date format. Use ISO 8601 format.' },
+        { status: 400 }
+      );
+    }
 
     const skip = (page - 1) * limit;
 
