@@ -175,7 +175,7 @@ async function getFailedMigrations(): Promise<string[]> {
         AND migration_name != ${INIT_MIGRATION_NAME}
     `;
     
-    return result.map(r => r.migration_name);
+    return result.map((r: MigrationRecord) => r.migration_name);
   } catch {
     // Table doesn't exist or query failed - no failed migrations to recover
     return [];

@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
 
     // Create a map for quick lookup
     const totalSpentMap = new Map(
-      orderTotals.map(ot => [ot.user_id, ot._sum.total || 0])
+      orderTotals.map((ot: { user_id: number; _sum: { total: number | null } }) => [ot.user_id, ot._sum.total || 0])
     );
 
     // Merge totals with customer data
