@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { isValidEmail, generatePasswordResetToken, getPasswordResetExpiry } from '@/lib/user-auth';
 
 export async function POST(request: NextRequest) {
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
       const expiresAt = getPasswordResetExpiry();
 
       // Use transaction to ensure token invalidation and creation are atomic
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         // Invalidate any existing tokens for this user
         await tx.passwordResetToken.updateMany({
           where: {

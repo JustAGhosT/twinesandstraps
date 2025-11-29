@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { getCurrentUser } from '@/lib/user-auth';
 import { z } from 'zod';
 
@@ -53,7 +54,7 @@ export async function PUT(
     const data = validation.data;
 
     // Use transaction to prevent race conditions when updating default address
-    const address = await prisma.$transaction(async (tx) => {
+    const address = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // If setting as default, unset others
       if (data.is_default) {
         await tx.address.updateMany({
@@ -103,7 +104,7 @@ export async function DELETE(
     }
 
     // Use transaction to prevent race conditions when deleting and reassigning default
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.address.delete({ where: { id: addressId } });
 
       // If deleted address was default, set another as default
