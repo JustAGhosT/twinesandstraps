@@ -60,17 +60,17 @@ export default function RecentlyViewed({ excludeProductId, limit = 4 }: Recently
   }
 
   return (
-    <section className="py-12 bg-gray-50">
+    <section className="py-12 bg-gray-50 dark:bg-secondary-900">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl font-bold text-secondary-900 mb-6">Recently Viewed</h2>
+        <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-6">Recently Viewed</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {items.map((item) => (
             <Link
               key={item.id}
               href={`/products/${item.product.id}`}
-              className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow group"
+              className="bg-white dark:bg-secondary-800 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow group"
             >
-              <div className="aspect-square bg-gray-100 overflow-hidden">
+              <div className="aspect-square bg-gray-100 dark:bg-secondary-700 overflow-hidden">
                 {item.product.image_url ? (
                   <Image
                     src={item.product.image_url}
@@ -80,7 +80,7 @@ export default function RecentlyViewed({ excludeProductId, limit = 4 }: Recently
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
                     No image
                   </div>
                 )}

@@ -51,7 +51,7 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => (
     {[1, 2, 3, 4, 5].map((star) => (
       <svg
         key={star}
-        className={`w-5 h-5 ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
+        className={`w-5 h-5 ${star <= rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}
         fill="currentColor"
         viewBox="0 0 20 20"
       >
@@ -79,7 +79,7 @@ const Testimonials: React.FC = () => {
   };
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-gray-50 dark:bg-secondary-900">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 mb-4">
@@ -92,11 +92,11 @@ const Testimonials: React.FC = () => {
 
         <div className="max-w-4xl mx-auto">
           {/* Testimonial Card */}
-          <div className="bg-white rounded-xl shadow-lg p-8 md:p-10 relative">
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-lg p-8 md:p-10 relative">
             <div className="absolute top-6 left-8 text-6xl text-primary-100 font-serif">&ldquo;</div>
 
             <div className="relative z-10">
-              <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6 italic">
+              <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed mb-6 italic">
                 {testimonials[activeIndex].quote}
               </p>
 
@@ -121,7 +121,7 @@ const Testimonials: React.FC = () => {
                 className={`w-3 h-3 rounded-full transition-all ${
                   index === activeIndex
                     ? 'bg-primary-600 w-8'
-                    : 'bg-gray-300 hover:bg-gray-400'
+                    : 'bg-gray-300 dark:bg-secondary-600 hover:bg-gray-400 dark:hover:bg-secondary-500'
                 }`}
                 aria-label={`Go to testimonial ${index + 1}`}
               />
@@ -135,10 +135,10 @@ const Testimonials: React.FC = () => {
                 setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
                 setIsAutoPlaying(false);
               }}
-              className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
+              className="p-2 rounded-full bg-gray-200 dark:bg-secondary-700 hover:bg-gray-300 dark:hover:bg-secondary-600 transition-colors"
               aria-label="Previous testimonial"
             >
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
@@ -147,10 +147,10 @@ const Testimonials: React.FC = () => {
                 setActiveIndex((prev) => (prev + 1) % testimonials.length);
                 setIsAutoPlaying(false);
               }}
-              className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
+              className="p-2 rounded-full bg-gray-200 dark:bg-secondary-700 hover:bg-gray-300 dark:hover:bg-secondary-600 transition-colors"
               aria-label="Next testimonial"
             >
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
