@@ -38,7 +38,7 @@ const StarRating: React.FC<{ rating: number; interactive?: boolean; onRate?: (ra
         >
           <svg
             className={`w-5 h-5 transition-colors ${
-              star <= (hoverRating || rating) ? 'text-yellow-400' : 'text-gray-300'
+              star <= (hoverRating || rating) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'
             }`}
             fill="currentColor"
             viewBox="0 0 20 20"
@@ -138,24 +138,24 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
       <h3 className="text-xl font-bold text-secondary-900 mb-6">Customer Reviews</h3>
 
       {/* Rating Summary */}
-      <div className="bg-gray-50 rounded-lg p-6 mb-6">
+      <div className="bg-gray-50 dark:bg-secondary-800 rounded-lg p-6 mb-6">
         <div className="flex flex-col md:flex-row md:items-center gap-6">
           <div className="text-center md:text-left">
             <div className="text-4xl font-bold text-secondary-900">{averageRating.toFixed(1)}</div>
             <StarRating rating={Math.round(averageRating)} />
-            <p className="text-sm text-gray-500 mt-1">{reviews.length} reviews</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{reviews.length} reviews</p>
           </div>
           <div className="flex-1">
             {[5, 4, 3, 2, 1].map((rating, index) => (
               <div key={rating} className="flex items-center gap-2 mb-1">
-                <span className="text-sm text-gray-600 w-8">{rating} star</span>
-                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <span className="text-sm text-gray-600 dark:text-gray-400 w-8">{rating} star</span>
+                <div className="flex-1 h-2 bg-gray-200 dark:bg-secondary-700 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-yellow-400 rounded-full"
                     style={{ width: `${totalReviews > 0 ? (ratingCounts[index] / totalReviews) * 100 : 0}%` }}
                   />
                 </div>
-                <span className="text-sm text-gray-500 w-8">{ratingCounts[index]}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 w-8">{ratingCounts[index]}</span>
               </div>
             ))}
           </div>
@@ -173,24 +173,24 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
       )}
 
       {submitted && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-700 dark:text-green-400">
           Thank you for your review! It will be published after moderation.
         </div>
       )}
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400">
           {error}
         </div>
       )}
 
       {/* Review Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-6 bg-gray-50 rounded-lg p-6">
+        <form onSubmit={handleSubmit} className="mb-6 bg-gray-50 dark:bg-secondary-800 rounded-lg p-6">
           <h4 className="font-semibold text-secondary-900 mb-4">Write a Review for {productName}</h4>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Your Rating *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Your Rating *</label>
             <StarRating
               rating={newReview.rating}
               interactive
@@ -200,53 +200,53 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Your Name *</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Your Name *</label>
               <input
                 type="text"
                 value={newReview.authorName}
                 onChange={(e) => setNewReview({ ...newReview, authorName: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-secondary-600 dark:bg-secondary-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email (optional)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email (optional)</label>
               <input
                 type="email"
                 value={newReview.authorEmail}
                 onChange={(e) => setNewReview({ ...newReview, authorEmail: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-secondary-600 dark:bg-secondary-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
             </div>
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Company (optional)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Company (optional)</label>
             <input
               type="text"
               value={newReview.company}
               onChange={(e) => setNewReview({ ...newReview, company: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-secondary-600 dark:bg-secondary-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Review Title (optional)</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Review Title (optional)</label>
             <input
               type="text"
               value={newReview.title}
               onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-secondary-600 dark:bg-secondary-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Your Review *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Your Review *</label>
             <textarea
               value={newReview.content}
               onChange={(e) => setNewReview({ ...newReview, content: e.target.value })}
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-secondary-600 dark:bg-secondary-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               required
               minLength={10}
             />
@@ -263,7 +263,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+              className="px-6 py-2 bg-gray-200 dark:bg-secondary-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-secondary-600 transition-colors"
             >
               Cancel
             </button>
@@ -273,19 +273,19 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
 
       {/* Reviews List */}
       {reviews.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
           <p>No reviews yet. Be the first to review this product!</p>
         </div>
       ) : (
         <div className="space-y-4">
           {reviews.map((review) => (
-            <div key={review.id} className="border-b border-gray-200 pb-4">
+            <div key={review.id} className="border-b border-gray-200 dark:border-secondary-700 pb-4">
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <div className="flex items-center gap-2">
                     <StarRating rating={review.rating} />
                     {review.verified_purchase && (
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
+                      <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded">
                         Verified Purchase
                       </span>
                     )}
@@ -294,7 +294,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
                     <h4 className="font-semibold text-secondary-900 mt-1">{review.title}</h4>
                   )}
                 </div>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   {new Date(review.created_at).toLocaleDateString('en-ZA', {
                     year: 'numeric',
                     month: 'short',
@@ -302,8 +302,8 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
                   })}
                 </span>
               </div>
-              <p className="text-gray-600 mb-2">{review.content}</p>
-              <p className="text-sm text-gray-500">By {review.author_name}</p>
+              <p className="text-gray-600 dark:text-gray-300 mb-2">{review.content}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">By {review.author_name}</p>
             </div>
           ))}
         </div>

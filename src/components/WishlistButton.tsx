@@ -35,7 +35,7 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
         className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
           isWishlisted
             ? 'bg-red-50 text-red-600 hover:bg-red-100'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-secondary-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-secondary-600'
         } ${className}`}
       >
         <svg
@@ -62,7 +62,7 @@ const WishlistButton: React.FC<WishlistButtonProps> = ({
       className={`p-2 rounded-full transition-colors ${
         isWishlisted
           ? 'bg-red-50 text-red-500 hover:bg-red-100'
-          : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-red-500'
+          : 'bg-gray-100 dark:bg-secondary-700 text-gray-500 hover:bg-gray-200 dark:hover:bg-secondary-600 hover:text-red-500'
       } ${className}`}
       title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
     >

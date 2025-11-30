@@ -41,7 +41,7 @@ const CompareButton: React.FC<CompareButtonProps> = ({
         className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
           isComparing
             ? 'bg-blue-50 text-blue-600 hover:bg-blue-100'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-gray-100 dark:bg-secondary-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-secondary-600'
         } ${className}`}
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@ const CompareButton: React.FC<CompareButtonProps> = ({
       className={`p-2 rounded-full transition-colors ${
         isComparing
           ? 'bg-blue-50 text-blue-500 hover:bg-blue-100'
-          : 'bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-blue-500'
+          : 'bg-gray-100 dark:bg-secondary-700 text-gray-500 hover:bg-gray-200 dark:hover:bg-secondary-600 hover:text-blue-500'
       } ${className}`}
       title={isComparing ? 'Remove from compare' : 'Add to compare'}
     >

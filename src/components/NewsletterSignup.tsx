@@ -88,7 +88,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ variant = 'footer' 
 
   // Inline variant for other pages
   return (
-    <div className="bg-primary-50 rounded-xl p-6 md:p-8">
+    <div className="bg-primary-50 dark:bg-secondary-800 rounded-xl p-6 md:p-8">
       <div className="max-w-xl mx-auto text-center">
         <h3 className="text-xl font-bold text-secondary-900 mb-2">
           Subscribe to Our Newsletter
@@ -102,7 +102,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ variant = 'footer' 
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email address"
-            className="flex-1 max-w-md px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="flex-1 max-w-md px-4 py-3 rounded-lg border border-gray-300 dark:border-secondary-600 dark:bg-secondary-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             disabled={status === 'loading'}
           />
           <button

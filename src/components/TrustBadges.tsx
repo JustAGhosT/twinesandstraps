@@ -60,7 +60,7 @@ const TrustBadges: React.FC = () => {
   ];
 
   return (
-    <section className="py-12 bg-white border-y border-gray-100">
+    <section className="py-12 bg-white dark:bg-secondary-900 border-y border-gray-100 dark:border-secondary-700">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-secondary-900">Why Trust TASSA</h2>
@@ -69,7 +69,7 @@ const TrustBadges: React.FC = () => {
           {badges.map((badge, index) => (
             <div
               key={index}
-              className="flex flex-col items-center text-center p-4 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex flex-col items-center text-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-secondary-800 transition-colors"
             >
               <div className="text-primary-600 mb-3">{badge.icon}</div>
               <h3 className="font-semibold text-secondary-900 text-sm mb-1">{badge.title}</h3>
