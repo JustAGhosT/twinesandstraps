@@ -73,7 +73,7 @@ const TrustBadges: React.FC = () => {
             >
               <div className="text-primary-600 mb-3">{badge.icon}</div>
               <h3 className="font-semibold text-secondary-900 dark:text-white text-sm mb-1">{badge.title}</h3>
-              <p className="text-xs text-accent-500">{badge.description}</p>
+              <p className="text-xs text-accent-500 dark:text-gray-300">{badge.description}</p>
             </div>
           ))}
         </div>
