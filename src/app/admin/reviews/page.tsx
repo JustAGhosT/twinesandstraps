@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useConfirm } from '@/components/ConfirmModal';
+import { REVIEW_STATUS, REVIEW_STATUS_LABELS } from '@/constants';
 
 interface Review {
   id: number;
@@ -131,12 +132,12 @@ export default function AdminReviewsPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'PENDING':
-        return <span className="px-2 py-1 text-xs font-medium text-yellow-700 bg-yellow-100 rounded">Pending</span>;
-      case 'APPROVED':
-        return <span className="px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded">Approved</span>;
-      case 'REJECTED':
-        return <span className="px-2 py-1 text-xs font-medium text-red-700 bg-red-100 rounded">Rejected</span>;
+      case REVIEW_STATUS.PENDING:
+        return <span className="px-2 py-1 text-xs font-medium text-yellow-700 bg-yellow-100 rounded">{REVIEW_STATUS_LABELS[REVIEW_STATUS.PENDING]}</span>;
+      case REVIEW_STATUS.APPROVED:
+        return <span className="px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded">{REVIEW_STATUS_LABELS[REVIEW_STATUS.APPROVED]}</span>;
+      case REVIEW_STATUS.REJECTED:
+        return <span className="px-2 py-1 text-xs font-medium text-red-700 bg-red-100 rounded">{REVIEW_STATUS_LABELS[REVIEW_STATUS.REJECTED]}</span>;
       default:
         return null;
     }
@@ -184,9 +185,9 @@ export default function AdminReviewsPage() {
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
           >
             <option value="">All Reviews</option>
-            <option value="PENDING">Pending</option>
-            <option value="APPROVED">Approved</option>
-            <option value="REJECTED">Rejected</option>
+            <option value={REVIEW_STATUS.PENDING}>{REVIEW_STATUS_LABELS[REVIEW_STATUS.PENDING]}</option>
+            <option value={REVIEW_STATUS.APPROVED}>{REVIEW_STATUS_LABELS[REVIEW_STATUS.APPROVED]}</option>
+            <option value={REVIEW_STATUS.REJECTED}>{REVIEW_STATUS_LABELS[REVIEW_STATUS.REJECTED]}</option>
           </select>
         </div>
       </div>
@@ -248,17 +249,17 @@ export default function AdminReviewsPage() {
 
                 {/* Actions */}
                 <div className="flex flex-wrap gap-2 lg:flex-col">
-                  {review.status === 'PENDING' && (
+                  {review.status === REVIEW_STATUS.PENDING && (
                     <>
                       <button
-                        onClick={() => updateReview(review.id, { status: 'APPROVED' })}
+                        onClick={() => updateReview(review.id, { status: REVIEW_STATUS.APPROVED })}
                         disabled={actionLoading === review.id}
                         className="px-3 py-1.5 text-sm font-medium text-green-700 bg-green-100 rounded-lg hover:bg-green-200 transition-colors disabled:opacity-50"
                       >
                         Approve
                       </button>
                       <button
-                        onClick={() => updateReview(review.id, { status: 'REJECTED' })}
+                        onClick={() => updateReview(review.id, { status: REVIEW_STATUS.REJECTED })}
                         disabled={actionLoading === review.id}
                         className="px-3 py-1.5 text-sm font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200 transition-colors disabled:opacity-50"
                       >
@@ -266,8 +267,8 @@ export default function AdminReviewsPage() {
                       </button>
                     </>
                   )}
-                  
-                  {review.status === 'APPROVED' && !review.promoted_to_testimonial && (
+
+                  {review.status === REVIEW_STATUS.APPROVED && !review.promoted_to_testimonial && (
                     <button
                       onClick={() => updateReview(review.id, { promoteToTestimonial: true })}
                       disabled={actionLoading === review.id}

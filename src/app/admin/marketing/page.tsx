@@ -607,10 +607,159 @@ export default function MarketingPage() {
 
       {activeTab === 'analytics' && (
         <div className="space-y-6">
+          {/* Integration Roadmap */}
           <div className="bg-white dark:bg-secondary-800 rounded-lg border border-gray-200 dark:border-secondary-700 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Coming Soon</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Integration Status</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Google Analytics */}
+              <div className="p-4 border border-gray-200 dark:border-secondary-600 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-900 dark:text-white">Google Analytics 4</span>
+                  <span className="px-2 py-1 text-xs font-medium rounded bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                    Pending
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Web analytics & e-commerce tracking</p>
+                <span className="text-xs text-gray-400">ADR 009</span>
+              </div>
+
+              {/* Email Marketing */}
+              <div className="p-4 border border-gray-200 dark:border-secondary-600 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-900 dark:text-white">Email Marketing</span>
+                  <span className="px-2 py-1 text-xs font-medium rounded bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                    Pending
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Brevo/Sendinblue integration</p>
+                <span className="text-xs text-gray-400">ADR 004</span>
+              </div>
+
+              {/* Google Merchant Center */}
+              <div className="p-4 border border-gray-200 dark:border-secondary-600 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-900 dark:text-white">Google Shopping</span>
+                  <span className="px-2 py-1 text-xs font-medium rounded bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                    Pending
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Product feed for Google Shopping</p>
+                <span className="text-xs text-gray-400">ADR 007</span>
+              </div>
+
+              {/* Facebook Catalog */}
+              <div className="p-4 border border-gray-200 dark:border-secondary-600 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-900 dark:text-white">Facebook Shops</span>
+                  <span className="px-2 py-1 text-xs font-medium rounded bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                    Pending
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Product catalog for FB/IG</p>
+                <span className="text-xs text-gray-400">ADR 007</span>
+              </div>
+
+              {/* Product Search */}
+              <div className="p-4 border border-gray-200 dark:border-secondary-600 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-900 dark:text-white">Product Search</span>
+                  <span className="px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-600 dark:bg-secondary-700 dark:text-gray-400">
+                    Planned
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Algolia search integration</p>
+                <span className="text-xs text-gray-400">ADR 006</span>
+              </div>
+
+              {/* Takealot */}
+              <div className="p-4 border border-gray-200 dark:border-secondary-600 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-gray-900 dark:text-white">Takealot</span>
+                  <span className="px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-600 dark:bg-secondary-700 dark:text-gray-400">
+                    Planned
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">SA marketplace integration</p>
+                <span className="text-xs text-gray-400">ADR 007</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Implementation Roadmap */}
+          <div className="bg-white dark:bg-secondary-800 rounded-lg border border-gray-200 dark:border-secondary-700 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Implementation Roadmap</h2>
+            <div className="space-y-4">
+              {/* Phase 1 */}
+              <div className="border-l-4 border-primary-500 pl-4">
+                <h3 className="font-medium text-gray-900 dark:text-white">Phase 1: Foundation</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Priority integrations for immediate value</p>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                    Google Analytics 4 setup
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                    Email service configuration
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                    Discount codes (Active)
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                    Google Merchant Center
+                  </li>
+                </ul>
+              </div>
+
+              {/* Phase 2 */}
+              <div className="border-l-4 border-blue-500 pl-4">
+                <h3 className="font-medium text-gray-900 dark:text-white">Phase 2: Growth</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Expand reach and automation</p>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-gray-400"></span>
+                    Facebook Catalog integration
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-gray-400"></span>
+                    Email automation flows
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-gray-400"></span>
+                    Product search (Algolia)
+                  </li>
+                </ul>
+              </div>
+
+              {/* Phase 3 */}
+              <div className="border-l-4 border-purple-500 pl-4">
+                <h3 className="font-medium text-gray-900 dark:text-white">Phase 3: Expansion</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Scale to new channels</p>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-gray-400"></span>
+                    Takealot marketplace
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-gray-400"></span>
+                    Advanced analytics
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-gray-400"></span>
+                    Referral program
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Analytics Preview */}
+          <div className="bg-white dark:bg-secondary-800 rounded-lg border border-gray-200 dark:border-secondary-700 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Analytics Dashboard Preview</h2>
             <p className="text-gray-500 dark:text-gray-400">
-              Marketing analytics dashboard will display:
+              Once integrations are configured, this dashboard will display:
             </p>
             <ul className="mt-4 space-y-2 text-gray-600 dark:text-gray-300">
               <li className="flex items-center gap-2">
@@ -629,25 +778,25 @@ export default function MarketingPage() {
                 <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Campaign performance comparison
+                Campaign ROI by channel
               </li>
               <li className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Customer lifetime value analysis
+                Customer lifetime value
               </li>
               <li className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                ROI by marketing channel
+                Product performance metrics
               </li>
             </ul>
 
             <div className="mt-6 p-4 bg-gray-50 dark:bg-secondary-700 rounded-lg">
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                <strong>To enable:</strong> Configure Google Analytics integration in Site Settings.
+                <strong>Next Step:</strong> Configure Google Analytics in Settings to enable real-time analytics.
               </p>
             </div>
           </div>

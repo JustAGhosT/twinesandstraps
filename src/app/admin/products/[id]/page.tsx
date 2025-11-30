@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import AIAssistantPanel from '@/components/AIAssistantPanel';
 import UseAIButton from '@/components/UseAIButton';
+import { STOCK_STATUS, STOCK_STATUS_LABELS } from '@/constants';
 
 interface Category {
   id: number;
@@ -48,7 +49,7 @@ export default function ProductEditPage() {
     strength_rating: '',
     price: '',
     vat_applicable: true,
-    stock_status: 'IN_STOCK',
+    stock_status: STOCK_STATUS.IN_STOCK,
     image_url: '',
     category_id: '',
   });
@@ -80,7 +81,7 @@ export default function ProductEditPage() {
           strength_rating: product.strength_rating || '',
           price: product.price?.toString() || '',
           vat_applicable: product.vat_applicable ?? true,
-          stock_status: product.stock_status || 'IN_STOCK',
+          stock_status: product.stock_status || STOCK_STATUS.IN_STOCK,
           image_url: product.image_url || '',
           category_id: product.category_id?.toString() || '',
         });
@@ -444,9 +445,9 @@ export default function ProductEditPage() {
                     required
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white"
                   >
-                    <option value="IN_STOCK">In Stock</option>
-                    <option value="LOW_STOCK">Low Stock</option>
-                    <option value="OUT_OF_STOCK">Out of Stock</option>
+                    <option value={STOCK_STATUS.IN_STOCK}>{STOCK_STATUS_LABELS[STOCK_STATUS.IN_STOCK]}</option>
+                    <option value={STOCK_STATUS.LOW_STOCK}>{STOCK_STATUS_LABELS[STOCK_STATUS.LOW_STOCK]}</option>
+                    <option value={STOCK_STATUS.OUT_OF_STOCK}>{STOCK_STATUS_LABELS[STOCK_STATUS.OUT_OF_STOCK]}</option>
                   </select>
                 </div>
               </div>

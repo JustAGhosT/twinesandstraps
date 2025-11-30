@@ -8,6 +8,7 @@ import ViewHistoryTracker from '@/components/ViewHistoryTracker';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import Link from 'next/link';
 import { featureFlags } from '@/config/featureFlags';
+import { STOCK_STATUS } from '@/constants';
 
 // Force dynamic rendering - data is fetched at request time
 export const dynamic = 'force-dynamic';
@@ -97,7 +98,7 @@ async function getRelatedProducts(productId: number, categoryId: number) {
         not: productId
       },
       stock_status: {
-        not: 'OUT_OF_STOCK'
+        not: STOCK_STATUS.OUT_OF_STOCK
       }
     },
     include: {
@@ -153,9 +154,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       url: `${siteUrl}/products/${product.id}`,
       priceCurrency: 'ZAR',
       price: product.price,
-      availability: product.stock_status === 'OUT_OF_STOCK'
+      availability: product.stock_status === STOCK_STATUS.OUT_OF_STOCK
         ? 'https://schema.org/OutOfStock'
-        : product.stock_status === 'LOW_STOCK'
+        : product.stock_status === STOCK_STATUS.LOW_STOCK
         ? 'https://schema.org/LimitedAvailability'
         : 'https://schema.org/InStock',
       seller: {

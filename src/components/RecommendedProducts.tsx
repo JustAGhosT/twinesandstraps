@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Product } from '@/types/database';
 import { useCart } from '@/contexts/CartContext';
+import { STOCK_STATUS, STOCK_STATUS_LABELS } from '@/constants';
 
 interface RecommendedProductsProps {
   title?: string;
@@ -93,17 +94,17 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
               <p className="text-sm font-bold text-primary-600 mt-1">R{product.price.toFixed(2)}</p>
               <button
                 onClick={() => handleAddToCart(product)}
-                disabled={product.stock_status === 'OUT_OF_STOCK'}
+                disabled={product.stock_status === STOCK_STATUS.OUT_OF_STOCK}
                 className={`w-full mt-2 py-1.5 px-3 rounded text-xs font-medium transition-all ${
-                  product.stock_status === 'OUT_OF_STOCK'
+                  product.stock_status === STOCK_STATUS.OUT_OF_STOCK
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : addedId === product.id
                     ? 'bg-green-500 text-white'
                     : 'bg-primary-600 text-white hover:bg-primary-700'
                 }`}
               >
-                {product.stock_status === 'OUT_OF_STOCK'
-                  ? 'Out of Stock'
+                {product.stock_status === STOCK_STATUS.OUT_OF_STOCK
+                  ? STOCK_STATUS_LABELS[STOCK_STATUS.OUT_OF_STOCK]
                   : addedId === product.id
                   ? 'Added!'
                   : 'Add to Cart'}
