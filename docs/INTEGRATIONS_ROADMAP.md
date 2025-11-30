@@ -485,9 +485,9 @@ Most integrations require webhook handling:
 // src/app/api/webhooks/[provider]/route.ts
 export async function POST(
   request: NextRequest,
-  { params }: { params: { provider: string } }
+  { params }: { params: Promise<{ provider: string }> }
 ) {
-  const { provider } = params;
+  const { provider } = await params;
 
   switch (provider) {
     case 'payfast':
