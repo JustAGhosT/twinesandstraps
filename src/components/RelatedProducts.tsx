@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Product, ProductWithCategory } from '@/types/database';
 import { useCart } from '@/contexts/CartContext';
+import { STOCK_STATUS, STOCK_STATUS_LABELS } from '@/constants';
 
 interface RelatedProductsProps {
   products: ProductWithCategory[];
@@ -51,9 +52,9 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
                   No Image
                 </div>
               )}
-              {product.stock_status === 'LOW_STOCK' && (
+              {product.stock_status === STOCK_STATUS.LOW_STOCK && (
                 <span className="absolute top-2 left-2 px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700 rounded">
-                  Low Stock
+                  {STOCK_STATUS_LABELS[STOCK_STATUS.LOW_STOCK]}
                 </span>
               )}
             </div>
@@ -68,16 +69,16 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
                 <span className="text-sm font-bold text-primary-600">R{product.price.toFixed(2)}</span>
                 <button
                   onClick={(e) => handleAddToCart(e, product)}
-                  disabled={product.stock_status === 'OUT_OF_STOCK'}
+                  disabled={product.stock_status === STOCK_STATUS.OUT_OF_STOCK}
                   className={`px-2 py-1 rounded text-xs font-medium transition-all ${
-                    product.stock_status === 'OUT_OF_STOCK'
+                    product.stock_status === STOCK_STATUS.OUT_OF_STOCK
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       : addedId === product.id
                       ? 'bg-green-500 text-white'
                       : 'bg-primary-600 text-white hover:bg-primary-700'
                   }`}
                 >
-                  {product.stock_status === 'OUT_OF_STOCK'
+                  {product.stock_status === STOCK_STATUS.OUT_OF_STOCK
                     ? 'Out'
                     : addedId === product.id
                     ? '✓'

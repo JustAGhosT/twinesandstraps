@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useCompare } from '@/contexts/CompareContext';
 import { useCart } from '@/contexts/CartContext';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { STOCK_STATUS, STOCK_STATUS_LABELS } from '@/constants';
 
 export default function ComparePage() {
   const router = useRouter();
@@ -63,9 +64,9 @@ export default function ComparePage() {
     { key: 'weight', label: 'Weight', format: (v: number | null) => v ? `${v}kg` : '-' },
     { key: 'stock_status', label: 'Availability', format: (v: string) => {
       switch (v) {
-        case 'IN_STOCK': return 'In Stock';
-        case 'LOW_STOCK': return 'Low Stock';
-        case 'OUT_OF_STOCK': return 'Out of Stock';
+        case STOCK_STATUS.IN_STOCK: return STOCK_STATUS_LABELS[STOCK_STATUS.IN_STOCK];
+        case STOCK_STATUS.LOW_STOCK: return STOCK_STATUS_LABELS[STOCK_STATUS.LOW_STOCK];
+        case STOCK_STATUS.OUT_OF_STOCK: return STOCK_STATUS_LABELS[STOCK_STATUS.OUT_OF_STOCK];
         default: return v || '-';
       }
     }},
@@ -149,7 +150,7 @@ export default function ComparePage() {
                   <td key={product.id} className="p-4 text-center">
                     <button
                       onClick={() => addToCart(product, 1)}
-                      disabled={product.stock_status === 'OUT_OF_STOCK'}
+                      disabled={product.stock_status === STOCK_STATUS.OUT_OF_STOCK}
                       className="px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                     >
                       Add to Cart

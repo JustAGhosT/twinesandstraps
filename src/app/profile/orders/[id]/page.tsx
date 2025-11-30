@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useUserAuth } from '@/contexts/UserAuthContext';
+import { ORDER_STATUS, PAYMENT_STATUS, ORDER_STATUS_LABELS } from '@/constants';
 
 interface OrderItem {
   id: number;
@@ -57,7 +58,13 @@ interface Order {
   status_history: StatusHistory[];
 }
 
-const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
+const ORDER_STATUSES = [
+  ORDER_STATUS.PENDING,
+  ORDER_STATUS.CONFIRMED,
+  ORDER_STATUS.PROCESSING,
+  ORDER_STATUS.SHIPPED,
+  ORDER_STATUS.DELIVERED,
+];
 
 export default function OrderDetailPage() {
   const router = useRouter();
@@ -97,29 +104,29 @@ export default function OrderDetailPage() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      PENDING: 'bg-yellow-500',
-      CONFIRMED: 'bg-blue-500',
-      PROCESSING: 'bg-purple-500',
-      SHIPPED: 'bg-indigo-500',
-      DELIVERED: 'bg-green-500',
-      CANCELLED: 'bg-red-500',
+      [ORDER_STATUS.PENDING]: 'bg-yellow-500',
+      [ORDER_STATUS.CONFIRMED]: 'bg-blue-500',
+      [ORDER_STATUS.PROCESSING]: 'bg-purple-500',
+      [ORDER_STATUS.SHIPPED]: 'bg-indigo-500',
+      [ORDER_STATUS.DELIVERED]: 'bg-green-500',
+      [ORDER_STATUS.CANCELLED]: 'bg-red-500',
     };
     return colors[status] || 'bg-gray-500';
   };
 
   const getPaymentStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      PENDING: 'text-yellow-600 bg-yellow-50',
-      PAID: 'text-green-600 bg-green-50',
-      FAILED: 'text-red-600 bg-red-50',
-      REFUNDED: 'text-blue-600 bg-blue-50',
+      [PAYMENT_STATUS.PENDING]: 'text-yellow-600 bg-yellow-50',
+      [PAYMENT_STATUS.PAID]: 'text-green-600 bg-green-50',
+      [PAYMENT_STATUS.FAILED]: 'text-red-600 bg-red-50',
+      [PAYMENT_STATUS.REFUNDED]: 'text-blue-600 bg-blue-50',
     };
     return colors[status] || 'text-gray-600 bg-gray-50';
   };
 
   const getCurrentStepIndex = () => {
-    if (order?.status === 'CANCELLED') return -1;
-    return ORDER_STATUSES.indexOf(order?.status || 'PENDING');
+    if (order?.status === ORDER_STATUS.CANCELLED) return -1;
+    return ORDER_STATUSES.indexOf(order?.status || ORDER_STATUS.PENDING);
   };
 
   if (authLoading || loading) {
@@ -174,7 +181,7 @@ export default function OrderDetailPage() {
       </div>
 
       {/* Order Status Tracker */}
-      {order.status !== 'CANCELLED' && (
+      {order.status !== ORDER_STATUS.CANCELLED && (
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <h2 className="text-lg font-semibold text-secondary-900 mb-6">Order Status</h2>
           <div className="relative">
@@ -231,7 +238,7 @@ export default function OrderDetailPage() {
       )}
 
       {/* Cancelled Order Notice */}
-      {order.status === 'CANCELLED' && (
+      {order.status === ORDER_STATUS.CANCELLED && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-3 text-red-700">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { ORDER_STATUS, PAYMENT_STATUS, ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from '@/constants';
 
 interface Order {
   id: number;
@@ -29,12 +30,7 @@ interface Pagination {
 
 const ORDER_STATUSES = [
   { value: 'all', label: 'All Orders' },
-  { value: 'PENDING', label: 'Pending' },
-  { value: 'CONFIRMED', label: 'Confirmed' },
-  { value: 'PROCESSING', label: 'Processing' },
-  { value: 'SHIPPED', label: 'Shipped' },
-  { value: 'DELIVERED', label: 'Delivered' },
-  { value: 'CANCELLED', label: 'Cancelled' },
+  ...Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => ({ value, label })),
 ];
 
 export default function AdminOrdersPage() {
@@ -83,22 +79,22 @@ export default function AdminOrdersPage() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      PENDING: 'bg-yellow-100 text-yellow-800',
-      CONFIRMED: 'bg-blue-100 text-blue-800',
-      PROCESSING: 'bg-purple-100 text-purple-800',
-      SHIPPED: 'bg-indigo-100 text-indigo-800',
-      DELIVERED: 'bg-green-100 text-green-800',
-      CANCELLED: 'bg-red-100 text-red-800',
+      [ORDER_STATUS.PENDING]: 'bg-yellow-100 text-yellow-800',
+      [ORDER_STATUS.CONFIRMED]: 'bg-blue-100 text-blue-800',
+      [ORDER_STATUS.PROCESSING]: 'bg-purple-100 text-purple-800',
+      [ORDER_STATUS.SHIPPED]: 'bg-indigo-100 text-indigo-800',
+      [ORDER_STATUS.DELIVERED]: 'bg-green-100 text-green-800',
+      [ORDER_STATUS.CANCELLED]: 'bg-red-100 text-red-800',
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
   const getPaymentStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      PENDING: 'bg-yellow-100 text-yellow-800',
-      PAID: 'bg-green-100 text-green-800',
-      FAILED: 'bg-red-100 text-red-800',
-      REFUNDED: 'bg-blue-100 text-blue-800',
+      [PAYMENT_STATUS.PENDING]: 'bg-yellow-100 text-yellow-800',
+      [PAYMENT_STATUS.PAID]: 'bg-green-100 text-green-800',
+      [PAYMENT_STATUS.FAILED]: 'bg-red-100 text-red-800',
+      [PAYMENT_STATUS.REFUNDED]: 'bg-blue-100 text-blue-800',
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
   };

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ORDER_STATUS, PAYMENT_STATUS, ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from '@/constants';
 
 interface OrderItem {
   id: number;
@@ -62,8 +63,8 @@ interface Order {
   status_history: StatusHistory[];
 }
 
-const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
-const PAYMENT_STATUSES = ['PENDING', 'PAID', 'FAILED', 'REFUNDED'];
+const ORDER_STATUSES = Object.values(ORDER_STATUS);
+const PAYMENT_STATUSES = Object.values(PAYMENT_STATUS);
 
 export default function AdminOrderDetailPage() {
   const params = useParams();
@@ -135,22 +136,22 @@ export default function AdminOrderDetailPage() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      PENDING: 'bg-yellow-500',
-      CONFIRMED: 'bg-blue-500',
-      PROCESSING: 'bg-purple-500',
-      SHIPPED: 'bg-indigo-500',
-      DELIVERED: 'bg-green-500',
-      CANCELLED: 'bg-red-500',
+      [ORDER_STATUS.PENDING]: 'bg-yellow-500',
+      [ORDER_STATUS.CONFIRMED]: 'bg-blue-500',
+      [ORDER_STATUS.PROCESSING]: 'bg-purple-500',
+      [ORDER_STATUS.SHIPPED]: 'bg-indigo-500',
+      [ORDER_STATUS.DELIVERED]: 'bg-green-500',
+      [ORDER_STATUS.CANCELLED]: 'bg-red-500',
     };
     return colors[status] || 'bg-gray-500';
   };
 
   const getPaymentStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      PENDING: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-      PAID: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      FAILED: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      REFUNDED: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      [PAYMENT_STATUS.PENDING]: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      [PAYMENT_STATUS.PAID]: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      [PAYMENT_STATUS.FAILED]: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      [PAYMENT_STATUS.REFUNDED]: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
     };
     return colors[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   };

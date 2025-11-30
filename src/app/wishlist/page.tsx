@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useCart } from '@/contexts/CartContext';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { STOCK_STATUS, STOCK_STATUS_LABELS } from '@/constants';
 
 export default function WishlistPage() {
   const router = useRouter();
@@ -106,11 +107,11 @@ export default function WishlistPage() {
                     R{product.price.toFixed(2)}
                   </p>
                   <p className={`text-sm mt-1 ${
-                    product.stock_status === 'OUT_OF_STOCK' ? 'text-red-600 dark:text-red-400' :
-                    product.stock_status === 'LOW_STOCK' ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'
+                    product.stock_status === STOCK_STATUS.OUT_OF_STOCK ? 'text-red-600 dark:text-red-400' :
+                    product.stock_status === STOCK_STATUS.LOW_STOCK ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'
                   }`}>
-                    {product.stock_status === 'OUT_OF_STOCK' ? 'Out of Stock' :
-                     product.stock_status === 'LOW_STOCK' ? 'Low Stock' : 'In Stock'}
+                    {product.stock_status === STOCK_STATUS.OUT_OF_STOCK ? STOCK_STATUS_LABELS[STOCK_STATUS.OUT_OF_STOCK] :
+                     product.stock_status === STOCK_STATUS.LOW_STOCK ? STOCK_STATUS_LABELS[STOCK_STATUS.LOW_STOCK] : STOCK_STATUS_LABELS[STOCK_STATUS.IN_STOCK]}
                   </p>
                 </div>
 
@@ -118,7 +119,7 @@ export default function WishlistPage() {
                 <div className="flex md:flex-col gap-2 shrink-0">
                   <button
                     onClick={() => handleMoveToCart(product)}
-                    disabled={product.stock_status === 'OUT_OF_STOCK'}
+                    disabled={product.stock_status === STOCK_STATUS.OUT_OF_STOCK}
                     className="flex-1 md:flex-none px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     Move to Cart
