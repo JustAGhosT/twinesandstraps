@@ -63,7 +63,7 @@ const TrustBadges: React.FC = () => {
     <section className="py-12 bg-white dark:bg-secondary-900 border-y border-gray-100 dark:border-secondary-700">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-secondary-900">Why Trust TASSA</h2>
+          <h2 className="text-2xl font-bold text-secondary-900 dark:text-white">Why Trust TASSA</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {badges.map((badge, index) => (
@@ -72,8 +72,8 @@ const TrustBadges: React.FC = () => {
               className="flex flex-col items-center text-center p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-secondary-800 transition-colors"
             >
               <div className="text-primary-600 mb-3">{badge.icon}</div>
-              <h3 className="font-semibold text-secondary-900 text-sm mb-1">{badge.title}</h3>
-              <p className="text-xs text-accent-500">{badge.description}</p>
+              <h3 className="font-semibold text-secondary-900 dark:text-white text-sm mb-1">{badge.title}</h3>
+              <p className="text-xs text-accent-500 dark:text-gray-300">{badge.description}</p>
             </div>
           ))}
         </div>
