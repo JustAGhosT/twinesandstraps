@@ -126,7 +126,8 @@ export default function OrderDetailPage() {
 
   const getCurrentStepIndex = () => {
     if (order?.status === ORDER_STATUS.CANCELLED) return -1;
-    return ORDER_STATUSES.indexOf(order?.status || ORDER_STATUS.PENDING);
+    const status = (order?.status || ORDER_STATUS.PENDING) as (typeof ORDER_STATUSES)[number];
+    return ORDER_STATUSES.indexOf(status);
   };
 
   if (authLoading || loading) {
