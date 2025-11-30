@@ -48,20 +48,20 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="bg-gray-50 min-h-screen py-8">
+      <div className="bg-gray-50 dark:bg-secondary-900 min-h-screen py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
-          <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center mb-8">
-            <svg className="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <h1 className="text-3xl font-bold mb-8 text-secondary-900 dark:text-white">Your Cart</h1>
+          <div className="bg-white dark:bg-secondary-800 rounded-lg shadow-sm p-8 md:p-12 text-center mb-8">
+            <svg className="w-20 h-20 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <h2 className="text-2xl font-semibold mb-2 text-gray-900">Your cart is empty</h2>
-            <p className="text-gray-600 mb-6">Add some products to get started with your quote</p>
+            <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">Your cart is empty</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">Add some products to get started with your quote</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/products" className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors">
                 Browse Products
               </Link>
-              <Link href="/quote" className="inline-block border-2 border-primary-600 text-primary-600 px-6 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-colors">
+              <Link href="/quote" className="inline-block border-2 border-primary-600 text-primary-600 dark:text-primary-400 px-6 py-3 rounded-lg font-semibold hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors">
                 Request Custom Quote
               </Link>
             </div>
@@ -69,7 +69,7 @@ export default function CartPage() {
 
           {/* Recommended Products */}
           {showRecommendedProducts && (
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white dark:bg-secondary-800 rounded-lg shadow-sm p-6">
               <RecommendedProducts title="You might be interested in" maxProducts={4} />
             </div>
           )}
@@ -79,18 +79,18 @@ export default function CartPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen py-8">
+    <div className="bg-gray-50 dark:bg-secondary-900 min-h-screen py-8">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold mb-8">Your Cart</h1>
-        
+        <h1 className="text-3xl font-bold mb-8 text-secondary-900 dark:text-white">Your Cart</h1>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm">
+            <div className="bg-white dark:bg-secondary-800 rounded-lg shadow-sm">
               {items.map((item) => (
-                <div key={item.product.id} className="p-6 border-b last:border-b-0">
+                <div key={item.product.id} className="p-6 border-b dark:border-secondary-700 last:border-b-0">
                   <div className="flex gap-4">
-                    <div className="w-24 h-24 bg-gray-100 rounded flex-shrink-0 relative overflow-hidden">
+                    <div className="w-24 h-24 bg-gray-100 dark:bg-secondary-700 rounded flex-shrink-0 relative overflow-hidden">
                       {item.product.image_url ? (
                         <Image
                           src={item.product.image_url}
@@ -100,20 +100,20 @@ export default function CartPage() {
                           sizes="96px"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
                           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="flex-grow">
-                      <Link href={`/products/${item.product.id}`} className="text-lg font-semibold hover:text-primary-600">
+                      <Link href={`/products/${item.product.id}`} className="text-lg font-semibold text-secondary-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
                         {item.product.name}
                       </Link>
-                      <p className="text-sm text-gray-600 mt-1">SKU: {item.product.sku}</p>
-                      <p className="text-lg font-bold text-gray-900 mt-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">SKU: {item.product.sku}</p>
+                      <p className="text-lg font-bold text-gray-900 dark:text-white mt-2">
                         ZAR {item.product.price.toFixed(2)}
                       </p>
                     </div>
@@ -121,15 +121,15 @@ export default function CartPage() {
                     <div className="flex flex-col items-end gap-4">
                       <button
                         onClick={() => removeFromCart(item.product.id)}
-                        className="text-red-600 hover:text-red-700 text-sm font-semibold"
+                        className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm font-semibold"
                       >
                         Remove
                       </button>
-                      
-                      <div className="flex items-center border rounded">
+
+                      <div className="flex items-center border dark:border-secondary-600 rounded">
                         <button
                           onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                          className="px-3 py-1 hover:bg-gray-100"
+                          className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-secondary-700 text-secondary-900 dark:text-white"
                         >
                           -
                         </button>
@@ -142,18 +142,18 @@ export default function CartPage() {
                               updateQuantity(item.product.id, value);
                             }
                           }}
-                          className="w-16 text-center border-x py-1"
+                          className="w-16 text-center border-x dark:border-secondary-600 py-1 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white"
                           min="1"
                         />
                         <button
                           onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                          className="px-3 py-1 hover:bg-gray-100"
+                          className="px-3 py-1 hover:bg-gray-100 dark:hover:bg-secondary-700 text-secondary-900 dark:text-white"
                         >
                           +
                         </button>
                       </div>
 
-                      <p className="text-lg font-semibold">
+                      <p className="text-lg font-semibold text-secondary-900 dark:text-white">
                         ZAR {(item.product.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
@@ -165,8 +165,8 @@ export default function CartPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
-              <h2 className="text-xl font-bold mb-4">Order Summary</h2>
+            <div className="bg-white dark:bg-secondary-800 rounded-lg shadow-sm p-6 sticky top-8">
+              <h2 className="text-xl font-bold mb-4 text-secondary-900 dark:text-white">Order Summary</h2>
 
               {(() => {
                 const subtotal = getTotalPrice();
@@ -178,27 +178,27 @@ export default function CartPage() {
                 return (
                   <>
                     <div className="space-y-3 mb-4">
-                      <div className="flex justify-between text-gray-600">
+                      <div className="flex justify-between text-gray-600 dark:text-gray-400">
                         <span>Items ({itemCount})</span>
                         <span>R {subtotal.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between text-gray-600">
+                      <div className="flex justify-between text-gray-600 dark:text-gray-400">
                         <span>Subtotal (excl. VAT)</span>
                         <span>R {subtotal.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between text-gray-600">
+                      <div className="flex justify-between text-gray-600 dark:text-gray-400">
                         <span>VAT (15%)</span>
                         <span>R {vatAmount.toFixed(2)}</span>
                       </div>
                     </div>
 
-                    <div className="border-t pt-4 mb-2">
-                      <div className="flex justify-between text-lg font-bold">
+                    <div className="border-t dark:border-secondary-700 pt-4 mb-2">
+                      <div className="flex justify-between text-lg font-bold text-secondary-900 dark:text-white">
                         <span>Total (incl. VAT)</span>
                         <span>R {total.toFixed(2)}</span>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-500 mb-6">* Final quote may vary based on quantity and delivery</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-6">* Final quote may vary based on quantity and delivery</p>
                   </>
                 );
               })()}
@@ -215,14 +215,14 @@ export default function CartPage() {
 
               <Link
                 href="/products"
-                className="block w-full text-center py-3 px-6 rounded-lg font-semibold border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                className="block w-full text-center py-3 px-6 rounded-lg font-semibold border-2 border-gray-300 dark:border-secondary-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-secondary-700 transition-colors"
               >
                 Continue Shopping
               </Link>
 
               <button
                 onClick={clearCart}
-                className="w-full mt-4 text-sm text-red-600 hover:text-red-700 font-semibold"
+                className="w-full mt-4 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-semibold"
               >
                 Clear Cart
               </button>

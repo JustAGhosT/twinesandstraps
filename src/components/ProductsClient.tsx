@@ -143,7 +143,7 @@ export default function ProductsClient({ products, categories }: ProductsClientP
   }, [products]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-secondary-900">
       {/* Hero Banner */}
       <div className="bg-primary-600 text-white py-8">
         <div className="container mx-auto px-4">
@@ -167,24 +167,24 @@ export default function ProductsClient({ products, categories }: ProductsClientP
       <div className="container mx-auto px-4 py-6">
         {/* Breadcrumbs */}
         <nav className="mb-6 text-sm">
-          <ol className="flex items-center space-x-2 text-gray-500">
-            <li><Link href="/" className="hover:text-primary-600 transition-colors">Home</Link></li>
-            <li className="text-gray-400">/</li>
-            <li className="text-gray-900 font-medium">Products</li>
+          <ol className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
+            <li><Link href="/" className="hover:text-primary-600 dark:hover:text-primary-500 transition-colors">Home</Link></li>
+            <li className="text-gray-400 dark:text-gray-500">/</li>
+            <li className="text-gray-900 dark:text-white font-medium">Products</li>
           </ol>
         </nav>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
           <aside className="lg:w-56 flex-shrink-0">
-            <div className="sticky top-20 bg-white rounded-lg p-4 shadow-sm">
+            <div className="sticky top-20 bg-white dark:bg-secondary-800 rounded-lg p-4 shadow-sm">
               {/* Categories */}
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
                   </svg>
-                  <h3 className="text-sm font-semibold text-gray-900">Categories</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Categories</h3>
                 </div>
                 <ul className="space-y-1">
                   <li>
@@ -192,15 +192,15 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                       href="/products"
                       className={`flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                         !categoryFilter && !searchQuery
-                          ? 'text-primary-600 bg-primary-50'
-                          : 'text-gray-600 hover:bg-gray-50'
+                          ? 'text-primary-600 dark:text-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-secondary-700'
                       }`}
                     >
                       <span className="flex items-center gap-2">
-                        <span className={`w-1.5 h-1.5 rounded-full ${!categoryFilter && !searchQuery ? 'bg-primary-500' : 'bg-gray-400'}`}></span>
+                        <span className={`w-1.5 h-1.5 rounded-full ${!categoryFilter && !searchQuery ? 'bg-primary-500' : 'bg-gray-400 dark:bg-gray-500'}`}></span>
                         All Products
                       </span>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${!categoryFilter && !searchQuery ? 'bg-primary-100 text-primary-700' : 'text-gray-400'}`}>{products.length}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${!categoryFilter && !searchQuery ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400' : 'text-gray-400 dark:text-gray-500'}`}>{products.length}</span>
                     </Link>
                   </li>
                   {categories.map((category) => (
@@ -209,15 +209,15 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                         href={`/products?category=${category.slug}`}
                         className={`flex items-center justify-between px-3 py-2 rounded-md text-sm transition-colors ${
                           categoryFilter === category.slug
-                            ? 'text-primary-600 bg-primary-50 font-medium'
-                            : 'text-gray-600 hover:bg-gray-50'
+                            ? 'text-primary-600 dark:text-primary-500 bg-primary-50 dark:bg-primary-900/20 font-medium'
+                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-secondary-700'
                         }`}
                       >
                         <span className="flex items-center gap-2">
-                          <span className={`w-1.5 h-1.5 rounded-full ${categoryFilter === category.slug ? 'bg-primary-500' : 'bg-gray-400'}`}></span>
+                          <span className={`w-1.5 h-1.5 rounded-full ${categoryFilter === category.slug ? 'bg-primary-500' : 'bg-gray-400 dark:bg-gray-500'}`}></span>
                           {category.name}
                         </span>
-                        <span className={`text-xs ${categoryFilter === category.slug ? 'bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full' : 'text-gray-400'}`}>{categoryProductCounts[category.slug] || 0}</span>
+                        <span className={`text-xs ${categoryFilter === category.slug ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 px-2 py-0.5 rounded-full' : 'text-gray-400 dark:text-gray-500'}`}>{categoryProductCounts[category.slug] || 0}</span>
                       </Link>
                     </li>
                   ))}
@@ -225,12 +225,12 @@ export default function ProductsClient({ products, categories }: ProductsClientP
               </div>
 
               {/* Divider */}
-              <hr className="my-4 border-gray-200" />
+              <hr className="my-4 border-gray-200 dark:border-secondary-700" />
 
               {/* Filters Toggle (Mobile) */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden w-full flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 mb-4"
+                className="lg:hidden w-full flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-secondary-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 mb-4"
               >
                 <span className="flex items-center gap-2">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -250,7 +250,7 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                 {hasActiveFilters && (
                   <button
                     onClick={clearAllFilters}
-                    className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
+                    className="text-xs text-primary-600 dark:text-primary-500 hover:text-primary-700 dark:hover:text-primary-400 font-medium flex items-center gap-1"
                   >
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -262,11 +262,11 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                 {/* Material Filter */}
                 {uniqueMaterials.length > 0 && (
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">Material</h4>
+                    <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">Material</h4>
                     <select
                       value={materialFilter}
                       onChange={(e) => setMaterialFilter(e.target.value)}
-                      className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     >
                       <option value="">All Materials</option>
                       {uniqueMaterials.map(material => (
@@ -278,7 +278,7 @@ export default function ProductsClient({ products, categories }: ProductsClientP
 
                 {/* Price Range Filter */}
                 <div>
-                  <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">Price Range (R)</h4>
+                  <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">Price Range (R)</h4>
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
@@ -286,7 +286,7 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                       onChange={(e) => setPriceRange({ ...priceRange, min: Number(e.target.value) })}
                       min={priceStats.min}
                       max={priceRange.max}
-                      className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                       placeholder="Min"
                     />
                     <span className="text-gray-400">-</span>
@@ -296,7 +296,7 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                       onChange={(e) => setPriceRange({ ...priceRange, max: Number(e.target.value) })}
                       min={priceRange.min}
                       max={priceStats.max}
-                      className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                       placeholder="Max"
                     />
                   </div>
@@ -305,7 +305,7 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                 {/* Diameter Range Filter */}
                 {diameterStats.max > 0 && (
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-2">Diameter (mm)</h4>
+                    <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide mb-2">Diameter (mm)</h4>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -313,7 +313,7 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                         onChange={(e) => setDiameterRange({ ...diameterRange, min: Number(e.target.value) })}
                         min={diameterStats.min}
                         max={diameterRange.max}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                         placeholder="Min"
                       />
                       <span className="text-gray-400">-</span>
@@ -323,7 +323,7 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                         onChange={(e) => setDiameterRange({ ...diameterRange, max: Number(e.target.value) })}
                         min={diameterRange.min}
                         max={diameterStats.max}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-2 py-1.5 text-sm border border-gray-200 dark:border-secondary-600 bg-white dark:bg-secondary-700 text-gray-900 dark:text-white rounded focus:ring-2 focus:ring-primary-500"
                         placeholder="Max"
                       />
                     </div>
@@ -332,12 +332,12 @@ export default function ProductsClient({ products, categories }: ProductsClientP
               </div>
 
               {/* Divider */}
-              <hr className="my-4 border-gray-200" />
+              <hr className="my-4 border-gray-200 dark:border-secondary-700" />
 
               {/* Need Help Section */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">Need Help?</h3>
-                <p className="text-xs text-gray-500 mb-3">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Need Help?</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                   Can&apos;t find what you&apos;re looking for? Request a custom quote.
                 </p>
                 <Link
@@ -354,18 +354,18 @@ export default function ProductsClient({ products, categories }: ProductsClientP
           <div className="flex-1">
             {/* Header with count and sort */}
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-gray-600">
-                <span className="font-semibold text-gray-900">{sortedProducts.length}</span> products available
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="font-semibold text-gray-900 dark:text-white">{sortedProducts.length}</span> products available
               </p>
-              
+
               {/* Sort Dropdown */}
               <div className="flex items-center gap-2">
-                <label htmlFor="sort" className="text-sm text-gray-500">Sort by:</label>
+                <label htmlFor="sort" className="text-sm text-gray-500 dark:text-gray-400">Sort by:</label>
                 <select
                   id="sort"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="px-3 py-1.5 border border-gray-200 rounded-md bg-white text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="px-3 py-1.5 border border-gray-200 dark:border-secondary-600 rounded-md bg-white dark:bg-secondary-800 text-gray-700 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="newest">Newest First</option>
                   <option value="price-low">Price: Low to High</option>
@@ -375,11 +375,11 @@ export default function ProductsClient({ products, categories }: ProductsClientP
                 </select>
               </div>
             </div>
-            
+
             {sortedProducts.length === 0 ? (
-              <div className="bg-white rounded-lg p-12 text-center shadow-sm">
-                <p className="text-gray-500 mb-4">No products found.</p>
-                <Link href="/" className="text-primary-600 hover:text-primary-700 font-medium">
+              <div className="bg-white dark:bg-secondary-800 rounded-lg p-12 text-center shadow-sm">
+                <p className="text-gray-500 dark:text-gray-400 mb-4">No products found.</p>
+                <Link href="/" className="text-primary-600 dark:text-primary-500 hover:text-primary-700 dark:hover:text-primary-400 font-medium">
                   Return to Home
                 </Link>
               </div>

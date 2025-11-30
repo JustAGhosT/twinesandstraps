@@ -10,9 +10,36 @@ interface DashboardStats {
   outOfStockProducts: number;
 }
 
+interface SetupTask {
+  id: number;
+  task_key: string;
+  title: string;
+  description: string;
+  category: string;
+  priority: number;
+  is_required: boolean;
+  completed: boolean;
+  completed_at: string | null;
+  link_url: string | null;
+  link_text: string | null;
+}
+
+interface SetupTasksData {
+  tasks: SetupTask[];
+  stats: {
+    total: number;
+    completed: number;
+    pending: number;
+    requiredPending: number;
+    completionPercentage: number;
+  };
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [setupTasks, setSetupTasks] = useState<SetupTasksData | null>(null);
+  const [setupLoading, setSetupLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/admin/stats')
@@ -20,7 +47,30 @@ export default function AdminDashboard() {
       .then(setStats)
       .catch(() => setStats({ totalProducts: 0, totalCategories: 0, lowStockProducts: 0, outOfStockProducts: 0 }))
       .finally(() => setLoading(false));
+
+    fetch('/api/admin/setup-tasks')
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(setSetupTasks)
+      .catch(() => setSetupTasks(null))
+      .finally(() => setSetupLoading(false));
   }, []);
+
+  const toggleTask = async (taskKey: string, currentCompleted: boolean) => {
+    try {
+      const res = await fetch('/api/admin/setup-tasks', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task_key: taskKey, completed: !currentCompleted }),
+      });
+      if (res.ok) {
+        // Refresh the tasks
+        const data = await fetch('/api/admin/setup-tasks').then(r => r.json());
+        setSetupTasks(data);
+      }
+    } catch (error) {
+      console.error('Failed to toggle task:', error);
+    }
+  };
 
   const quickActions = [
     { href: '/admin/products/new', label: 'Add New Product', icon: 'M12 6v6m0 0v6m0-6h6m-6 0H6', color: 'bg-green-500' },
@@ -124,35 +174,132 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Recent Activity Placeholder */}
+      {/* Setup Checklist */}
       <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
-        <h2 className="text-xl font-bold text-secondary-900 dark:text-white mb-4">Getting Started</h2>
-        <div className="space-y-3 text-gray-600 dark:text-gray-300">
-          <p className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            Manage your products and inventory
-          </p>
-          <p className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            Update site settings and contact information
-          </p>
-          <p className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            Toggle features on/off with feature flags
-          </p>
-          <p className="flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            Customize your brand colors and theme
-          </p>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-bold text-secondary-900 dark:text-white">Store Setup Checklist</h2>
+            {setupTasks && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {setupTasks.stats.completed} of {setupTasks.stats.total} tasks completed
+              </p>
+            )}
+          </div>
+          {setupTasks && setupTasks.stats.requiredPending > 0 && (
+            <span className="px-3 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full text-sm font-medium">
+              {setupTasks.stats.requiredPending} required
+            </span>
+          )}
         </div>
+
+        {/* Progress Bar */}
+        {setupTasks && (
+          <div className="mb-6">
+            <div className="w-full bg-gray-200 dark:bg-secondary-700 rounded-full h-2.5">
+              <div
+                className="bg-primary-600 h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${setupTasks.stats.completionPercentage}%` }}
+              ></div>
+            </div>
+            <p className="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {setupTasks.stats.completionPercentage}% complete
+            </p>
+          </div>
+        )}
+
+        {/* Task List */}
+        {setupLoading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">Loading tasks...</p>
+          </div>
+        ) : setupTasks ? (
+          <div className="space-y-3">
+            {setupTasks.tasks.map((task) => (
+              <div
+                key={task.task_key}
+                className={`flex items-start gap-3 p-3 rounded-lg border transition-all ${
+                  task.completed
+                    ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800/50'
+                    : task.is_required
+                    ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/50'
+                    : 'bg-gray-50 dark:bg-secondary-700/50 border-gray-200 dark:border-secondary-600'
+                }`}
+              >
+                <button
+                  onClick={() => toggleTask(task.task_key, task.completed)}
+                  className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                    task.completed
+                      ? 'bg-green-500 border-green-500 text-white'
+                      : 'border-gray-300 dark:border-gray-500 hover:border-primary-500'
+                  }`}
+                  aria-label={task.completed ? 'Mark as incomplete' : 'Mark as complete'}
+                >
+                  {task.completed && (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className={`font-medium ${
+                      task.completed
+                        ? 'text-gray-500 dark:text-gray-400 line-through'
+                        : 'text-secondary-900 dark:text-white'
+                    }`}>
+                      {task.title}
+                    </h3>
+                    {task.is_required && !task.completed && (
+                      <span className="px-1.5 py-0.5 bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 rounded text-xs font-medium">
+                        Required
+                      </span>
+                    )}
+                  </div>
+                  <p className={`text-sm mt-0.5 ${
+                    task.completed
+                      ? 'text-gray-400 dark:text-gray-500'
+                      : 'text-gray-600 dark:text-gray-400'
+                  }`}>
+                    {task.description}
+                  </p>
+                  {!task.completed && task.link_url && (
+                    <Link
+                      href={task.link_url}
+                      className="inline-flex items-center gap-1 mt-2 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+                    >
+                      {task.link_text || 'Get Started'}
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  )}
+                </div>
+                <span className={`flex-shrink-0 text-xs px-2 py-1 rounded ${
+                  task.category === 'BRANDING' ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' :
+                  task.category === 'PRODUCTS' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' :
+                  task.category === 'SETTINGS' ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400' :
+                  'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400'
+                }`}>
+                  {task.category}
+                </span>
+              </div>
+            ))}
+
+            {/* Celebration Message */}
+            {setupTasks.stats.completionPercentage === 100 && (
+              <div className="mt-4 p-4 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg text-center">
+                <p className="text-green-700 dark:text-green-400 font-medium">
+                  Congratulations! You&apos;ve completed all setup tasks!
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <p>Unable to load setup tasks</p>
+          </div>
+        )}
       </div>
     </div>
   );

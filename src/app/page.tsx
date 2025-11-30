@@ -91,80 +91,80 @@ export default async function Home() {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-secondary-900">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 mb-4">Why Choose TASSA?</h2>
-            <p className="text-lg text-accent-500 max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-4">Why Choose TASSA?</h2>
+            <p className="text-lg text-accent-500 dark:text-gray-400 max-w-2xl mx-auto">
               Strict quality control and decades of experience ensure superior products every time.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            <div className="bg-gray-50 p-6 rounded-xl border-l-4 border-primary-600 hover:shadow-lg transition-shadow">
-              <div className="text-primary-600 text-2xl mb-3">✓</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Premium Quality</h3>
-              <p className="text-sm text-accent-500">Strict quality control ensures superior products.</p>
+            <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl border-l-4 border-primary-600 hover:shadow-lg transition-shadow">
+              <div className="text-primary-600 dark:text-primary-500 text-2xl mb-3">✓</div>
+              <h3 className="font-bold text-secondary-900 dark:text-white mb-2">Premium Quality</h3>
+              <p className="text-sm text-accent-500 dark:text-gray-400">Strict quality control ensures superior products.</p>
             </div>
-            <div className="bg-gray-50 p-6 rounded-xl border-l-4 border-primary-600 hover:shadow-lg transition-shadow">
-              <div className="text-primary-600 text-2xl mb-3">✓</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Customization Available</h3>
-              <p className="text-sm text-accent-500">We tailor solutions to meet specific customer needs.</p>
+            <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl border-l-4 border-primary-600 hover:shadow-lg transition-shadow">
+              <div className="text-primary-600 dark:text-primary-500 text-2xl mb-3">✓</div>
+              <h3 className="font-bold text-secondary-900 dark:text-white mb-2">Customization Available</h3>
+              <p className="text-sm text-accent-500 dark:text-gray-400">We tailor solutions to meet specific customer needs.</p>
             </div>
-            <div className="bg-gray-50 p-6 rounded-xl border-l-4 border-primary-600 hover:shadow-lg transition-shadow">
-              <div className="text-primary-600 text-2xl mb-3">✓</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Reliable Supply Chain</h3>
-              <p className="text-sm text-accent-500">Consistent and timely delivery.</p>
+            <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl border-l-4 border-primary-600 hover:shadow-lg transition-shadow">
+              <div className="text-primary-600 dark:text-primary-500 text-2xl mb-3">✓</div>
+              <h3 className="font-bold text-secondary-900 dark:text-white mb-2">Reliable Supply Chain</h3>
+              <p className="text-sm text-accent-500 dark:text-gray-400">Consistent and timely delivery.</p>
             </div>
-            <div className="bg-gray-50 p-6 rounded-xl border-l-4 border-primary-600 hover:shadow-lg transition-shadow">
-              <div className="text-primary-600 text-2xl mb-3">✓</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Proudly South African</h3>
-              <p className="text-sm text-accent-500">Supporting local manufacturing and job creation.</p>
+            <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl border-l-4 border-primary-600 hover:shadow-lg transition-shadow">
+              <div className="text-primary-600 dark:text-primary-500 text-2xl mb-3">✓</div>
+              <h3 className="font-bold text-secondary-900 dark:text-white mb-2">Proudly South African</h3>
+              <p className="text-sm text-accent-500 dark:text-gray-400">Supporting local manufacturing and job creation.</p>
             </div>
-            <div className="bg-gray-50 p-6 rounded-xl border-l-4 border-primary-600 hover:shadow-lg transition-shadow">
-              <div className="text-primary-600 text-2xl mb-3">✓</div>
-              <h3 className="font-bold text-secondary-900 mb-2">Climate & UV Resistant</h3>
-              <p className="text-sm text-accent-500">Built to last in harsh conditions.</p>
+            <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl border-l-4 border-primary-600 hover:shadow-lg transition-shadow">
+              <div className="text-primary-600 dark:text-primary-500 text-2xl mb-3">✓</div>
+              <h3 className="font-bold text-secondary-900 dark:text-white mb-2">Climate & UV Resistant</h3>
+              <p className="text-sm text-accent-500 dark:text-gray-400">Built to last in harsh conditions.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* About Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 dark:bg-secondary-800">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 mb-6">About TASSA</h2>
-              <div className="space-y-4 text-accent-600">
+              <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-6">About TASSA</h2>
+              <div className="space-y-4 text-accent-600 dark:text-gray-300">
                 <p className="leading-relaxed">
-                  <strong className="text-secondary-900">Twines and Straps SA (TASSA)</strong> is a leading local manufacturer 
-                  specializing in the production of high-quality twines and ropes. Founded in 2016, we have steadily grown 
+                  <strong className="text-secondary-900 dark:text-white">Twines and Straps SA (TASSA)</strong> is a leading local manufacturer
+                  specializing in the production of high-quality twines and ropes. Founded in 2016, we have steadily grown
                   into a full-scale production facility, dedicated to providing premium products.
                 </p>
                 <p className="leading-relaxed">
-                  Our carefully selected manufacturing equipment ensures <strong className="text-secondary-900">consistency, 
+                  Our carefully selected manufacturing equipment ensures <strong className="text-secondary-900 dark:text-white">consistency,
                   durability, and excellence</strong> in every roll.
                 </p>
               </div>
               <div className="mt-8">
-                <Link 
-                  href="/about" 
-                  className="inline-flex items-center gap-2 text-primary-600 font-semibold hover:text-primary-700"
+                <Link
+                  href="/about"
+                  className="inline-flex items-center gap-2 text-primary-600 dark:text-primary-500 font-semibold hover:text-primary-700 dark:hover:text-primary-400"
                 >
                   Learn more about us →
                 </Link>
               </div>
             </div>
-            <div className="bg-white p-8 rounded-xl shadow-lg">
-              <h3 className="text-xl font-bold text-secondary-900 mb-6 border-b pb-4">Our Expertise</h3>
-              <p className="text-accent-600 leading-relaxed">
-                At TASSA, we pride ourselves on our highly skilled and motivated workforce. Our management and advisory team 
-                collectively boast over <strong className="text-secondary-900">70 years of experience</strong> in manufacturing 
+            <div className="bg-white dark:bg-secondary-900 p-8 rounded-xl shadow-lg">
+              <h3 className="text-xl font-bold text-secondary-900 dark:text-white mb-6 border-b border-gray-200 dark:border-secondary-700 pb-4">Our Expertise</h3>
+              <p className="text-accent-600 dark:text-gray-300 leading-relaxed">
+                At TASSA, we pride ourselves on our highly skilled and motivated workforce. Our management and advisory team
+                collectively boast over <strong className="text-secondary-900 dark:text-white">70 years of experience</strong> in manufacturing
                 and the plastics industry.
               </p>
-              <p className="text-accent-600 leading-relaxed mt-4">
-                Through continuous research and development, we have perfected a proprietary manufacturing process, allowing us 
-                to produce some of the <strong className="text-secondary-900">highest-quality twines and ropes in South Africa</strong>.
+              <p className="text-accent-600 dark:text-gray-300 leading-relaxed mt-4">
+                Through continuous research and development, we have perfected a proprietary manufacturing process, allowing us
+                to produce some of the <strong className="text-secondary-900 dark:text-white">highest-quality twines and ropes in South Africa</strong>.
               </p>
             </div>
           </div>
@@ -175,12 +175,12 @@ export default async function Home() {
       {featureFlags.trustBadges && <TrustBadges />}
 
       {/* Our Customers Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-secondary-900">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 mb-4">Our Commitment to Customers</h2>
-          <p className="text-lg text-accent-500 max-w-3xl mx-auto mb-8">
-            We are committed to <strong className="text-secondary-900">customer satisfaction</strong>, ensuring our products 
-            consistently meet your expectations. We work closely with clients across various industries, tailoring solutions 
+          <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-4">Our Commitment to Customers</h2>
+          <p className="text-lg text-accent-500 dark:text-gray-400 max-w-3xl mx-auto mb-8">
+            We are committed to <strong className="text-secondary-900 dark:text-white">customer satisfaction</strong>, ensuring our products
+            consistently meet your expectations. We work closely with clients across various industries, tailoring solutions
             to specific requirements.
           </p>
           <div className="bg-primary-600 text-white py-4 px-8 rounded-lg inline-block">
@@ -190,38 +190,38 @@ export default async function Home() {
       </section>
 
       {/* Brand Values Section */}
-      <section className="py-12 bg-warm-100">
+      <section className="py-12 bg-warm-100 dark:bg-secondary-800">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-sm">
+            <div className="flex flex-col items-center bg-white dark:bg-secondary-900 p-6 rounded-xl shadow-sm">
               <span className="text-4xl mb-3">🏭</span>
-              <h3 className="font-bold text-secondary-900">Local Manufacturing</h3>
-              <p className="text-sm text-accent-500 mt-1">Proudly South African</p>
+              <h3 className="font-bold text-secondary-900 dark:text-white">Local Manufacturing</h3>
+              <p className="text-sm text-accent-500 dark:text-gray-400 mt-1">Proudly South African</p>
             </div>
-            <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-sm">
+            <div className="flex flex-col items-center bg-white dark:bg-secondary-900 p-6 rounded-xl shadow-sm">
               <span className="text-4xl mb-3">💪</span>
-              <h3 className="font-bold text-secondary-900">Boundless Strength</h3>
-              <p className="text-sm text-accent-500 mt-1">Built to last</p>
+              <h3 className="font-bold text-secondary-900 dark:text-white">Boundless Strength</h3>
+              <p className="text-sm text-accent-500 dark:text-gray-400 mt-1">Built to last</p>
             </div>
-            <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-sm">
+            <div className="flex flex-col items-center bg-white dark:bg-secondary-900 p-6 rounded-xl shadow-sm">
               <span className="text-4xl mb-3">☀️</span>
-              <h3 className="font-bold text-secondary-900">UV Resistant</h3>
-              <p className="text-sm text-accent-500 mt-1">Climate tough</p>
+              <h3 className="font-bold text-secondary-900 dark:text-white">UV Resistant</h3>
+              <p className="text-sm text-accent-500 dark:text-gray-400 mt-1">Climate tough</p>
             </div>
-            <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-sm">
+            <div className="flex flex-col items-center bg-white dark:bg-secondary-900 p-6 rounded-xl shadow-sm">
               <span className="text-4xl mb-3">🎯</span>
-              <h3 className="font-bold text-secondary-900">Customization</h3>
-              <p className="text-sm text-accent-500 mt-1">Tailored solutions</p>
+              <h3 className="font-bold text-secondary-900 dark:text-white">Customization</h3>
+              <p className="text-sm text-accent-500 dark:text-gray-400 mt-1">Tailored solutions</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Categories Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 dark:bg-secondary-800">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center text-secondary-900">Shop by Category</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold mb-8 text-center text-secondary-900 dark:text-white">Shop by Category</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {categories.map((category: Category) => {
               // Category-specific images and icons
               const categoryData: Record<string, { image: string; icon: string; description: string }> = {
@@ -235,10 +235,15 @@ export default async function Home() {
                   icon: '🪢',
                   description: 'Durable ropes for all applications'
                 },
-                'natural-ropes': {
-                  image: 'https://images.unsplash.com/photo-1519638831568-d9897f54ed69?w=400&h=300&fit=crop',
-                  icon: '🌿',
-                  description: 'Eco-friendly natural fiber ropes'
+                'nets': {
+                  image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=300&fit=crop',
+                  icon: '🥅',
+                  description: 'Cargo, safety, and sports nets for every need'
+                },
+                'accessories': {
+                  image: 'https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=400&h=300&fit=crop',
+                  icon: '🔗',
+                  description: 'Hooks, shackles, connectors, and tensioners'
                 }
               };
               const data = categoryData[category.slug] || {
@@ -251,9 +256,9 @@ export default async function Home() {
                 <Link
                   key={category.id}
                   href={`/products?category=${category.slug}`}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all overflow-hidden group"
+                  className="bg-white dark:bg-secondary-900 rounded-xl shadow-sm hover:shadow-lg transition-all overflow-hidden group"
                 >
-                  <div className="relative h-40 bg-gray-200 overflow-hidden">
+                  <div className="relative h-40 bg-gray-200 dark:bg-secondary-700 overflow-hidden">
                     <Image
                       src={data.image}
                       alt={category.name}
@@ -268,8 +273,8 @@ export default async function Home() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <p className="text-sm text-gray-600 mb-2">{data.description}</p>
-                    <span className="text-primary-600 font-medium text-sm group-hover:text-primary-700 inline-flex items-center gap-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{data.description}</p>
+                    <span className="text-primary-600 dark:text-primary-500 font-medium text-sm group-hover:text-primary-700 dark:group-hover:text-primary-400 inline-flex items-center gap-1">
                       Browse products
                       <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -284,11 +289,11 @@ export default async function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-secondary-900">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-secondary-900">Featured Products</h2>
-            <Link href="/products" className="text-primary-600 hover:text-primary-700 font-semibold">
+            <h2 className="text-3xl font-bold text-secondary-900 dark:text-white">Featured Products</h2>
+            <Link href="/products" className="text-primary-600 dark:text-primary-500 hover:text-primary-700 dark:hover:text-primary-400 font-semibold">
               View All →
             </Link>
           </div>
@@ -357,8 +362,8 @@ export default async function Home() {
       </section>
 
       {/* Terms Note */}
-      <section className="py-6 bg-gray-100 border-t">
-        <div className="container mx-auto px-4 text-center text-sm text-accent-500">
+      <section className="py-6 bg-gray-100 dark:bg-secondary-800 border-t border-gray-200 dark:border-secondary-700">
+        <div className="container mx-auto px-4 text-center text-sm text-accent-500 dark:text-gray-400">
           <p>Approximate measurements apply. Anti-static options available. Terms & Conditions Apply. Prices are subject to change and exclude VAT.</p>
         </div>
       </section>

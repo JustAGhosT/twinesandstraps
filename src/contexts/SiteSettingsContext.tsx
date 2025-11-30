@@ -15,6 +15,8 @@ export interface SiteSettings {
   socialFacebook: string;
   socialInstagram: string;
   socialLinkedIn: string;
+  socialTwitter: string;
+  socialYoutube: string;
 }
 
 const defaultSettings: SiteSettings = {
@@ -30,6 +32,8 @@ const defaultSettings: SiteSettings = {
   socialFacebook: '',
   socialInstagram: '',
   socialLinkedIn: '',
+  socialTwitter: '',
+  socialYoutube: '',
 };
 
 interface SiteSettingsContextType {

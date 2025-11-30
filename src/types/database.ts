@@ -21,6 +21,33 @@ export interface Product {
   category_id: number;
   category?: Category;
   weight?: number | null;
+  // 3rd party product fields
+  is_third_party?: boolean;
+  supplier_id?: number | null;
+  supplier_sku?: string | null;
+  supplier_price?: number | null;
+  markup_percentage?: number | null;
+  last_synced_at?: Date | null;
+  supplier?: Supplier | null;
+}
+
+export interface Supplier {
+  id: number;
+  name: string;
+  code: string;
+  contact_name: string | null;
+  email: string | null;
+  phone: string | null;
+  website: string | null;
+  address: string | null;
+  notes: string | null;
+  default_markup: number;
+  is_active: boolean;
+  payment_terms: string | null;
+  lead_time_days: number | null;
+  min_order_value: number | null;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface Category {

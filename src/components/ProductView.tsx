@@ -7,6 +7,7 @@ import Image from 'next/image';
 import WishlistButton from '@/components/WishlistButton';
 import CompareButton from '@/components/CompareButton';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
+import { STOCK_STATUS, STOCK_STATUS_LABELS, ROUTES, TIMEOUTS, SUCCESS_MESSAGES } from '@/constants';
 
 interface ProductViewProps {
   product: Product;
@@ -25,23 +26,23 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const handleAddToCart = () => {
     addToCart(product, quantity);
     setShowAddedToCart(true);
-    setTimeout(() => setShowAddedToCart(false), 3000);
+    setTimeout(() => setShowAddedToCart(false), TIMEOUTS.STATUS_MESSAGE_DURATION);
   };
 
   const getStockBadge = () => {
     switch (product.stock_status) {
-      case 'IN_STOCK':
-        return <span className="inline-block px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded">In Stock</span>;
-      case 'LOW_STOCK':
-        return <span className="inline-block px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100 rounded">Low Stock</span>;
-      case 'OUT_OF_STOCK':
-        return <span className="inline-block px-3 py-1 text-sm font-semibold text-red-800 bg-red-100 rounded">Out of Stock</span>;
+      case STOCK_STATUS.IN_STOCK:
+        return <span className="inline-block px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded">{STOCK_STATUS_LABELS.IN_STOCK}</span>;
+      case STOCK_STATUS.LOW_STOCK:
+        return <span className="inline-block px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100 rounded">{STOCK_STATUS_LABELS.LOW_STOCK}</span>;
+      case STOCK_STATUS.OUT_OF_STOCK:
+        return <span className="inline-block px-3 py-1 text-sm font-semibold text-red-800 bg-red-100 rounded">{STOCK_STATUS_LABELS.OUT_OF_STOCK}</span>;
       default:
         return null;
     }
   };
 
-  const isOutOfStock = product.stock_status === 'OUT_OF_STOCK';
+  const isOutOfStock = product.stock_status === STOCK_STATUS.OUT_OF_STOCK;
 
   return (
     <>
@@ -76,7 +77,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <div
-            className={`aspect-square bg-gray-200 rounded-lg flex items-center justify-center relative overflow-hidden ${product.image_url ? 'cursor-zoom-in group' : ''}`}
+            className={`aspect-square bg-gray-200 dark:bg-secondary-700 rounded-lg flex items-center justify-center relative overflow-hidden ${product.image_url ? 'cursor-zoom-in group' : ''}`}
             onClick={() => product.image_url && setIsZoomed(true)}
           >
             {product.image_url ? (
@@ -97,7 +98,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
                 </div>
               </>
             ) : (
-              <span className="text-gray-500 text-lg">No Image Available</span>
+              <span className="text-gray-500 dark:text-gray-400 text-lg">No Image Available</span>
             )}
           </div>
         </div>
@@ -105,55 +106,55 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
         <div className="mb-4">
           {getStockBadge()}
         </div>
-        <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
+        <h1 className="text-3xl font-bold mb-4 text-secondary-900 dark:text-white">{product.name}</h1>
         {showPrices ? (
           <div className="mb-6">
             <div className="flex items-baseline gap-3 mb-2">
-              <span className="text-3xl font-bold text-gray-900">ZAR {product.price.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-gray-900 dark:text-white">ZAR {product.price.toFixed(2)}</span>
             </div>
           </div>
         ) : (
           <div className="mb-6">
             <a
-              href="/quote"
-              className="inline-block px-6 py-2 bg-primary-50 text-primary-700 rounded-lg font-semibold hover:bg-primary-100 transition-colors"
+              href={ROUTES.QUOTE}
+              className="inline-block px-6 py-2 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-lg font-semibold hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors"
             >
               Request Quote for Pricing
             </a>
           </div>
         )}
-        <p className="text-gray-600 mb-6 leading-relaxed">{product.description}</p>
+        <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{product.description}</p>
         
         {/* Quantity Selector and Add to Cart */}
-        <div className="mb-6 pb-6 border-b">
-          <label className="block text-sm font-semibold mb-2">Quantity</label>
+        <div className="mb-6 pb-6 border-b dark:border-secondary-700">
+          <label className="block text-sm font-semibold mb-2 text-secondary-900 dark:text-white">Quantity</label>
           <div className="flex items-center gap-4 mb-4">
-            <div className="flex items-center border rounded">
-              <button 
+            <div className="flex items-center border dark:border-secondary-600 rounded">
+              <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="px-4 py-2 hover:bg-gray-100 transition-colors"
+                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-secondary-700 text-secondary-900 dark:text-white transition-colors"
                 disabled={isOutOfStock || !showPrices}
               >
                 -
               </button>
-              <input 
-                type="number" 
+              <input
+                type="number"
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-16 text-center border-x py-2"
+                className="w-16 text-center border-x dark:border-secondary-600 py-2 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white"
                 min="1"
                 disabled={isOutOfStock || !showPrices}
               />
-              <button 
+              <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="px-4 py-2 hover:bg-gray-100 transition-colors"
+                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-secondary-700 text-secondary-900 dark:text-white transition-colors"
                 disabled={isOutOfStock || !showPrices}
               >
                 +
               </button>
             </div>
             {showPrices && quantity > 1 && (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
                 <p>Total: ZAR {totalPrice.toFixed(2)}</p>
               </div>
             )}
@@ -173,8 +174,8 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
               </button>
             )}
             <a
-              href="/quote"
-              className={`${showPrices ? 'flex-1' : 'w-full'} py-3 px-6 rounded-lg font-semibold border-2 border-primary-600 text-primary-600 hover:bg-primary-50 transition-colors text-center`}
+              href={ROUTES.QUOTE}
+              className={`${showPrices ? 'flex-1' : 'w-full'} py-3 px-6 rounded-lg font-semibold border-2 border-primary-600 dark:border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors text-center`}
             >
               Request Quote
             </a>
@@ -187,42 +188,42 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
             </div>
           )}
           {showAddedToCart && (
-            <div className="mt-3 p-3 bg-green-100 text-green-800 rounded-lg text-sm font-semibold">
-              ✓ Added to cart successfully!
+            <div className="mt-3 p-3 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-lg text-sm font-semibold">
+              {SUCCESS_MESSAGES.ADDED_TO_CART}
             </div>
           )}
         </div>
 
         {/* Specifications */}
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-semibold mb-4">Specifications</h3>
+        <div className="border-t dark:border-secondary-700 pt-6">
+          <h3 className="text-lg font-semibold mb-4 text-secondary-900 dark:text-white">Specifications</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="bg-gray-50 p-3 rounded">
-              <span className="text-sm text-gray-600">SKU</span>
-              <p className="font-semibold">{product.sku}</p>
+            <div className="bg-gray-50 dark:bg-secondary-700 p-3 rounded">
+              <span className="text-sm text-gray-600 dark:text-gray-400">SKU</span>
+              <p className="font-semibold text-secondary-900 dark:text-white">{product.sku}</p>
             </div>
             {product.material && (
-              <div className="bg-gray-50 p-3 rounded">
-                <span className="text-sm text-gray-600">Material</span>
-                <p className="font-semibold">{product.material}</p>
+              <div className="bg-gray-50 dark:bg-secondary-700 p-3 rounded">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Material</span>
+                <p className="font-semibold text-secondary-900 dark:text-white">{product.material}</p>
               </div>
             )}
             {product.diameter && (
-              <div className="bg-gray-50 p-3 rounded">
-                <span className="text-sm text-gray-600">Diameter</span>
-                <p className="font-semibold">{product.diameter}mm</p>
+              <div className="bg-gray-50 dark:bg-secondary-700 p-3 rounded">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Diameter</span>
+                <p className="font-semibold text-secondary-900 dark:text-white">{product.diameter}mm</p>
               </div>
             )}
             {product.length && (
-              <div className="bg-gray-50 p-3 rounded">
-                <span className="text-sm text-gray-600">Length</span>
-                <p className="font-semibold">{product.length}m</p>
+              <div className="bg-gray-50 dark:bg-secondary-700 p-3 rounded">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Length</span>
+                <p className="font-semibold text-secondary-900 dark:text-white">{product.length}m</p>
               </div>
             )}
             {product.strength_rating && (
-              <div className="bg-gray-50 p-3 rounded">
-                <span className="text-sm text-gray-600">Strength Rating</span>
-                <p className="font-semibold">{product.strength_rating}</p>
+              <div className="bg-gray-50 dark:bg-secondary-700 p-3 rounded">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Strength Rating</span>
+                <p className="font-semibold text-secondary-900 dark:text-white">{product.strength_rating}</p>
               </div>
             )}
           </div>

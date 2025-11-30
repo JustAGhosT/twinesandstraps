@@ -18,6 +18,8 @@ interface SiteSettings {
   socialFacebook: string;
   socialInstagram: string;
   socialLinkedIn: string;
+  socialTwitter: string;
+  socialYoutube: string;
 }
 
 const defaultSettings: SiteSettings = {
@@ -33,6 +35,8 @@ const defaultSettings: SiteSettings = {
   socialFacebook: '',
   socialInstagram: '',
   socialLinkedIn: '',
+  socialTwitter: '',
+  socialYoutube: '',
 };
 
 // Save result interface for detailed feedback
@@ -537,9 +541,12 @@ export default function SettingsPage() {
         </div>
 
         {/* Social Media */}
-        <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+        <div id="social" className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-semibold text-secondary-900 dark:text-white mb-4">Social Media Links</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            Add your social media links to display them in the website footer.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Facebook
@@ -580,6 +587,34 @@ export default function SettingsPage() {
                 onChange={handleChange}
                 placeholder="https://linkedin.com/company/..."
                 className={getInputClassName('socialLinkedIn')}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                X (Twitter)
+                {isFieldModified('socialTwitter') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
+              </label>
+              <input
+                type="url"
+                name="socialTwitter"
+                value={settings.socialTwitter}
+                onChange={handleChange}
+                placeholder="https://x.com/..."
+                className={getInputClassName('socialTwitter')}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                YouTube
+                {isFieldModified('socialYoutube') && <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">(modified)</span>}
+              </label>
+              <input
+                type="url"
+                name="socialYoutube"
+                value={settings.socialYoutube}
+                onChange={handleChange}
+                placeholder="https://youtube.com/@..."
+                className={getInputClassName('socialYoutube')}
               />
             </div>
           </div>

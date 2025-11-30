@@ -28,15 +28,15 @@ export default function ComparePage() {
 
   if (items.length < 2) {
     return (
-      <div className="bg-gray-50 min-h-screen py-8">
+      <div className="bg-gray-50 dark:bg-secondary-900 min-h-screen py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-8">Compare Products</h1>
-          <div className="bg-white rounded-lg shadow-sm p-8 md:p-12 text-center">
-            <svg className="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <h1 className="text-3xl font-bold mb-8 text-secondary-900 dark:text-white">Compare Products</h1>
+          <div className="bg-white dark:bg-secondary-800 rounded-lg shadow-sm p-8 md:p-12 text-center">
+            <svg className="w-20 h-20 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">Not enough products to compare</h2>
-            <p className="text-gray-500 mb-6">
+            <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-2">Not enough products to compare</h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
               {items.length === 0
                 ? 'Add products to compare by clicking the compare icon on product pages.'
                 : 'Add at least one more product to start comparing.'}
@@ -73,23 +73,23 @@ export default function ComparePage() {
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen py-8">
+    <div className="bg-gray-50 dark:bg-secondary-900 min-h-screen py-8">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Compare Products</h1>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Compare Products</h1>
           <button
             onClick={clearCompare}
-            className="text-sm text-red-600 hover:text-red-700 font-medium"
+            className="text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium"
           >
             Clear All
           </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+        <div className="bg-white dark:bg-secondary-800 rounded-lg shadow-sm overflow-x-auto">
           <table className="w-full min-w-[600px]">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="p-4 text-left font-medium text-gray-500 w-40">Product</th>
+              <tr className="border-b border-gray-200 dark:border-secondary-700">
+                <th className="p-4 text-left font-medium text-gray-500 dark:text-gray-400 w-40">Product</th>
                 {items.map((product) => (
                   <th key={product.id} className="p-4 text-center">
                     <div className="relative">
@@ -103,7 +103,7 @@ export default function ComparePage() {
                         </svg>
                       </button>
                       <Link href={`/products/${product.id}`}>
-                        <div className="w-32 h-32 mx-auto relative bg-gray-100 rounded-lg overflow-hidden mb-3">
+                        <div className="w-32 h-32 mx-auto relative bg-gray-100 dark:bg-secondary-700 rounded-lg overflow-hidden mb-3">
                           {product.image_url ? (
                             <Image
                               src={product.image_url}
@@ -113,12 +113,12 @@ export default function ComparePage() {
                               sizes="128px"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
                               No Image
                             </div>
                           )}
                         </div>
-                        <h3 className="font-semibold text-secondary-900 hover:text-primary-600 transition-colors text-sm">
+                        <h3 className="font-semibold text-secondary-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-sm">
                           {product.name}
                         </h3>
                       </Link>
@@ -129,13 +129,13 @@ export default function ComparePage() {
             </thead>
             <tbody>
               {attributes.map((attr, index) => (
-                <tr key={attr.key} className={index % 2 === 0 ? 'bg-gray-50' : ''}>
-                  <td className="p-4 font-medium text-gray-700">{attr.label}</td>
+                <tr key={attr.key} className={index % 2 === 0 ? 'bg-gray-50 dark:bg-secondary-700/50' : 'dark:bg-secondary-800'}>
+                  <td className="p-4 font-medium text-gray-700 dark:text-gray-300">{attr.label}</td>
                   {items.map((product) => {
                     const value = (product as unknown as Record<string, unknown>)[attr.key];
                     return (
-                      <td key={product.id} className="p-4 text-center">
-                        <span className={attr.key === 'price' ? 'font-bold text-primary-600' : ''}>
+                      <td key={product.id} className="p-4 text-center text-secondary-900 dark:text-white">
+                        <span className={attr.key === 'price' ? 'font-bold text-primary-600 dark:text-primary-400' : ''}>
                           {attr.format(value as never)}
                         </span>
                       </td>
@@ -143,8 +143,8 @@ export default function ComparePage() {
                   })}
                 </tr>
               ))}
-              <tr className="border-t border-gray-200">
-                <td className="p-4 font-medium text-gray-700">Action</td>
+              <tr className="border-t border-gray-200 dark:border-secondary-700">
+                <td className="p-4 font-medium text-gray-700 dark:text-gray-300">Action</td>
                 {items.map((product) => (
                   <td key={product.id} className="p-4 text-center">
                     <button
@@ -164,7 +164,7 @@ export default function ComparePage() {
         <div className="mt-6">
           <Link
             href="/products"
-            className="inline-flex items-center text-primary-600 hover:text-primary-700 font-semibold"
+            className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

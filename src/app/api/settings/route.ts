@@ -18,6 +18,8 @@ const DEFAULT_SETTINGS = {
   socialFacebook: '',
   socialInstagram: '',
   socialLinkedIn: '',
+  socialTwitter: '',
+  socialYoutube: '',
 };
 
 // Helper to convert database fields to API format
@@ -34,6 +36,8 @@ function dbToApiFormat(dbSettings: {
   social_facebook: string;
   social_instagram: string;
   social_linkedin: string;
+  social_twitter: string;
+  social_youtube: string;
 }) {
   return {
     companyName: dbSettings.company_name,
@@ -48,6 +52,8 @@ function dbToApiFormat(dbSettings: {
     socialFacebook: dbSettings.social_facebook,
     socialInstagram: dbSettings.social_instagram,
     socialLinkedIn: dbSettings.social_linkedin,
+    socialTwitter: dbSettings.social_twitter,
+    socialYoutube: dbSettings.social_youtube,
   };
 }
 
