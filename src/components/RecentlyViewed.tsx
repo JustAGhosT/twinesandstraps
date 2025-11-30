@@ -62,7 +62,7 @@ export default function RecentlyViewed({ excludeProductId, limit = 4 }: Recently
   return (
     <section className="py-12 bg-gray-50 dark:bg-secondary-900">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl font-bold text-secondary-900 mb-6">Recently Viewed</h2>
+        <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-6">Recently Viewed</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {items.map((item) => (
             <Link
