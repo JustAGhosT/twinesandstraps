@@ -168,7 +168,22 @@ interface PayFastPaymentData {
   customerName: string;
 }
 
-export function generatePayFastForm(data: PayFastPaymentData): Record<string, string> {
+interface PayFastFormData {
+  merchant_id: string;
+  merchant_key: string;
+  return_url: string;
+  cancel_url: string;
+  notify_url: string;
+  m_payment_id: string;
+  amount: string;
+  item_name: string;
+  email_address: string;
+  name_first: string;
+  name_last: string;
+  signature: string;
+}
+
+export function generatePayFastForm(data: PayFastPaymentData): PayFastFormData {
   const paymentData = {
     merchant_id: PAYFAST_CONFIG.merchantId,
     merchant_key: PAYFAST_CONFIG.merchantKey,
