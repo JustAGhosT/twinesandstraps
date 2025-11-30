@@ -62,7 +62,7 @@ export default function MarketingPage() {
   // Mock data for demonstration - replace with actual API calls
   useEffect(() => {
     // Simulate API call
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setDiscounts([
         {
           id: 1,
@@ -152,6 +152,8 @@ export default function MarketingPage() {
 
       setLoading(false);
     }, 500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handleSaveDiscount = () => {
