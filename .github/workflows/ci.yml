@@ -183,6 +183,86 @@ jobs:
                 ;;
             esac
           fi
+          
+      - name: Validate optional environment variables
+        env:
+          AZURE_AI_ENDPOINT: ${{ secrets.AZURE_AI_ENDPOINT }}
+          AZURE_AI_API_KEY: ${{ secrets.AZURE_AI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: |
+          echo ""
+          echo "=== Optional Environment Variables Check ==="
+          echo ""
+          
+          MISSING_VARS=""
+          
+          # Check AI configuration (Azure OpenAI or OpenAI)
+          if [ -n "$AZURE_AI_ENDPOINT" ] && [ -n "$AZURE_AI_API_KEY" ]; then
+            echo "✓ Azure OpenAI is configured (AZURE_AI_ENDPOINT, AZURE_AI_API_KEY)"
+          elif [ -n "$OPENAI_API_KEY" ]; then
+            echo "✓ OpenAI is configured (OPENAI_API_KEY)"
+          else
+            echo "⚠ AI features not configured."
+            echo "  To enable AI-powered features (product analysis, description enhancement, etc.),"
+            echo "  configure one of the following in Netlify Environment Variables:"
+            echo ""
+            echo "  Option 1 - Azure OpenAI (Preferred):"
+            echo "    • AZURE_AI_ENDPOINT: Your Azure OpenAI endpoint URL"
+            echo "    • AZURE_AI_API_KEY: Your Azure OpenAI API key"
+            echo "    • AZURE_AI_DEPLOYMENT_NAME (optional): Model deployment name (default: gpt-4o)"
+            echo "    Get credentials: https://portal.azure.com/ → Azure AI Foundry"
+            echo ""
+            echo "  Option 2 - OpenAI:"
+            echo "    • OPENAI_API_KEY: Your OpenAI API key"
+            echo "    Get API key: https://platform.openai.com/api-keys"
+            echo ""
+            MISSING_VARS="${MISSING_VARS}AI_CONFIG,"
+          fi
+          
+          # Validate Azure AI endpoint format if provided
+          if [ -n "$AZURE_AI_ENDPOINT" ]; then
+            case "$AZURE_AI_ENDPOINT" in
+              https://*.openai.azure.com*|https://*.cognitiveservices.azure.com*)
+                echo "  ✓ Azure AI endpoint format looks valid"
+                ;;
+              *)
+                echo "::warning::AZURE_AI_ENDPOINT format may be incorrect."
+                echo "  Expected format: https://your-resource-name.openai.azure.com/"
+                echo "  Current value starts with: ${AZURE_AI_ENDPOINT:0:30}..."
+                ;;
+            esac
+          fi
+          
+          # Check for partial Azure AI configuration
+          if [ -n "$AZURE_AI_ENDPOINT" ] && [ -z "$AZURE_AI_API_KEY" ]; then
+            echo "::warning::AZURE_AI_ENDPOINT is set but AZURE_AI_API_KEY is missing."
+            echo "  Both are required for Azure OpenAI to work."
+            MISSING_VARS="${MISSING_VARS}AZURE_AI_API_KEY,"
+          fi
+          
+          if [ -z "$AZURE_AI_ENDPOINT" ] && [ -n "$AZURE_AI_API_KEY" ]; then
+            echo "::warning::AZURE_AI_API_KEY is set but AZURE_AI_ENDPOINT is missing."
+            echo "  Both are required for Azure OpenAI to work."
+            MISSING_VARS="${MISSING_VARS}AZURE_AI_ENDPOINT,"
+          fi
+          
+          # Check ADMIN_PASSWORD
+          if [ -z "$ADMIN_PASSWORD" ]; then
+            echo "⚠ ADMIN_PASSWORD not configured in GitHub secrets."
+            echo "  Ensure it's set in Netlify Environment Variables for admin panel access."
+            MISSING_VARS="${MISSING_VARS}ADMIN_PASSWORD,"
+          else
+            echo "✓ ADMIN_PASSWORD is configured"
+          fi
+          
+          echo ""
+          if [ -n "$MISSING_VARS" ]; then
+            echo "Summary: Some optional environment variables are not configured."
+            echo "Configure them in Netlify: Site Settings → Environment variables"
+          else
+            echo "Summary: All optional environment variables are configured ✓"
+          fi
         
       - name: Setup Node.js
         uses: actions/setup-node@v4
