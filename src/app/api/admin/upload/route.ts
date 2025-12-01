@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 
-// Allowed MIME types for image uploads
+// Allowed MIME types for image uploads with display names
 // Note: SVG is intentionally excluded due to XSS risks (can contain embedded JavaScript)
-const ALLOWED_MIME_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif',
-];
+const ALLOWED_MIME_TYPES: Record<string, string> = {
+  'image/jpeg': 'JPEG',
+  'image/png': 'PNG',
+  'image/webp': 'WebP',
+  'image/gif': 'GIF',
+};
 
 // Maximum file size for base64 storage (2MB to keep database entries reasonable)
-// Base64 encoding increases size by ~33%, so 2MB file becomes ~2.67MB in storage
+// Base64 encoding increases size by ~33%, so 2MB file becomes ~2.67MB in storage.
+// Additional overhead from database storage and JSON encoding may increase total storage further.
 const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
 export async function POST(request: NextRequest) {
@@ -44,12 +45,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate MIME type
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+    if (!Object.keys(ALLOWED_MIME_TYPES).includes(file.type)) {
+      const allowedTypeNames = Object.values(ALLOWED_MIME_TYPES).join(', ');
       return NextResponse.json(
         {
           error: 'Invalid file type',
           details: { 
-            type: `Allowed types: JPEG, PNG, WebP, GIF` 
+            type: `Allowed types: ${allowedTypeNames}` 
           }
         },
         { status: 400 }
