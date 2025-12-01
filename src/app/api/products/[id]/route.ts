@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import type { ProductWithCategory } from '@/types/database';
+import { successResponse, errorResponse } from '@/types/api';
 
 export async function GET(
   request: NextRequest,
@@ -12,7 +14,7 @@ export async function GET(
     // Validate ID
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(
-        { error: 'Invalid product ID' },
+        errorResponse('Invalid product ID'),
         { status: 400 }
       );
     }
@@ -24,16 +26,18 @@ export async function GET(
 
     if (!product) {
       return NextResponse.json(
-        { error: 'Product not found' },
+        errorResponse('Product not found'),
         { status: 404 }
       );
     }
 
-    return NextResponse.json(product);
+    return NextResponse.json(
+      successResponse(product as ProductWithCategory, 'Product retrieved successfully')
+    );
   } catch (error) {
     console.error('Error fetching product:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch product' },
+      errorResponse('Failed to fetch product'),
       { status: 500 }
     );
   }

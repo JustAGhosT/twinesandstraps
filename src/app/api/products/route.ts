@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { paginationSchema, validateBody, formatZodErrors } from '@/lib/validations';
+import type { PaginatedData } from '@/types/api';
+import type { ProductWithCategory } from '@/types/database';
+import { successResponse, errorResponse } from '@/types/api';
 
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
@@ -23,7 +26,7 @@ export async function GET(request: NextRequest) {
     const validation = validateBody(paginationSchema, queryParams);
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid query parameters', details: formatZodErrors(validation.errors) },
+        errorResponse('Invalid query parameters', formatZodErrors(validation.errors)),
         { status: 400 }
       );
     }
@@ -62,8 +65,8 @@ export async function GET(request: NextRequest) {
       take: limit,
     });
 
-    return NextResponse.json({
-      products,
+    const paginatedData: PaginatedData<ProductWithCategory> = {
+      items: products as ProductWithCategory[],
       pagination: {
         page,
         limit,
@@ -71,11 +74,15 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil(total / limit),
         hasMore: page * limit < total,
       },
-    });
+    };
+
+    return NextResponse.json(
+      successResponse(paginatedData, 'Products retrieved successfully')
+    );
   } catch (error) {
     console.error('Error fetching products:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch products' },
+      errorResponse('Failed to fetch products'),
       { status: 500 }
     );
   }

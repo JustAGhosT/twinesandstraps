@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { updateProductSchema, validateBody, formatZodErrors } from '@/lib/validations';
+import type { ProductWithCategory } from '@/types/database';
+import { successResponse, errorResponse } from '@/types/api';
 
 export async function PUT(
   request: NextRequest,
@@ -18,7 +20,7 @@ export async function PUT(
     // Validate ID
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(
-        { error: 'Invalid product ID' },
+        errorResponse('Invalid product ID'),
         { status: 400 }
       );
     }
@@ -29,7 +31,7 @@ export async function PUT(
     const validation = validateBody(updateProductSchema, body);
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: formatZodErrors(validation.errors) },
+        errorResponse('Validation failed', formatZodErrors(validation.errors)),
         { status: 400 }
       );
     }
@@ -43,7 +45,7 @@ export async function PUT(
 
     if (!existingProduct) {
       return NextResponse.json(
-        { error: 'Product not found' },
+        errorResponse('Product not found'),
         { status: 404 }
       );
     }
@@ -56,7 +58,7 @@ export async function PUT(
 
       if (!category) {
         return NextResponse.json(
-          { error: 'Category not found', details: { category_id: 'Selected category does not exist' } },
+          errorResponse('Category not found', { category_id: 'Selected category does not exist' }),
           { status: 400 }
         );
       }
@@ -70,7 +72,7 @@ export async function PUT(
 
       if (existingSku) {
         return NextResponse.json(
-          { error: 'Duplicate SKU', details: { sku: 'A product with this SKU already exists' } },
+          errorResponse('Duplicate SKU', { sku: 'A product with this SKU already exists' }),
           { status: 409 }
         );
       }
@@ -95,11 +97,13 @@ export async function PUT(
       include: { category: true },
     });
 
-    return NextResponse.json(product);
+    return NextResponse.json(
+      successResponse(product as ProductWithCategory, 'Product updated successfully')
+    );
   } catch (error) {
     console.error('Error updating product:', error);
     return NextResponse.json(
-      { error: 'Failed to update product. Please try again.' },
+      errorResponse('Failed to update product. Please try again.'),
       { status: 500 }
     );
   }
@@ -120,7 +124,7 @@ export async function DELETE(
     // Validate ID
     if (isNaN(productId) || productId <= 0) {
       return NextResponse.json(
-        { error: 'Invalid product ID' },
+        errorResponse('Invalid product ID'),
         { status: 400 }
       );
     }
@@ -132,7 +136,7 @@ export async function DELETE(
 
     if (!existingProduct) {
       return NextResponse.json(
-        { error: 'Product not found' },
+        errorResponse('Product not found'),
         { status: 404 }
       );
     }
@@ -141,11 +145,13 @@ export async function DELETE(
       where: { id: productId },
     });
 
-    return NextResponse.json({ success: true, message: 'Product deleted successfully' });
+    return NextResponse.json(
+      successResponse(null, 'Product deleted successfully')
+    );
   } catch (error) {
     console.error('Error deleting product:', error);
     return NextResponse.json(
-      { error: 'Failed to delete product. Please try again.' },
+      errorResponse('Failed to delete product. Please try again.'),
       { status: 500 }
     );
   }

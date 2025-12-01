@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { successResponse } from '@/types/api';
 
 // Singleton ID for site settings - there's only one settings record
 const SITE_SETTINGS_ID = 1;
@@ -69,14 +70,20 @@ export async function GET() {
     });
 
     if (settings) {
-      return NextResponse.json(dbToApiFormat(settings));
+      return NextResponse.json(
+        successResponse(dbToApiFormat(settings), 'Settings retrieved successfully')
+      );
     }
 
     // Return default settings if not found in database
-    return NextResponse.json(DEFAULT_SETTINGS);
+    return NextResponse.json(
+      successResponse(DEFAULT_SETTINGS, 'Using default settings')
+    );
   } catch (error) {
     console.error('Error fetching public settings:', error);
     // Return default settings on error to ensure frontend doesn't break
-    return NextResponse.json(DEFAULT_SETTINGS);
+    return NextResponse.json(
+      successResponse(DEFAULT_SETTINGS, 'Error fetching settings, using defaults')
+    );
   }
 }

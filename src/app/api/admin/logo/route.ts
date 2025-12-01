@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import prisma from '@/lib/prisma';
+import { uploadFile, isBlobStorageConfigured } from '@/lib/blob-storage';
+import type { UploadData } from '@/types/api';
+import { successResponse, errorResponse } from '@/types/api';
 
 // Only allow SVG format for logos
 const ALLOWED_MIME_TYPE = 'image/svg+xml';
-const MAX_FILE_SIZE = 512 * 1024; // 512KB - SVGs should be small
+// Maximum file size:
+// - 1MB when using blob storage (SVGs should be small but allow more for blob)
+// - 512KB when using base64
+const MAX_FILE_SIZE_BLOB = 1024 * 1024; // 1MB
+const MAX_FILE_SIZE_BASE64 = 512 * 1024; // 512KB
 const SITE_SETTINGS_ID = 1;
+
+// Logo response data
+interface LogoData {
+  hasLogo: boolean;
+  url: string | null;
+}
 
 // Basic SVG validation to ensure it's a valid SVG
 function isValidSvg(content: string): boolean {
@@ -85,23 +98,18 @@ export async function GET(request: NextRequest) {
       select: { logo_url: true },
     });
 
-    if (settings?.logo_url) {
-      return NextResponse.json({ 
-        hasLogo: true, 
-        url: settings.logo_url,
-      });
-    }
-    
-    return NextResponse.json({ 
-      hasLogo: false, 
-      url: null 
-    });
+    const logoData: LogoData = settings?.logo_url 
+      ? { hasLogo: true, url: settings.logo_url }
+      : { hasLogo: false, url: null };
+
+    return NextResponse.json(
+      successResponse(logoData, logoData.hasLogo ? 'Logo found' : 'No logo configured')
+    );
   } catch (error) {
     console.error('Error fetching logo:', error);
-    return NextResponse.json({ 
-      hasLogo: false, 
-      url: null 
-    });
+    return NextResponse.json(
+      successResponse({ hasLogo: false, url: null }, 'Error fetching logo, returning default')
+    );
   }
 }
 
@@ -116,18 +124,19 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json(
-        { error: 'No file provided' },
+        errorResponse('No file provided'),
         { status: 400 }
       );
     }
 
+    // Determine max file size based on storage type
+    const useBlobStorage = isBlobStorageConfigured();
+    const maxFileSize = useBlobStorage ? MAX_FILE_SIZE_BLOB : MAX_FILE_SIZE_BASE64;
+
     // Validate file size
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > maxFileSize) {
       return NextResponse.json(
-        {
-          error: 'File too large',
-          details: { size: `Maximum file size is ${MAX_FILE_SIZE / 1024}KB` }
-        },
+        errorResponse('File too large', { size: `Maximum file size is ${maxFileSize / 1024}KB` }),
         { status: 400 }
       );
     }
@@ -137,10 +146,7 @@ export async function POST(request: NextRequest) {
     const svgExtensionMatch = fileName.match(/\.svg$/);
     if (!svgExtensionMatch) {
       return NextResponse.json(
-        {
-          error: 'Invalid file type',
-          details: { type: 'Only SVG files are allowed for logos' }
-        },
+        errorResponse('Invalid file type', { type: 'Only SVG files are allowed for logos' }),
         { status: 400 }
       );
     }
@@ -148,10 +154,7 @@ export async function POST(request: NextRequest) {
     // Validate MIME type
     if (file.type !== ALLOWED_MIME_TYPE) {
       return NextResponse.json(
-        {
-          error: 'Invalid file type',
-          details: { mime: 'File must be an SVG image (image/svg+xml)' }
-        },
+        errorResponse('Invalid file type', { mime: 'File must be an SVG image (image/svg+xml)' }),
         { status: 400 }
       );
     }
@@ -162,10 +165,7 @@ export async function POST(request: NextRequest) {
     // Validate SVG structure
     if (!isValidSvg(content)) {
       return NextResponse.json(
-        {
-          error: 'Invalid SVG file',
-          details: { format: 'The file does not appear to be a valid SVG' }
-        },
+        errorResponse('Invalid SVG file', { format: 'The file does not appear to be a valid SVG' }),
         { status: 400 }
       );
     }
@@ -174,7 +174,6 @@ export async function POST(request: NextRequest) {
     const sanitizedContent = sanitizeSvg(content);
     
     // Post-sanitization security check: reject if dangerous patterns remain
-    // This is an additional safety layer in case the sanitization missed something
     const dangerousPatterns = [
       /<script/i,
       /\son[a-z]+\s*=/i,
@@ -188,40 +187,53 @@ export async function POST(request: NextRequest) {
     for (const pattern of dangerousPatterns) {
       if (pattern.test(sanitizedContent)) {
         return NextResponse.json(
-          {
-            error: 'SVG contains potentially unsafe content',
-            details: { security: 'The SVG file contains elements that are not allowed for security reasons' }
-          },
+          errorResponse('SVG contains potentially unsafe content', { 
+            security: 'The SVG file contains elements that are not allowed for security reasons' 
+          }),
           { status: 400 }
         );
       }
     }
 
-    // Convert SVG to data URL for storage in database
-    const base64Content = Buffer.from(sanitizedContent).toString('base64');
-    const dataUrl = `data:image/svg+xml;base64,${base64Content}`;
+    let logoUrl: string;
+
+    if (useBlobStorage) {
+      // Create a new File from sanitized content for blob upload
+      const sanitizedFile = new File([sanitizedContent], file.name, { type: file.type });
+      const result = await uploadFile(sanitizedFile, { folder: 'logos' });
+      logoUrl = result.url;
+    } else {
+      // Convert sanitized SVG to data URL for database storage
+      const base64Content = Buffer.from(sanitizedContent).toString('base64');
+      logoUrl = `data:image/svg+xml;base64,${base64Content}`;
+    }
 
     // Store logo URL in database
     await prisma.siteSetting.upsert({
       where: { id: SITE_SETTINGS_ID },
       create: {
         id: SITE_SETTINGS_ID,
-        logo_url: dataUrl,
+        logo_url: logoUrl,
       },
       update: {
-        logo_url: dataUrl,
+        logo_url: logoUrl,
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      url: dataUrl,
-      message: 'Logo uploaded successfully'
-    });
+    const uploadData: UploadData = {
+      url: logoUrl,
+      filename: file.name,
+      size: file.size,
+      type: file.type,
+    };
+
+    return NextResponse.json(
+      successResponse(uploadData, 'Logo uploaded successfully')
+    );
   } catch (error) {
     console.error('Error uploading logo:', error);
     return NextResponse.json(
-      { error: 'Failed to upload logo. Please try again.' },
+      errorResponse('Failed to upload logo. Please try again.'),
       { status: 500 }
     );
   }
@@ -245,14 +257,13 @@ export async function DELETE(request: NextRequest) {
       },
     });
     
-    return NextResponse.json({
-      success: true,
-      message: 'Logo removed successfully'
-    });
+    return NextResponse.json(
+      successResponse(null, 'Logo removed successfully')
+    );
   } catch (error) {
     console.error('Error removing logo:', error);
     return NextResponse.json(
-      { error: 'Failed to remove logo. Please try again.' },
+      errorResponse('Failed to remove logo. Please try again.'),
       { status: 500 }
     );
   }

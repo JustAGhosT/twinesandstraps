@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { z } from 'zod';
+import { successResponse, errorResponse } from '@/types/api';
 
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
@@ -42,11 +43,13 @@ export async function GET(request: NextRequest) {
       orderBy: { created_at: 'desc' },
     });
 
-    return NextResponse.json(reviews);
+    return NextResponse.json(
+      successResponse(reviews, 'Reviews retrieved successfully')
+    );
   } catch (error) {
     console.error('Error fetching reviews:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch reviews' },
+      errorResponse('Failed to fetch reviews'),
       { status: 500 }
     );
   }
@@ -61,8 +64,15 @@ export async function POST(request: NextRequest) {
     
     const result = createReviewSchema.safeParse(body);
     if (!result.success) {
+      const fieldErrors = result.error.flatten().fieldErrors;
+      const details: Record<string, string> = {};
+      for (const [key, msgs] of Object.entries(fieldErrors)) {
+        if (msgs && msgs.length > 0) {
+          details[key] = msgs[0];
+        }
+      }
       return NextResponse.json(
-        { error: 'Validation failed', details: result.error.flatten().fieldErrors },
+        errorResponse('Validation failed', details),
         { status: 400 }
       );
     }
@@ -76,7 +86,7 @@ export async function POST(request: NextRequest) {
       });
       if (!product) {
         return NextResponse.json(
-          { error: 'Product not found' },
+          errorResponse('Product not found'),
           { status: 404 }
         );
       }
@@ -97,15 +107,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      message: 'Thank you for your review! It will be published after moderation.',
-      review: { id: review.id },
-    }, { status: 201 });
+    return NextResponse.json(
+      successResponse({ id: review.id }, 'Thank you for your review! It will be published after moderation.'),
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error creating review:', error);
     return NextResponse.json(
-      { error: 'Failed to submit review. Please try again.' },
+      errorResponse('Failed to submit review. Please try again.'),
       { status: 500 }
     );
   }
