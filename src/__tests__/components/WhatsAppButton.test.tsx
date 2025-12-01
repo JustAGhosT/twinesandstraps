@@ -222,14 +222,14 @@ describe('WhatsAppButton', () => {
       );
     });
 
-    it('should not open WhatsApp when number is empty', () => {
+    it('should use default number when settings number is empty', () => {
       mockUseSiteSettings.mockReturnValue({
         settings: {
           companyName: 'Test',
           tagline: '',
           email: 'test@example.com',
           phone: '',
-          whatsappNumber: '', // Empty - will fallback to placeholder
+          whatsappNumber: '', // Empty - will fallback to default (27639690773)
           address: '',
           businessHours: '',
           vatRate: '15',
@@ -250,8 +250,12 @@ describe('WhatsAppButton', () => {
       const button = screen.getByRole('button', { name: /contact us on whatsapp/i });
       fireEvent.click(button);
 
-      // Should show warning since empty string falls back to placeholder
-      expect(mockWarning).toHaveBeenCalled();
+      // Should open WhatsApp with the default number
+      expect(mockWindowOpen).toHaveBeenCalledWith(
+        expect.stringContaining('https://wa.me/27639690773'),
+        '_blank',
+        expect.any(String)
+      );
     });
   });
 

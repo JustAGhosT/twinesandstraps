@@ -8,10 +8,11 @@ const WhatsAppButton: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
   const { settings } = useSiteSettings();
   const { warning } = useToast();
-  const whatsappNumber = settings.whatsappNumber || '27XXXXXXXXX';
+  const whatsappNumber = settings.whatsappNumber || '27639690773';
 
   const handleClick = () => {
-    if (whatsappNumber === '27XXXXXXXXX') {
+    // Show warning only if using placeholder value
+    if (whatsappNumber === '27XXXXXXXXX' || !whatsappNumber) {
       warning(`WhatsApp not configured. Please contact us at ${settings.email}`);
       return;
     }

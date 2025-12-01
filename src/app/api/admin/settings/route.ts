@@ -11,7 +11,7 @@ const DEFAULT_SETTINGS = {
   tagline: 'Boundless Strength, Endless Solutions!',
   email: 'admin@tassa.co.za',
   phone: '+27 (0)63 969 0773',
-  whatsappNumber: '27XXXXXXXXX',
+  whatsappNumber: '27639690773',
   address: '',
   businessHours: 'Mon-Fri 8:00-17:00',
   vatRate: '15',

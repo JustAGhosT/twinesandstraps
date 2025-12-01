@@ -234,7 +234,7 @@ model SiteSetting {
   tagline         String   @default("Boundless Strength, Endless Solutions!")
   email           String   @default("admin@tassa.co.za")
   phone           String   @default("+27 (0)63 969 0773")
-  whatsapp_number String   @default("27XXXXXXXXX")
+  whatsapp_number String   @default("27639690773")
   address         String   @default("")
   business_hours  String   @default("Mon-Fri 8:00-17:00")
   vat_rate        String   @default("15")
