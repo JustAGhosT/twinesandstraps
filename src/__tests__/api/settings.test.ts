@@ -113,9 +113,9 @@ describe('Site Settings Validation', () => {
       const fullSettings = {
         companyName: 'Twines and Straps SA (Pty) Ltd',
         tagline: 'Boundless Strength, Endless Solutions!',
-        email: 'info@twinesandstraps.co.za',
-        phone: '+27 (0) 11 234 5678',
-        whatsappNumber: '27123456789',
+        email: 'admin@tassa.co.za',
+        phone: '+27 (0)63 969 0773',
+        whatsappNumber: '27639690773',
         address: '123 Industrial Road, Johannesburg',
         businessHours: 'Mon-Fri 8:00-17:00',
         vatRate: '15',
@@ -130,9 +130,9 @@ describe('Site Settings Validation', () => {
       const result = validateBody(siteSettingsSchema, fullSettings);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.email).toBe('info@twinesandstraps.co.za');
-        expect(result.data.phone).toBe('+27 (0) 11 234 5678');
-        expect(result.data.whatsappNumber).toBe('27123456789');
+        expect(result.data.email).toBe('admin@tassa.co.za');
+        expect(result.data.phone).toBe('+27 (0)63 969 0773');
+        expect(result.data.whatsappNumber).toBe('27639690773');
       }
     });
 

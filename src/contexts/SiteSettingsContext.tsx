@@ -22,8 +22,8 @@ export interface SiteSettings {
 const defaultSettings: SiteSettings = {
   companyName: 'Twines and Straps SA (Pty) Ltd',
   tagline: 'Boundless Strength, Endless Solutions!',
-  email: 'info@twinesandstraps.co.za',
-  phone: '+27 (0) 11 234 5678',
+  email: 'admin@tassa.co.za',
+  phone: '+27 (0)63 969 0773',
   whatsappNumber: '27XXXXXXXXX',
   address: '',
   businessHours: 'Mon-Fri 8:00-17:00',

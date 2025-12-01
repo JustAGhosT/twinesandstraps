@@ -102,8 +102,8 @@ describe('SiteSettingsContext', () => {
       });
 
       // Contact info should fall back to defaults when not provided
-      expect(screen.getByTestId('email')).toHaveTextContent('info@twinesandstraps.co.za');
-      expect(screen.getByTestId('phone')).toHaveTextContent('+27 (0) 11 234 5678');
+      expect(screen.getByTestId('email')).toHaveTextContent('admin@tassa.co.za');
+      expect(screen.getByTestId('phone')).toHaveTextContent('+27 (0)63 969 0773');
     });
 
     it('should use default contact info when API fails', async () => {
@@ -120,8 +120,8 @@ describe('SiteSettingsContext', () => {
       });
 
       // Should fall back to default values
-      expect(screen.getByTestId('email')).toHaveTextContent('info@twinesandstraps.co.za');
-      expect(screen.getByTestId('phone')).toHaveTextContent('+27 (0) 11 234 5678');
+      expect(screen.getByTestId('email')).toHaveTextContent('admin@tassa.co.za');
+      expect(screen.getByTestId('phone')).toHaveTextContent('+27 (0)63 969 0773');
       expect(screen.getByTestId('error')).toHaveTextContent('Failed to load site settings');
     });
 
@@ -142,8 +142,8 @@ describe('SiteSettingsContext', () => {
       });
 
       // Should fall back to defaults
-      expect(screen.getByTestId('email')).toHaveTextContent('info@twinesandstraps.co.za');
-      expect(screen.getByTestId('phone')).toHaveTextContent('+27 (0) 11 234 5678');
+      expect(screen.getByTestId('email')).toHaveTextContent('admin@tassa.co.za');
+      expect(screen.getByTestId('phone')).toHaveTextContent('+27 (0)63 969 0773');
     });
 
     it('should not lose contact info on refresh', async () => {
