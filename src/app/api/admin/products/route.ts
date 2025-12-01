@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { createProductSchema, validateBody, formatZodErrors } from '@/lib/validations';
+import type { ProductWithCategory } from '@/types/database';
+import { successResponse, errorResponse } from '@/types/api';
 
 export async function POST(request: NextRequest) {
   // Verify admin authentication
@@ -15,7 +17,7 @@ export async function POST(request: NextRequest) {
     const validation = validateBody(createProductSchema, body);
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: formatZodErrors(validation.errors) },
+        errorResponse('Validation failed', formatZodErrors(validation.errors)),
         { status: 400 }
       );
     }
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     if (!category) {
       return NextResponse.json(
-        { error: 'Category not found', details: { category_id: 'Selected category does not exist' } },
+        errorResponse('Category not found', { category_id: 'Selected category does not exist' }),
         { status: 400 }
       );
     }
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     if (existingSku) {
       return NextResponse.json(
-        { error: 'Duplicate SKU', details: { sku: 'A product with this SKU already exists' } },
+        errorResponse('Duplicate SKU', { sku: 'A product with this SKU already exists' }),
         { status: 409 }
       );
     }
@@ -64,11 +66,14 @@ export async function POST(request: NextRequest) {
       include: { category: true },
     });
 
-    return NextResponse.json(product, { status: 201 });
+    return NextResponse.json(
+      successResponse(product as ProductWithCategory, 'Product created successfully'),
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error creating product:', error);
     return NextResponse.json(
-      { error: 'Failed to create product. Please try again.' },
+      errorResponse('Failed to create product. Please try again.'),
       { status: 500 }
     );
   }

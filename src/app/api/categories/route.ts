@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import type { Category } from '@/types/database';
+import { successResponse, errorResponse } from '@/types/api';
 
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
+
+// Extended category type with product count
+interface CategoryWithCount extends Category {
+  _count: {
+    products: number;
+  };
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,11 +37,13 @@ export async function GET(request: NextRequest) {
       orderBy: { name: 'asc' },
     });
 
-    return NextResponse.json(categories);
+    return NextResponse.json(
+      successResponse(categories as CategoryWithCount[], 'Categories retrieved successfully')
+    );
   } catch (error) {
     console.error('Error fetching categories:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch categories' },
+      errorResponse('Failed to fetch categories'),
       { status: 500 }
     );
   }
