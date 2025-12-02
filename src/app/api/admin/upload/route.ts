@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     // Warn in response if using base64 fallback (development only)
     const message = result.storageType === 'base64' 
       ? 'File uploaded as base64 (development mode only - configure Azure Blob Storage for production)'
-      : 'File uploaded successfully to Azure Blob Storage';
+      : `File uploaded successfully to Azure Blob Storage (container: ${result.containerName})`;
 
     return NextResponse.json(
       successResponse(uploadData, message)
