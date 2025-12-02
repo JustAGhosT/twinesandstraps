@@ -1,8 +1,16 @@
 /**
  * Blob Storage Utility
  * 
- * Provides abstraction for storing files in blob storage.
- * Supports Azure Blob Storage and falls back to base64 data URLs when not configured.
+ * Provides abstraction for storing files in Azure Blob Storage.
+ * 
+ * IMPORTANT: Azure Blob Storage is REQUIRED for production deployments.
+ * Base64 fallback is only allowed in development mode to prevent hitting
+ * Netlify size limits and to ensure proper image storage.
+ * 
+ * Required environment variables:
+ * - AZURE_STORAGE_ACCOUNT_NAME
+ * - AZURE_STORAGE_ACCOUNT_KEY
+ * - AZURE_STORAGE_CONTAINER_NAME
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -24,6 +32,15 @@ export interface BlobUploadResult {
   storageType: 'blob' | 'base64';
 }
 
+// Storage status with detailed information
+export interface StorageStatusInfo {
+  configured: boolean;
+  type: 'azure' | 'base64';
+  message: string;
+  isProduction: boolean;
+  missingVariables: string[];
+}
+
 /**
  * Check if blob storage is configured
  */
@@ -33,6 +50,30 @@ export function isBlobStorageConfigured(): boolean {
     process.env.AZURE_STORAGE_ACCOUNT_KEY &&
     process.env.AZURE_STORAGE_CONTAINER_NAME
   );
+}
+
+/**
+ * Check if we're in production environment
+ */
+function isProduction(): boolean {
+  return process.env.NODE_ENV === 'production';
+}
+
+/**
+ * Get list of missing Azure storage environment variables
+ */
+function getMissingVariables(): string[] {
+  const missing: string[] = [];
+  if (!process.env.AZURE_STORAGE_ACCOUNT_NAME) {
+    missing.push('AZURE_STORAGE_ACCOUNT_NAME');
+  }
+  if (!process.env.AZURE_STORAGE_ACCOUNT_KEY) {
+    missing.push('AZURE_STORAGE_ACCOUNT_KEY');
+  }
+  if (!process.env.AZURE_STORAGE_CONTAINER_NAME) {
+    missing.push('AZURE_STORAGE_CONTAINER_NAME');
+  }
+  return missing;
 }
 
 /**
@@ -136,6 +177,7 @@ async function uploadToAzureBlob(
 
 /**
  * Convert file to base64 data URL (fallback when blob storage is not configured)
+ * WARNING: Only available in development mode
  */
 function toBase64DataUrl(buffer: Buffer, contentType: string): string {
   const base64 = buffer.toString('base64');
@@ -143,7 +185,14 @@ function toBase64DataUrl(buffer: Buffer, contentType: string): string {
 }
 
 /**
- * Upload a file to blob storage or return base64 data URL as fallback
+ * Upload a file to Azure Blob Storage
+ * 
+ * In production, Azure Blob Storage is REQUIRED. If not configured,
+ * an error will be thrown instead of falling back to base64.
+ * 
+ * In development, falls back to base64 for easier local development.
+ * 
+ * @throws Error if Azure Blob Storage is not configured in production
  */
 export async function uploadFile(
   file: File,
@@ -156,24 +205,36 @@ export async function uploadFile(
     ? `${options.folder}/${generateBlobName(file.name)}`
     : generateBlobName(file.name);
 
+  // If Azure Blob Storage is configured, use it
   if (config) {
-    // Upload to Azure Blob Storage
-    try {
-      const url = await uploadToAzureBlob(config, blobName, buffer, contentType);
-      return {
-        url,
-        filename: blobName,
-        size: file.size,
-        type: contentType,
-        storageType: 'blob',
-      };
-    } catch (error) {
-      console.error('Blob storage upload failed, falling back to base64:', error);
-      // Fall through to base64 fallback
-    }
+    const url = await uploadToAzureBlob(config, blobName, buffer, contentType);
+    return {
+      url,
+      filename: blobName,
+      size: file.size,
+      type: contentType,
+      storageType: 'blob',
+    };
   }
 
-  // Fallback to base64 data URL
+  // In production, Azure Blob Storage is REQUIRED
+  if (isProduction()) {
+    const missing = getMissingVariables();
+    throw new Error(
+      `Azure Blob Storage is required in production but not configured. ` +
+      `Missing environment variables: ${missing.join(', ')}. ` +
+      `Please configure Azure Blob Storage in your Netlify environment variables.`
+    );
+  }
+
+  // In development, allow base64 fallback with a warning
+  console.warn(
+    '[BLOB STORAGE] Azure Blob Storage is not configured. ' +
+    'Falling back to base64 encoding. ' +
+    'This is only allowed in development mode. ' +
+    `Missing: ${getMissingVariables().join(', ')}`
+  );
+
   const dataUrl = toBase64DataUrl(buffer, contentType);
   return {
     url: dataUrl,
@@ -227,19 +288,27 @@ export async function deleteBlob(blobUrl: string): Promise<boolean> {
 }
 
 /**
- * Get storage status information
+ * Get storage status information with detailed diagnostics
  */
-export function getStorageStatus(): {
-  configured: boolean;
-  type: 'azure' | 'base64';
-  message: string;
-} {
+export function getStorageStatus(): StorageStatusInfo {
   const isConfigured = isBlobStorageConfigured();
+  const isProd = isProduction();
+  const missing = getMissingVariables();
+  
+  let message: string;
+  if (isConfigured) {
+    message = 'Azure Blob Storage is configured and ready';
+  } else if (isProd) {
+    message = `Azure Blob Storage is REQUIRED but not configured. Missing: ${missing.join(', ')}`;
+  } else {
+    message = `Development mode: Using base64 fallback. Configure Azure for production. Missing: ${missing.join(', ')}`;
+  }
+
   return {
     configured: isConfigured,
     type: isConfigured ? 'azure' : 'base64',
-    message: isConfigured 
-      ? 'Azure Blob Storage is configured' 
-      : 'Blob storage not configured. Images will be stored as base64 in the database.',
+    message,
+    isProduction: isProd,
+    missingVariables: missing,
   };
 }

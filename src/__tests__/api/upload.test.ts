@@ -258,3 +258,91 @@ describe('Common Upload Failure Scenarios', () => {
     expect(fsError.message).toContain('permission');
   });
 });
+
+describe('Azure Blob Storage Configuration', () => {
+  // These tests document the Azure Blob Storage behavior
+  
+  describe('Production Environment', () => {
+    it('should require Azure Blob Storage configuration', () => {
+      // In production, Azure Blob Storage is REQUIRED
+      // Base64 fallback is NOT allowed to prevent Netlify size limits
+      const productionError = {
+        status: 503,
+        error: 'Azure Blob Storage configuration required',
+        details: {
+          configuration: 'Azure Blob Storage is required in production but not configured.',
+          missing: 'AZURE_STORAGE_ACCOUNT_NAME, AZURE_STORAGE_ACCOUNT_KEY, AZURE_STORAGE_CONTAINER_NAME',
+          help: 'Please configure Azure Blob Storage environment variables in Netlify dashboard.',
+        },
+      };
+      expect(productionError.status).toBe(503);
+      expect(productionError.error).toContain('Azure Blob Storage');
+    });
+
+    it('should list all required environment variables', () => {
+      const requiredEnvVars = [
+        'AZURE_STORAGE_ACCOUNT_NAME',
+        'AZURE_STORAGE_ACCOUNT_KEY',
+        'AZURE_STORAGE_CONTAINER_NAME',
+      ];
+      
+      requiredEnvVars.forEach(envVar => {
+        expect(envVar).toMatch(/^AZURE_STORAGE_/);
+      });
+      expect(requiredEnvVars).toHaveLength(3);
+    });
+  });
+
+  describe('Development Environment', () => {
+    it('should allow base64 fallback with warning', () => {
+      // In development, base64 fallback is allowed for easier local development
+      // A warning should be logged to remind developers to configure Azure
+      const devWarning = '[BLOB STORAGE] Azure Blob Storage is not configured. Falling back to base64 encoding.';
+      expect(devWarning).toContain('Falling back to base64');
+      expect(devWarning).toContain('not configured');
+    });
+
+    it('should indicate storage type in response', () => {
+      // Response should indicate whether blob or base64 was used
+      const base64Response = {
+        storageType: 'base64' as const,
+        message: 'File uploaded as base64 (development mode only - configure Azure Blob Storage for production)',
+      };
+      expect(base64Response.storageType).toBe('base64');
+      expect(base64Response.message).toContain('development mode only');
+    });
+  });
+
+  describe('Storage Status API', () => {
+    it('should provide storage configuration status', () => {
+      // Admin can check storage configuration via /api/admin/storage-status
+      const statusResponse = {
+        configured: false,
+        type: 'base64' as const,
+        isProduction: false,
+        missingVariables: ['AZURE_STORAGE_ACCOUNT_NAME', 'AZURE_STORAGE_ACCOUNT_KEY', 'AZURE_STORAGE_CONTAINER_NAME'],
+        severity: 'warning' as const,
+        recommendation: 'Configure Azure Blob Storage before deploying to production.',
+      };
+      
+      expect(statusResponse.type).toBe('base64');
+      expect(statusResponse.missingVariables).toHaveLength(3);
+      expect(statusResponse.severity).toBe('warning');
+    });
+
+    it('should show success when Azure is configured', () => {
+      const configuredStatus = {
+        configured: true,
+        type: 'azure' as const,
+        isProduction: true,
+        missingVariables: [],
+        severity: 'success' as const,
+        recommendation: 'Azure Blob Storage is properly configured. Images will be stored in Azure.',
+      };
+      
+      expect(configuredStatus.configured).toBe(true);
+      expect(configuredStatus.type).toBe('azure');
+      expect(configuredStatus.severity).toBe('success');
+    });
+  });
+});

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
-import { uploadFile, isBlobStorageConfigured } from '@/lib/blob-storage';
+import { uploadFile, isBlobStorageConfigured, getStorageStatus } from '@/lib/blob-storage';
 import type { UploadData } from '@/types/api';
 import { successResponse, errorResponse } from '@/types/api';
 
@@ -14,8 +14,8 @@ const ALLOWED_MIME_TYPES: Record<string, string> = {
 };
 
 // Maximum file size:
-// - 5MB when using blob storage
-// - 2MB when using base64 (to keep database entries reasonable)
+// - 5MB when using blob storage (required for production)
+// - 2MB when using base64 (development fallback only)
 const MAX_FILE_SIZE_BLOB = 5 * 1024 * 1024; // 5MB
 const MAX_FILE_SIZE_BASE64 = 2 * 1024 * 1024; // 2MB
 
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Upload file using blob storage or fallback to base64
+    // Upload file using Azure Blob Storage (required in production)
     const result = await uploadFile(file, { folder: 'products' });
 
     const uploadData: UploadData = {
@@ -70,13 +70,40 @@ export async function POST(request: NextRequest) {
       type: result.type,
     };
 
+    // Warn in response if using base64 fallback (development only)
+    const message = result.storageType === 'base64' 
+      ? 'File uploaded as base64 (development mode only - configure Azure Blob Storage for production)'
+      : 'File uploaded successfully to Azure Blob Storage';
+
     return NextResponse.json(
-      successResponse(uploadData, `File uploaded successfully${result.storageType === 'base64' ? ' (stored as base64)' : ''}`)
+      successResponse(uploadData, message)
     );
   } catch (error) {
     console.error('Error uploading file:', error);
+    
+    // Provide a more helpful error message for Azure configuration issues
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const isConfigError = errorMessage.includes('Azure Blob Storage is required');
+    
+    if (isConfigError) {
+      const status = getStorageStatus();
+      return NextResponse.json(
+        errorResponse(
+          'Azure Blob Storage configuration required',
+          { 
+            configuration: errorMessage,
+            missing: status.missingVariables.join(', '),
+            help: 'Please configure Azure Blob Storage environment variables in Netlify dashboard.'
+          }
+        ),
+        { status: 503 }
+      );
+    }
+    
     return NextResponse.json(
-      errorResponse('Failed to upload file. Please try again.'),
+      errorResponse('Failed to upload file. Please try again.', 
+        process.env.NODE_ENV === 'development' ? { details: errorMessage } : undefined
+      ),
       { status: 500 }
     );
   }
