@@ -2,24 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'crypto';
 import { promises as fs } from 'fs';
 import path from 'path';
-
-// Allowed domains for image caching (security measure)
-const ALLOWED_DOMAINS = [
-  'images.unsplash.com',
-  'blob.core.windows.net', // Azure Blob Storage
-];
+import { ALLOWED_IMAGE_CACHE_DOMAINS, SUPPORTED_IMAGE_CONTENT_TYPES } from '@/constants';
 
 // Cache directory path
 const CACHE_DIR = path.join(process.cwd(), 'public', 'images', 'cache');
-
-// Supported image content types
-const SUPPORTED_CONTENT_TYPES: Record<string, string> = {
-  'image/jpeg': '.jpg',
-  'image/png': '.png',
-  'image/webp': '.webp',
-  'image/gif': '.gif',
-  'image/svg+xml': '.svg',
-};
 
 /**
  * Generate a hash-based filename for the cached image
@@ -35,7 +21,7 @@ function generateCacheFilename(url: string): string {
 function isAllowedDomain(url: string): boolean {
   try {
     const parsedUrl = new URL(url);
-    return ALLOWED_DOMAINS.some(
+    return ALLOWED_IMAGE_CACHE_DOMAINS.some(
       (domain) =>
         parsedUrl.hostname === domain || parsedUrl.hostname.endsWith(`.${domain}`)
     );
@@ -50,14 +36,14 @@ function isAllowedDomain(url: string): boolean {
 function getExtensionFromContentType(contentType: string): string {
   // Handle content type with charset or other parameters
   const baseType = contentType.split(';')[0].trim();
-  return SUPPORTED_CONTENT_TYPES[baseType] || '.jpg';
+  return SUPPORTED_IMAGE_CONTENT_TYPES[baseType] || '.jpg';
 }
 
 /**
  * Check if a cached file exists and return its path with extension
  */
 async function findCachedFile(basePath: string): Promise<string | null> {
-  const extensions = Object.values(SUPPORTED_CONTENT_TYPES);
+  const extensions = Object.values(SUPPORTED_IMAGE_CONTENT_TYPES);
   for (const ext of extensions) {
     const filePath = `${basePath}${ext}`;
     try {
@@ -118,7 +104,7 @@ export async function GET(request: NextRequest) {
       const cachedData = await fs.readFile(existingCachedFile);
       const ext = path.extname(existingCachedFile);
       const contentType =
-        Object.entries(SUPPORTED_CONTENT_TYPES).find(
+        Object.entries(SUPPORTED_IMAGE_CONTENT_TYPES).find(
           ([, e]) => e === ext
         )?.[0] || 'image/jpeg';
 
@@ -135,7 +121,7 @@ export async function GET(request: NextRequest) {
     // Fetch image from external source
     const response = await fetch(decodedUrl, {
       headers: {
-        'User-Agent': 'TwinesAndStraps-ImageCache/1.0',
+        'User-Agent': 'ImageCache/1.0',
       },
     });
 

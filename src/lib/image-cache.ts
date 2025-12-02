@@ -5,11 +5,7 @@
  * performance and reduce dependency on external image sources.
  */
 
-// Domains that are allowed for caching (must match route.ts)
-const ALLOWED_DOMAINS = [
-  'images.unsplash.com',
-  'blob.core.windows.net',
-];
+import { ALLOWED_IMAGE_CACHE_DOMAINS } from '@/constants';
 
 /**
  * Check if a URL is from an allowed domain for caching
@@ -17,7 +13,7 @@ const ALLOWED_DOMAINS = [
 export function isAllowedForCaching(url: string): boolean {
   try {
     const parsedUrl = new URL(url);
-    return ALLOWED_DOMAINS.some(
+    return ALLOWED_IMAGE_CACHE_DOMAINS.some(
       (domain) =>
         parsedUrl.hostname === domain || parsedUrl.hostname.endsWith(`.${domain}`)
     );
