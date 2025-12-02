@@ -30,6 +30,7 @@ export interface BlobUploadResult {
   size: number;
   type: string;
   storageType: 'blob' | 'base64';
+  containerName?: string;
 }
 
 // Storage status with detailed information
@@ -39,6 +40,8 @@ export interface StorageStatusInfo {
   message: string;
   isProduction: boolean;
   missingVariables: string[];
+  containerName?: string;
+  accountName?: string;
 }
 
 /**
@@ -128,6 +131,8 @@ async function uploadToAzureBlob(
   const contentLength = buffer.length;
   const blobUrl = `${config.endpoint}/${config.containerName}/${blobName}`;
   
+  console.log(`[BLOB STORAGE] Uploading to container: ${config.containerName}, blob: ${blobName}`);
+  
   // Azure Storage REST API authorization
   const stringToSign = [
     'PUT', // HTTP Verb
@@ -169,9 +174,11 @@ async function uploadToAzureBlob(
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Failed to upload to Azure Blob Storage: ${response.status} - ${errorText}`);
+    console.error(`[BLOB STORAGE] Upload failed: ${response.status} - ${errorText}`);
+    throw new Error(`Failed to upload to Azure Blob Storage (container: ${config.containerName}): ${response.status} - ${errorText}`);
   }
 
+  console.log(`[BLOB STORAGE] Upload successful: ${blobUrl}`);
   return blobUrl;
 }
 
@@ -214,6 +221,7 @@ export async function uploadFile(
       size: file.size,
       type: contentType,
       storageType: 'blob',
+      containerName: config.containerName,
     };
   }
 
@@ -294,10 +302,11 @@ export function getStorageStatus(): StorageStatusInfo {
   const isConfigured = isBlobStorageConfigured();
   const isProd = isProduction();
   const missing = getMissingVariables();
+  const config = getBlobStorageConfig();
   
   let message: string;
   if (isConfigured) {
-    message = 'Azure Blob Storage is configured and ready';
+    message = `Azure Blob Storage is configured and ready. Container: ${config?.containerName}`;
   } else if (isProd) {
     message = `Azure Blob Storage is REQUIRED but not configured. Missing: ${missing.join(', ')}`;
   } else {
@@ -310,5 +319,7 @@ export function getStorageStatus(): StorageStatusInfo {
     message,
     isProduction: isProd,
     missingVariables: missing,
+    containerName: config?.containerName,
+    accountName: config?.accountName,
   };
 }

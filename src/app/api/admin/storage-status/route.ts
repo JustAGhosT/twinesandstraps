@@ -28,15 +28,28 @@ export async function GET(request: NextRequest) {
       severity = 'warning';
     }
 
+    // Build recommendation message
+    let recommendation: string;
+    if (status.configured) {
+      recommendation = `Azure Blob Storage is properly configured. Images will be uploaded to container "${status.containerName}" in account "${status.accountName}". Note: Images are stored in the "products/" virtual folder within the container.`;
+    } else if (status.isProduction) {
+      recommendation = 'CRITICAL: Configure Azure Blob Storage in Netlify environment variables to enable image uploads.';
+    } else {
+      recommendation = 'Configure Azure Blob Storage before deploying to production.';
+    }
+
     return NextResponse.json(
       successResponse({
         ...status,
         severity,
-        recommendation: status.configured 
-          ? 'Azure Blob Storage is properly configured. Images will be stored in Azure.'
-          : status.isProduction
-            ? 'CRITICAL: Configure Azure Blob Storage in Netlify environment variables to enable image uploads.'
-            : 'Configure Azure Blob Storage before deploying to production.',
+        recommendation,
+        // Add explicit endpoint info when configured
+        endpoint: status.configured && status.accountName 
+          ? `https://${status.accountName}.blob.core.windows.net` 
+          : null,
+        uploadPath: status.configured 
+          ? `${status.containerName}/products/` 
+          : null,
       })
     );
   } catch (error) {
