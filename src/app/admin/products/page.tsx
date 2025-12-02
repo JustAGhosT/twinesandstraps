@@ -81,21 +81,36 @@ export default function ProductsPage() {
       );
     }
     
-    // Check if it's from blob storage (starts with / or contains blob storage domains)
-    const isBlobStorage = imageUrl.startsWith('/') || 
-      imageUrl.includes('blob.core.windows.net') || 
-      imageUrl.includes('vercel-storage.com') ||
-      imageUrl.includes('netlify');
-    
-    if (isBlobStorage) {
+    // Check if it's a local/relative path (hosted on same domain)
+    if (imageUrl.startsWith('/')) {
       return (
-        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
-          Blob Storage
+        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+          Local
         </span>
       );
     }
     
-    // External URL (http/https)
+    // Check if it's from known blob storage providers
+    const blobStoragePatterns = [
+      'blob.core.windows.net',      // Azure Blob Storage
+      'vercel-storage.com',         // Vercel Blob
+      's3.amazonaws.com',           // AWS S3
+      'storage.googleapis.com',     // Google Cloud Storage
+      'netlify',                    // Netlify (assets/functions)
+      'cloudinary.com',             // Cloudinary
+    ];
+    
+    const isBlobStorage = blobStoragePatterns.some(pattern => imageUrl.includes(pattern));
+    
+    if (isBlobStorage) {
+      return (
+        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
+          Cloud Storage
+        </span>
+      );
+    }
+    
+    // External URL (http/https from other sources like Unsplash, etc.)
     return (
       <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400">
         External URL
