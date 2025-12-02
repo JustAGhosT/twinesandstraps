@@ -1,6 +1,6 @@
 # ADR-011: Hosting Infrastructure Decision
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2025-12-02
 **Decision Makers:** Development Team, Business Owner
 **Technical Story:** Evaluate hosting infrastructure options for the Twines and Straps e-commerce platform
@@ -8,6 +8,8 @@
 ## Context and Problem Statement
 
 Twines and Straps SA needs to select a hosting infrastructure that balances cost, performance, reliability, and operational complexity. The current stack uses Netlify for frontend hosting with Neon PostgreSQL as the database. With the addition of Azure Blob Storage for image hosting, we should evaluate whether to consolidate on Azure or continue with the current multi-provider approach.
+
+> **Note:** If you're seeing a 503 error on `/api/admin/upload`, this is a configuration issue, not a hosting issue. Azure Blob Storage environment variables need to be configured in Netlify. See [docs/SETUP.md](../SETUP.md#azure-blob-storage-required-for-production) for setup instructions.
 
 ### Current Architecture
 
