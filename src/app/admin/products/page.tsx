@@ -31,7 +31,7 @@ export default function ProductsPage() {
       const res = await fetch('/api/products');
       if (res.ok) {
         const data = await res.json();
-        setProducts(data.products || []);
+        setProducts(data.data?.items || []);
       }
     } catch (error) {
       console.error('Error fetching products:', error);

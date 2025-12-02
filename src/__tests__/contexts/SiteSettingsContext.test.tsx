@@ -60,7 +60,7 @@ describe('SiteSettingsContext', () => {
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockSettings,
+        json: async () => ({ data: mockSettings }),
       });
 
       render(
@@ -88,7 +88,7 @@ describe('SiteSettingsContext', () => {
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => partialSettings,
+        json: async () => ({ data: partialSettings }),
       });
 
       render(
@@ -156,7 +156,7 @@ describe('SiteSettingsContext', () => {
       // First load
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockSettings,
+        json: async () => ({ data: mockSettings }),
       });
 
       let capturedRefresh: (() => Promise<void>) | null = null;
@@ -193,7 +193,7 @@ describe('SiteSettingsContext', () => {
       // Setup mock for refresh - same data should persist
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockSettings,
+        json: async () => ({ data: mockSettings }),
       });
 
       // Trigger refresh
@@ -218,7 +218,7 @@ describe('SiteSettingsContext', () => {
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => settingsWithEmptyPhone,
+        json: async () => ({ data: settingsWithEmptyPhone }),
       });
 
       render(

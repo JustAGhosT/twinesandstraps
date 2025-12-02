@@ -65,7 +65,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
       const res = await fetch(`/api/reviews?productId=${productId}`);
       if (res.ok) {
         const data = await res.json();
-        setReviews(data);
+        setReviews(data.data || []);
       }
     } catch (err) {
       console.error('Error fetching reviews:', err);

@@ -61,7 +61,7 @@ export function SiteSettingsProvider({ children }: SiteSettingsProviderProps) {
       const res = await fetch('/api/settings');
       if (res.ok) {
         const data = await res.json();
-        setSettings({ ...defaultSettings, ...data });
+        setSettings({ ...defaultSettings, ...(data.data || {}) });
       } else {
         console.warn('Failed to fetch settings, using defaults');
       }
