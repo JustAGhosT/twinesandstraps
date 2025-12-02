@@ -59,7 +59,7 @@ export default function ProductEditPage() {
       const res = await fetch('/api/categories');
       if (res.ok) {
         const data = await res.json();
-        setCategories(data);
+        setCategories(data.data || []);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -70,7 +70,8 @@ export default function ProductEditPage() {
     try {
       const res = await fetch(`/api/products/${params.id}`);
       if (res.ok) {
-        const product = await res.json();
+        const data = await res.json();
+        const product = data.data;
         setForm({
           name: product.name || '',
           sku: product.sku || '',
@@ -128,8 +129,8 @@ export default function ProductEditPage() {
     try {
       const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
       if (res.ok) {
-        const { url } = await res.json();
-        setForm(prev => ({ ...prev, image_url: url }));
+        const data = await res.json();
+        setForm(prev => ({ ...prev, image_url: data.data?.url || '' }));
       }
     } catch (error) {
       console.error('Error uploading image:', error);
