@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import prisma from '@/lib/prisma';
-import { uploadFile, isBlobStorageConfigured } from '@/lib/blob-storage';
+import { uploadFile, isBlobStorageConfigured, getStorageStatus } from '@/lib/blob-storage';
 import type { UploadData } from '@/types/api';
 import { successResponse, errorResponse } from '@/types/api';
 
@@ -202,8 +202,23 @@ export async function POST(request: NextRequest) {
       const sanitizedFile = new File([sanitizedContent], file.name, { type: file.type });
       const result = await uploadFile(sanitizedFile, { folder: 'logos' });
       logoUrl = result.url;
+    } else if (process.env.NODE_ENV === 'production') {
+      // In production, Azure Blob Storage is required
+      const status = getStorageStatus();
+      return NextResponse.json(
+        errorResponse(
+          'Azure Blob Storage configuration required',
+          { 
+            configuration: 'Azure Blob Storage is required for logo uploads in production.',
+            missing: status.missingVariables.join(', '),
+            help: 'Please configure Azure Blob Storage environment variables in Netlify dashboard.'
+          }
+        ),
+        { status: 503 }
+      );
     } else {
-      // Convert sanitized SVG to data URL for database storage
+      // In development, allow base64 fallback with a warning
+      console.warn('[LOGO UPLOAD] Azure Blob Storage not configured. Using base64 fallback (development only).');
       const base64Content = Buffer.from(sanitizedContent).toString('base64');
       logoUrl = `data:image/svg+xml;base64,${base64Content}`;
     }

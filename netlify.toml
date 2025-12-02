@@ -63,5 +63,16 @@
 # NEXT_PUBLIC_WHATSAPP_NUMBER (REQUIRED)
 #   - WhatsApp Business number for quote requests
 #   - Format: country code + number (e.g., 27821234567)
+#
+# AZURE_STORAGE_ACCOUNT_NAME (REQUIRED for image uploads)
+#   - Azure Storage account name
+#
+# AZURE_STORAGE_ACCOUNT_KEY (REQUIRED for image uploads)
+#   - Azure Storage account access key
+#
+# AZURE_STORAGE_CONTAINER_NAME (REQUIRED for image uploads)
+#   - Azure Blob Storage container name (e.g., "images")
+#
+# Note: Image uploads will FAIL in production without Azure Blob Storage configured.
 # =============================================================================
 
