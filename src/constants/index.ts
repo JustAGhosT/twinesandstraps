@@ -9,3 +9,4 @@ export * from './api';
 export * from './ui';
 export * from './theme';
 export * from './messages';
+export * from './images';

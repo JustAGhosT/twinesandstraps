@@ -15,7 +15,13 @@ export const createProductSchema = z.object({
   price: z.number().positive('Price must be positive'),
   vat_applicable: z.boolean().default(true),
   stock_status: z.enum([STOCK_STATUS.IN_STOCK, STOCK_STATUS.LOW_STOCK, STOCK_STATUS.OUT_OF_STOCK]).default(STOCK_STATUS.IN_STOCK),
-  image_url: z.string().url('Invalid image URL').nullable().optional(),
+  image_url: z.string()
+    .refine(
+      (val) => !val || val.startsWith('data:image/') || z.string().url().safeParse(val).success,
+      'Invalid image URL'
+    )
+    .nullable()
+    .optional(),
   category_id: z.number().int().positive('Valid category is required'),
 });
 
