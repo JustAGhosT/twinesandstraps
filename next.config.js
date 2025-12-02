@@ -8,13 +8,13 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
         pathname: '/**',
       },
-      // Azure AI Foundry - for AI-generated product images (optional)
-      // Add your Azure storage endpoint if using AI-generated images
-      // {
-      //   protocol: 'https',
-      //   hostname: 'your-azure-storage.blob.core.windows.net',
-      //   pathname: '/**',
-      // },
+      // Azure Blob Storage - for uploaded product images and logos
+      // Wildcard pattern allows any Azure blob storage account
+      {
+        protocol: 'https',
+        hostname: '*.blob.core.windows.net',
+        pathname: '/**',
+      },
     ],
   },
 };
