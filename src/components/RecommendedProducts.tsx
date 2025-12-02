@@ -28,7 +28,8 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
         return res.json();
       })
       .then(data => {
-        setProducts(data.slice(0, maxProducts));
+        const products = data.data || [];
+        setProducts(products.slice(0, maxProducts));
         setLoading(false);
       })
       .catch((error) => {
