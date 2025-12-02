@@ -1,0 +1,338 @@
+# ADR-011: Hosting Infrastructure Decision
+
+**Status:** Proposed
+**Date:** 2025-12-02
+**Decision Makers:** Development Team, Business Owner
+**Technical Story:** Evaluate hosting infrastructure options for the Twines and Straps e-commerce platform
+
+## Context and Problem Statement
+
+Twines and Straps SA needs to select a hosting infrastructure that balances cost, performance, reliability, and operational complexity. The current stack uses Netlify for frontend hosting with Neon PostgreSQL as the database. With the addition of Azure Blob Storage for image hosting, we should evaluate whether to consolidate on Azure or continue with the current multi-provider approach.
+
+### Current Architecture
+
+| Component | Current Provider | Monthly Cost (Est.) |
+|-----------|-----------------|---------------------|
+| Frontend Hosting | Netlify | Free tier / $19 Pro |
+| Database | Neon PostgreSQL | Free tier / $19 Pro |
+| Image Storage | Azure Blob Storage | ~$5-20 |
+| Domain/DNS | External | ~$10/year |
+
+## Decision Drivers
+
+- **Cost Efficiency:** Total cost of ownership for a small e-commerce site
+- **Operational Complexity:** Number of providers/dashboards to manage
+- **Performance:** Global CDN, edge computing, database latency
+- **Scalability:** Ability to grow with business needs
+- **Developer Experience:** Deployment workflow, monitoring, debugging
+- **South African Market:** CDN presence, latency for SA users
+- **Reliability:** Uptime SLAs, disaster recovery options
+
+## Considered Options
+
+### Option 1: Current Stack (Netlify + Neon + Azure Blob)
+
+**Description:** Maintain current multi-provider architecture.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Architecture                             │
+├─────────────────────────────────────────────────────────────────┤
+│  User → Netlify CDN → Next.js (Serverless)                      │
+│                           │                                      │
+│                    ┌──────┴──────┐                               │
+│                    ↓             ↓                               │
+│              Neon PostgreSQL   Azure Blob                        │
+│              (Database)        (Images)                          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+| Aspect | Details |
+|--------|---------|
+| **Monthly Cost** | Free-$40 (starter), $50-100 (production) |
+| **Providers** | 3 separate providers |
+| **Deployment** | Git push to Netlify |
+| **Database** | Serverless PostgreSQL with autoscaling |
+| **CDN** | Netlify Edge (global) |
+| **SA Latency** | Good (Netlify has African PoPs) |
+
+**Pros:**
+- Already implemented and working
+- Each provider specializes in their domain
+- Free tiers cover development/staging
+- Netlify has excellent Next.js support
+- Neon offers serverless PostgreSQL with branching
+- Minimal vendor lock-in
+
+**Cons:**
+- Three separate dashboards to manage
+- Three separate billing relationships
+- Potential latency between services
+- Cross-provider debugging is harder
+- No unified logging/monitoring
+
+### Option 2: Full Azure Stack
+
+**Description:** Migrate everything to Azure for unified management.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Azure Architecture                            │
+├─────────────────────────────────────────────────────────────────┤
+│  User → Azure Front Door (CDN)                                  │
+│              │                                                   │
+│              ↓                                                   │
+│    Azure App Service / Container Apps                            │
+│    (Next.js Application)                                         │
+│              │                                                   │
+│       ┌──────┴──────┐                                           │
+│       ↓             ↓                                           │
+│  Azure PostgreSQL   Azure Blob                                   │
+│  Flexible Server    Storage                                      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+| Aspect | Details |
+|--------|---------|
+| **Monthly Cost** | $50-150 (starter), $150-400 (production) |
+| **Providers** | 1 unified provider |
+| **Deployment** | Azure DevOps / GitHub Actions |
+| **Database** | Azure Database for PostgreSQL |
+| **CDN** | Azure Front Door / CDN |
+| **SA Latency** | Excellent (Azure South Africa regions) |
+
+**Pros:**
+- Single provider for all services
+- Azure South Africa region for low latency
+- Unified billing and management
+- Integrated monitoring (Azure Monitor)
+- Enterprise-grade SLAs
+- Access to Azure AI services
+
+**Cons:**
+- Higher base cost for small sites
+- More complex initial setup
+- Requires Azure expertise
+- Less streamlined than Netlify for Next.js
+- Overengineered for current scale
+
+### Option 3: Vercel + Neon + Azure Blob
+
+**Description:** Use Vercel (Next.js creators) for optimal frontend hosting.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Vercel Architecture                           │
+├─────────────────────────────────────────────────────────────────┤
+│  User → Vercel Edge Network                                      │
+│              │                                                   │
+│              ↓                                                   │
+│    Vercel Serverless (Next.js)                                  │
+│              │                                                   │
+│       ┌──────┴──────┐                                           │
+│       ↓             ↓                                           │
+│  Neon PostgreSQL    Azure Blob                                   │
+│  (or Vercel Postgres)                                           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+| Aspect | Details |
+|--------|---------|
+| **Monthly Cost** | $20-50 (starter), $80-200 (production) |
+| **Providers** | 2-3 providers |
+| **Deployment** | Git push (best-in-class) |
+| **Database** | Neon or Vercel Postgres |
+| **CDN** | Vercel Edge Network |
+| **SA Latency** | Good (Vercel has African edge nodes) |
+
+**Pros:**
+- Best Next.js performance and features
+- First-party Next.js support
+- Excellent preview deployments
+- Built-in analytics
+- Vercel Postgres integration option
+
+**Cons:**
+- Higher cost than Netlify
+- Still multiple providers
+- Hobby tier limitations
+- Team plans can get expensive
+
+### Option 4: Cloudflare Pages + D1/Turso + R2
+
+**Description:** Full Cloudflare stack for edge-first architecture.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  Cloudflare Architecture                         │
+├─────────────────────────────────────────────────────────────────┤
+│  User → Cloudflare CDN (global edge)                            │
+│              │                                                   │
+│              ↓                                                   │
+│    Cloudflare Pages + Workers                                    │
+│    (Next.js on Edge Runtime)                                     │
+│              │                                                   │
+│       ┌──────┴──────┐                                           │
+│       ↓             ↓                                           │
+│   D1 / Turso        R2 Storage                                   │
+│   (SQLite Edge)     (S3-compatible)                              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+| Aspect | Details |
+|--------|---------|
+| **Monthly Cost** | Free-$25 (starter), $50-100 (production) |
+| **Providers** | 1-2 providers |
+| **Deployment** | Git push |
+| **Database** | D1 (SQLite) or Turso (edge SQLite) |
+| **CDN** | Cloudflare (excellent global coverage) |
+| **SA Latency** | Excellent (Cloudflare has SA PoPs) |
+
+**Pros:**
+- Lowest latency globally
+- Excellent free tier
+- S3-compatible storage (R2)
+- Unified Cloudflare dashboard
+- Great DDoS protection included
+
+**Cons:**
+- Requires PostgreSQL to SQLite migration
+- Some Next.js features limited on edge
+- D1 is still in beta
+- Less mature than other options
+
+### Option 5: AWS Amplify + RDS + S3
+
+**Description:** Full AWS stack using Amplify for simplified deployment.
+
+| Aspect | Details |
+|--------|---------|
+| **Monthly Cost** | $30-80 (starter), $100-300 (production) |
+| **Providers** | 1 unified provider |
+| **Deployment** | Git push via Amplify |
+| **Database** | RDS PostgreSQL / Aurora Serverless |
+| **CDN** | CloudFront |
+| **SA Latency** | Good (AWS Cape Town region) |
+
+**Pros:**
+- Single provider
+- AWS Cape Town region
+- Enterprise-grade infrastructure
+- Excellent scaling options
+
+**Cons:**
+- Complex pricing model
+- AWS expertise required
+- Higher cost for small sites
+- Steeper learning curve
+
+## Cost Comparison
+
+### Estimated Monthly Costs by Traffic Level
+
+| Scenario | Netlify+Neon+Azure | Full Azure | Vercel+Neon+Azure | Cloudflare+R2 | AWS |
+|----------|-------------------|------------|-------------------|---------------|-----|
+| **Development** | Free | $30-50 | $20 | Free | $30 |
+| **Small (1K visits/mo)** | $0-30 | $50-80 | $20-40 | $0-10 | $40-60 |
+| **Medium (10K visits/mo)** | $40-60 | $80-120 | $50-80 | $25-40 | $70-100 |
+| **Growth (50K visits/mo)** | $60-100 | $150-250 | $100-150 | $50-80 | $120-180 |
+
+### Feature Comparison
+
+| Feature | Netlify+Neon | Full Azure | Vercel+Neon | Cloudflare |
+|---------|--------------|------------|-------------|------------|
+| Deploy Preview | ✅ Excellent | ⚠️ Manual setup | ✅ Excellent | ✅ Good |
+| CDN | ✅ Good | ✅ Front Door | ✅ Excellent | ✅ Excellent |
+| Edge Functions | ✅ Good | ⚠️ Limited | ✅ Excellent | ✅ Excellent |
+| Database Branching | ✅ Neon | ❌ No | ✅ Neon | ❌ No |
+| SA Presence | ✅ Yes | ✅ Native | ✅ Yes | ✅ Yes |
+| Unified Billing | ❌ 3 providers | ✅ 1 provider | ❌ 2-3 providers | ✅ 1 provider |
+| Monitoring | ⚠️ Separate | ✅ Azure Monitor | ⚠️ Separate | ⚠️ Separate |
+
+## Decision Outcome
+
+**Chosen Option: Option 1 - Current Stack (Netlify + Neon + Azure Blob)**
+
+### Rationale
+
+1. **Already Working:** The current architecture is functional and proven
+2. **Cost-Effective:** Free tiers cover development; production costs are reasonable
+3. **Right-Sized:** Matches current traffic and complexity needs
+4. **Best-of-Breed:** Each provider excels at their specific function
+5. **Migration Risk:** Moving to a new platform introduces unnecessary risk
+6. **Azure Integration:** Already using Azure Blob Storage; easy to expand Azure usage later
+
+### When to Reconsider
+
+Consider migrating to Full Azure (Option 2) when:
+- Monthly traffic exceeds 50K visits
+- Need unified enterprise logging/monitoring
+- Want to leverage Azure AI services more heavily
+- Team has Azure expertise
+- Require Azure Active Directory integration
+
+Consider Vercel (Option 3) when:
+- Need cutting-edge Next.js features immediately
+- Preview deployments become critical to workflow
+- Team size grows significantly
+
+### Implementation Notes
+
+#### Current Stack Optimization
+
+1. **Add Azure CDN in front of Blob Storage** for faster image delivery:
+   ```
+   Azure CDN → Azure Blob Storage
+   ```
+
+2. **Configure Neon for South Africa** by selecting appropriate region
+
+3. **Monitor costs** using each provider's dashboard:
+   - Netlify: Analytics dashboard
+   - Neon: Usage metrics
+   - Azure: Cost Management
+
+4. **Set up unified logging** using external service (e.g., Axiom, LogRocket) if needed
+
+### Future Migration Path
+
+If consolidation becomes necessary:
+
+```
+Phase 1: Current Stack (Now)
+    ↓
+Phase 2: Add Azure CDN for images
+    ↓
+Phase 3: Evaluate Azure Container Apps for app hosting
+    ↓
+Phase 4: Consider Azure PostgreSQL migration
+    ↓
+Phase 5: Full Azure Stack (if justified by scale)
+```
+
+### Positive Consequences
+
+- No immediate migration effort required
+- Continue using familiar tools
+- Costs remain predictable
+- Each provider can be replaced independently
+- Can gradually adopt more Azure services
+
+### Negative Consequences
+
+- Multiple dashboards to monitor
+- Cross-provider debugging challenges
+- No unified support contract
+- Potential latency between services
+
+## Links
+
+- [Netlify Pricing](https://www.netlify.com/pricing/)
+- [Neon Pricing](https://neon.tech/pricing)
+- [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/)
+- [Vercel Pricing](https://vercel.com/pricing)
+- [Cloudflare Pages](https://pages.cloudflare.com/)
+
+---
+
+*Last Updated: December 2025*
