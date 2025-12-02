@@ -89,11 +89,12 @@ export async function POST(request: NextRequest) {
       const status = getStorageStatus();
       return NextResponse.json(
         errorResponse(
-          'Azure Blob Storage configuration required',
+          'Azure Blob Storage configuration required for image uploads',
           { 
             configuration: errorMessage,
             missing: status.missingVariables.join(', '),
-            help: 'Please configure Azure Blob Storage environment variables in Netlify dashboard.'
+            help: 'Please configure Azure Blob Storage environment variables in Netlify dashboard. See docs/SETUP.md for detailed setup instructions.',
+            documentation: 'https://github.com/JustAGhosT/twinesandstraps/blob/main/docs/SETUP.md#azure-blob-storage-required-for-production'
           }
         ),
         { status: 503 }

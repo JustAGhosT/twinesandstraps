@@ -121,6 +121,16 @@ DATABASE_URL="postgresql://localhost:5432/twinesandstraps"
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@host/db` |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | WhatsApp Business number for quotes | `27821234567` |
 
+### Required for Production (Image Uploads)
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `AZURE_STORAGE_ACCOUNT_NAME` | Azure Storage account name | `twinesandstrapsstorage` |
+| `AZURE_STORAGE_ACCOUNT_KEY` | Azure Storage account access key | (from Azure Portal) |
+| `AZURE_STORAGE_CONTAINER_NAME` | Azure Blob Storage container name | `images` |
+
+> ⚠️ **Important**: Image uploads will fail with a 503 error in production if Azure Blob Storage is not configured. See [Azure Blob Storage Setup](#azure-blob-storage-required-for-production) below.
+
 ### Optional Variables
 
 | Variable | Description | Default |
@@ -185,6 +195,54 @@ The repository includes automated workflows:
 
 ---
 
+## Azure Blob Storage (Required for Production)
+
+Azure Blob Storage is **required** for image uploads in production. Without it, the admin panel will return a 503 error when trying to upload product images.
+
+### Setup Steps
+
+1. **Go to [Azure Portal](https://portal.azure.com/)**
+
+2. **Create a Storage Account:**
+   - Search for "Storage accounts" in the portal
+   - Click "Create"
+   - Select your subscription and resource group
+   - Enter a unique storage account name (lowercase letters and numbers only)
+   - Choose a region close to your users (e.g., South Africa North for SA customers)
+   - Click "Review + create"
+
+3. **Get Your Credentials:**
+   - Go to your storage account
+   - Under "Security + networking", click "Access keys"
+   - Copy **Storage account name** → `AZURE_STORAGE_ACCOUNT_NAME`
+   - Copy **key1** (or key2) → `AZURE_STORAGE_ACCOUNT_KEY`
+
+4. **Create a Container:**
+   - In your storage account, go to "Data storage" → "Containers"
+   - Click "+ Container"
+   - Name it `images` (or your preferred name)
+   - Set "Public access level" to **Blob** (for public image access)
+   - Copy container name → `AZURE_STORAGE_CONTAINER_NAME`
+
+5. **Add to Netlify:**
+   - Go to Netlify: **Site settings → Environment variables**
+   - Add all three variables:
+     - `AZURE_STORAGE_ACCOUNT_NAME`
+     - `AZURE_STORAGE_ACCOUNT_KEY`
+     - `AZURE_STORAGE_CONTAINER_NAME`
+
+6. **Redeploy your site** to pick up the new environment variables.
+
+### Verify Configuration
+
+After deployment, you can check if Azure Blob Storage is properly configured:
+
+1. Log in to the admin panel
+2. Go to Admin Settings → Storage Status
+3. You should see "Azure Blob Storage is configured and ready"
+
+---
+
 ## AI Image Generation (Optional)
 
 Products can have AI-generated images created during database seeding.
@@ -212,6 +270,25 @@ For detailed setup: [Azure AI Foundry Quickstart](https://learn.microsoft.com/en
 ---
 
 ## Troubleshooting
+
+### "503 Service Unavailable" on Image Upload
+
+This error occurs when Azure Blob Storage is not configured in production.
+
+**Error message in browser console:**
+```
+POST https://yoursite.netlify.app/api/admin/upload 503 (Service Unavailable)
+```
+
+**Solution:**
+1. Configure Azure Blob Storage environment variables in Netlify. See [Azure Blob Storage Setup](#azure-blob-storage-required-for-production).
+2. Ensure all three variables are set:
+   - `AZURE_STORAGE_ACCOUNT_NAME`
+   - `AZURE_STORAGE_ACCOUNT_KEY`
+   - `AZURE_STORAGE_CONTAINER_NAME`
+3. Redeploy your site after adding the variables.
+
+**Why this happens:** In development, images are stored as base64 data URLs. In production, this is disabled because base64 images can be very large and cause performance issues. Azure Blob Storage is required for production deployments.
 
 ### "Cannot connect to database"
 
