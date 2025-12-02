@@ -72,6 +72,37 @@ export default function ProductsPage() {
     }
   };
 
+  const getImageSourceBadge = (imageUrl: string | null) => {
+    if (!imageUrl) {
+      return (
+        <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+          None
+        </span>
+      );
+    }
+    
+    // Check if it's from blob storage (starts with / or contains blob storage domains)
+    const isBlobStorage = imageUrl.startsWith('/') || 
+      imageUrl.includes('blob.core.windows.net') || 
+      imageUrl.includes('vercel-storage.com') ||
+      imageUrl.includes('netlify');
+    
+    if (isBlobStorage) {
+      return (
+        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
+          Blob Storage
+        </span>
+      );
+    }
+    
+    // External URL (http/https)
+    return (
+      <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400">
+        External URL
+      </span>
+    );
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
@@ -134,6 +165,7 @@ export default function ProductsPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Category</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Price</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Image Source</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
               </tr>
             </thead>
@@ -164,6 +196,7 @@ export default function ProductsPage() {
                   <td className="px-6 py-4 text-gray-500 dark:text-gray-400">{product.category?.name || '-'}</td>
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">R{product.price.toFixed(2)}</td>
                   <td className="px-6 py-4">{getStockBadge(product.stock_status)}</td>
+                  <td className="px-6 py-4">{getImageSourceBadge(product.image_url)}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <Link
