@@ -1,5 +1,5 @@
--- CreateTable
-CREATE TABLE "SiteSetting" (
+-- CreateTable (if not exists - table may have been created by earlier migration)
+CREATE TABLE IF NOT EXISTS "SiteSetting" (
     "id" INTEGER NOT NULL DEFAULT 1,
     "company_name" TEXT NOT NULL DEFAULT 'Twines and Straps SA (Pty) Ltd',
     "tagline" TEXT NOT NULL DEFAULT 'Boundless Strength, Endless Solutions!',
@@ -20,8 +20,12 @@ CREATE TABLE "SiteSetting" (
     CONSTRAINT "SiteSetting_pkey" PRIMARY KEY ("id")
 );
 
+-- Add missing columns if they don't exist (for databases where table was created by earlier migration)
+ALTER TABLE "SiteSetting" ADD COLUMN IF NOT EXISTS "social_twitter" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "SiteSetting" ADD COLUMN IF NOT EXISTS "social_youtube" TEXT NOT NULL DEFAULT '';
+
 -- CreateTable
-CREATE TABLE "AdminSetupTask" (
+CREATE TABLE IF NOT EXISTS "AdminSetupTask" (
     "id" SERIAL NOT NULL,
     "task_key" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -40,10 +44,10 @@ CREATE TABLE "AdminSetupTask" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "AdminSetupTask_task_key_key" ON "AdminSetupTask"("task_key");
+CREATE UNIQUE INDEX IF NOT EXISTS "AdminSetupTask_task_key_key" ON "AdminSetupTask"("task_key");
 
 -- CreateIndex
-CREATE INDEX "AdminSetupTask_category_idx" ON "AdminSetupTask"("category");
+CREATE INDEX IF NOT EXISTS "AdminSetupTask_category_idx" ON "AdminSetupTask"("category");
 
 -- CreateIndex
-CREATE INDEX "AdminSetupTask_completed_idx" ON "AdminSetupTask"("completed");
+CREATE INDEX IF NOT EXISTS "AdminSetupTask_completed_idx" ON "AdminSetupTask"("completed");
