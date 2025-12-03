@@ -28,6 +28,7 @@ Welcome to the Twines and Straps SA documentation. This index helps you find the
 |----------|-------------|
 | [API Reference](./API.md) | REST API endpoints for products, categories, and admin |
 | [Deployment Pipeline](./DEPLOYMENT_PIPELINE.md) | CI/CD workflows, build configuration, and troubleshooting |
+| [Azure Deployment](./AZURE_DEPLOYMENT.md) | Deploy to Azure with Bicep infrastructure and CI/CD |
 
 ---
 

@@ -84,7 +84,7 @@ The project uses a CSS variable-based theming system, defined in `src/styles/glo
 - **Language:** TypeScript
 - **Database:** PostgreSQL via Prisma ORM
 - **Styling:** Tailwind CSS
-- **Hosting:** Netlify
+- **Hosting:** Azure App Service (primary) / Netlify (legacy)
 
 ---
 
@@ -109,6 +109,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 | Document                                   | Description                                               |
 | ------------------------------------------ | --------------------------------------------------------- |
 | [Setup Guide](./docs/SETUP.md)             | Environment setup, database configuration, and deployment |
+| [Azure Deployment](./docs/AZURE_DEPLOYMENT.md) | Deploy to Azure with Bicep infrastructure and CI/CD   |
 | [Design System](./docs/DESIGN.md)          | Color palette, typography, and component styles           |
 | [Best Practices](./docs/BEST_PRACTICES.md) | Industry standards for the project's tech stack           |
 | [Product Requirements](./docs/PRD.md)      | Full product vision and business requirements             |

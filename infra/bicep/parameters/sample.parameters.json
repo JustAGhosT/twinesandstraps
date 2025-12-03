@@ -1,0 +1,34 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "_comment": "This is a sample parameter file for initial deployments. Replace placeholder values with actual secrets. For production, use the environment-specific parameter files that reference Key Vault secrets.",
+  "parameters": {
+    "environment": {
+      "value": "dev"
+    },
+    "baseName": {
+      "value": "twinesandstraps"
+    },
+    "postgresAdminLogin": {
+      "value": "REPLACE_WITH_POSTGRES_ADMIN_USERNAME"
+    },
+    "postgresAdminPassword": {
+      "value": "REPLACE_WITH_STRONG_PASSWORD"
+    },
+    "adminPassword": {
+      "value": "REPLACE_WITH_APP_ADMIN_PASSWORD"
+    },
+    "whatsappNumber": {
+      "value": "27639690773"
+    },
+    "azureAiEndpoint": {
+      "value": ""
+    },
+    "azureAiApiKey": {
+      "value": ""
+    },
+    "azureAiDeploymentName": {
+      "value": "gpt-4o"
+    }
+  }
+}
