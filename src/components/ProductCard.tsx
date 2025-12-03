@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { STOCK_STATUS, STOCK_STATUS_LABELS, ROUTES, TIMEOUTS } from '@/constants';
+import { Button } from './Button';
 
 interface ProductCardProps {
   product: Product & { category?: Category };
@@ -145,18 +146,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
           {showAddToCart && showPrices && (
             <div className="flex items-center gap-1">
               {/* Decrement button */}
-              <button
+              <Button
                 onClick={handleDecrement}
                 disabled={isOutOfStock || quantity <= 1}
                 aria-label="Decrease quantity"
-                className={`w-7 h-7 flex items-center justify-center rounded text-sm font-bold transition-all ${
-                  isOutOfStock || quantity <= 1
-                    ? 'bg-gray-100 dark:bg-secondary-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                    : 'bg-gray-200 dark:bg-secondary-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-secondary-500 active:scale-95'
-                }`}
+                variant="secondary"
+                className="w-7 h-7"
               >
                 −
-              </button>
+              </Button>
 
               {/* Quantity display */}
               <span className="w-6 text-center text-sm font-semibold text-gray-700 dark:text-gray-200">
@@ -164,30 +162,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
               </span>
 
               {/* Increment button */}
-              <button
+              <Button
                 onClick={handleIncrement}
                 disabled={isOutOfStock}
                 aria-label="Increase quantity"
-                className={`w-7 h-7 flex items-center justify-center rounded text-sm font-bold transition-all ${
-                  isOutOfStock
-                    ? 'bg-gray-100 dark:bg-secondary-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                    : 'bg-gray-200 dark:bg-secondary-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-secondary-500 active:scale-95'
-                }`}
+                variant="secondary"
+                className="w-7 h-7"
               >
                 +
-              </button>
+              </Button>
 
               {/* Add to cart button */}
-              <button
+              <Button
                 onClick={handleAddToCart}
                 disabled={isOutOfStock || isAdding}
-                className={`relative px-3 py-1.5 rounded text-xs font-semibold transition-all ml-1 ${
-                  isOutOfStock
-                    ? 'bg-gray-100 dark:bg-secondary-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                    : showAdded
-                    ? 'bg-green-500 text-white'
-                    : 'bg-primary-600 text-white hover:bg-primary-700 active:scale-95'
-                }`}
+                className="relative px-3 py-1.5 text-xs ml-1"
               >
                 {isAdding ? (
                   <span className="flex items-center gap-1">

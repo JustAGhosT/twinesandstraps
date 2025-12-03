@@ -10,8 +10,9 @@ import Link from 'next/link';
 import { featureFlags } from '@/config/featureFlags';
 import { STOCK_STATUS } from '@/constants';
 
-// Force dynamic rendering - data is fetched at request time
-export const dynamic = 'force-dynamic';
+// TODO: A production-ready implementation would involve a more sophisticated
+// caching strategy, potentially with on-demand revalidation via webhooks.
+export const revalidate = 3600; // Revalidate every hour
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://twinesandstraps.netlify.app';
 
@@ -71,46 +72,7 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
   };
 }
 
-async function getProduct(id: string) {
-  const productId = parseInt(id, 10);
-
-  // Validate that the ID is a valid positive number
-  if (isNaN(productId) || productId <= 0 || !Number.isFinite(productId)) {
-    return null;
-  }
-
-  const product = await prisma.product.findUnique({
-    where: {
-      id: productId,
-    },
-    include: {
-      category: true,
-    },
-  });
-  return product;
-}
-
-async function getRelatedProducts(productId: number, categoryId: number) {
-  const relatedProducts = await prisma.product.findMany({
-    where: {
-      category_id: categoryId,
-      id: {
-        not: productId
-      },
-      stock_status: {
-        not: STOCK_STATUS.OUT_OF_STOCK
-      }
-    },
-    include: {
-      category: true,
-    },
-    take: 4,
-    orderBy: {
-      created_at: 'desc'
-    }
-  });
-  return relatedProducts;
-}
+import { getProduct, getRelatedProducts } from '@/lib/data';
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
   const product = await getProduct(params.id);
