@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import type { Product } from '@/types/database';
+import React, { useState, useEffect, useRef } from 'react';
+import type { ProductWithCategory } from '@/types/database';
 import { useCart } from '@/contexts/CartContext';
 import Image from 'next/image';
 import WishlistButton from '@/components/WishlistButton';
@@ -10,7 +10,7 @@ import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { STOCK_STATUS, STOCK_STATUS_LABELS, ROUTES, TIMEOUTS, SUCCESS_MESSAGES } from '@/constants';
 
 interface ProductViewProps {
-  product: Product;
+  product: ProductWithCategory;
 }
 
 const ProductView: React.FC<ProductViewProps> = ({ product }) => {
@@ -22,6 +22,47 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const showWishlist = useFeatureFlag('wishlist');
   const showCompare = useFeatureFlag('compareProducts');
   const showPrices = useFeatureFlag('showPrices');
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isZoomed) {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          setIsZoomed(false);
+        } else if (event.key === 'Tab') {
+          // Focus trapping logic
+          const focusableElements = modalRef.current?.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusableElements && focusableElements.length > 0) {
+            const firstElement = focusableElements[0] as HTMLElement;
+            const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+            if (event.shiftKey) {
+              // Shift + Tab
+              if (document.activeElement === firstElement) {
+                lastElement.focus();
+                event.preventDefault();
+              }
+            } else {
+              // Tab
+              if (document.activeElement === lastElement) {
+                firstElement.focus();
+                event.preventDefault();
+              }
+            }
+          }
+        }
+      };
+
+      document.addEventListener('keydown', handleKeyDown);
+      modalRef.current?.focus(); // Focus the modal container itself
+
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isZoomed]);
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
@@ -32,11 +73,11 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const getStockBadge = () => {
     switch (product.stock_status) {
       case STOCK_STATUS.IN_STOCK:
-        return <span className="inline-block px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded">{STOCK_STATUS_LABELS.IN_STOCK}</span>;
+        return <span className="inline-block px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded dark:bg-green-900/30 dark:text-green-300">{STOCK_STATUS_LABELS.IN_STOCK}</span>;
       case STOCK_STATUS.LOW_STOCK:
-        return <span className="inline-block px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100 rounded">{STOCK_STATUS_LABELS.LOW_STOCK}</span>;
+        return <span className="inline-block px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100 rounded dark:bg-yellow-900/30 dark:text-yellow-300">{STOCK_STATUS_LABELS.LOW_STOCK}</span>;
       case STOCK_STATUS.OUT_OF_STOCK:
-        return <span className="inline-block px-3 py-1 text-sm font-semibold text-red-800 bg-red-100 rounded">{STOCK_STATUS_LABELS.OUT_OF_STOCK}</span>;
+        return <span className="inline-block px-3 py-1 text-sm font-semibold text-red-800 bg-red-100 rounded dark:bg-red-900/30 dark:text-red-300">{STOCK_STATUS_LABELS.OUT_OF_STOCK}</span>;
       default:
         return null;
     }
@@ -49,11 +90,19 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
       {/* Image Zoom Modal */}
       {isZoomed && product.image_url && (
         <div
+          ref={modalRef}
           className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-zoom-out"
           onClick={() => setIsZoomed(false)}
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Zoomed Product Image"
         >
           <button
-            onClick={() => setIsZoomed(false)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsZoomed(false);
+            }}
             className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
             aria-label="Close zoom"
           >
@@ -77,7 +126,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <div
-            className={`aspect-square bg-gray-200 dark:bg-secondary-700 rounded-lg flex items-center justify-center relative overflow-hidden ${product.image_url ? 'cursor-zoom-in group' : ''}`}
+            className={`aspect-square rounded-lg flex items-center justify-center relative overflow-hidden ${product.image_url ? 'cursor-zoom-in group' : 'no-image-placeholder'}`}
             onClick={() => product.image_url && setIsZoomed(true)}
           >
             {product.image_url ? (
@@ -98,7 +147,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
                 </div>
               </>
             ) : (
-              <span className="text-gray-500 dark:text-gray-400 text-lg">No Image Available</span>
+              <span>No Image Available</span>
             )}
           </div>
         </div>
@@ -106,33 +155,33 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
         <div className="mb-4">
           {getStockBadge()}
         </div>
-        <h1 className="text-3xl font-bold mb-4 text-secondary-900 dark:text-white">{product.name}</h1>
+        <h1 className="text-3xl font-bold mb-4 text-foreground">{product.name}</h1>
         {showPrices ? (
           <div className="mb-6">
             <div className="flex items-baseline gap-3 mb-2">
-              <span className="text-3xl font-bold text-gray-900 dark:text-white">ZAR {product.price.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-foreground">ZAR {product.price.toFixed(2)}</span>
             </div>
           </div>
         ) : (
           <div className="mb-6">
             <a
               href={ROUTES.QUOTE}
-              className="inline-block px-6 py-2 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-lg font-semibold hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors"
+              className="inline-block px-6 py-2 bg-secondary text-secondary-foreground rounded-lg font-semibold hover:bg-secondary/90 transition-colors"
             >
               Request Quote for Pricing
             </a>
           </div>
         )}
-        <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">{product.description}</p>
+        <p className="text-muted-foreground mb-6 leading-relaxed">{product.description}</p>
         
         {/* Quantity Selector and Add to Cart */}
-        <div className="mb-6 pb-6 border-b dark:border-secondary-700">
-          <label className="block text-sm font-semibold mb-2 text-secondary-900 dark:text-white">Quantity</label>
+        <div className="mb-6 pb-6 border-b">
+          <label className="block text-sm font-semibold mb-2 text-foreground">Quantity</label>
           <div className="flex items-center gap-4 mb-4">
-            <div className="flex items-center border dark:border-secondary-600 rounded">
+            <div className="flex items-center border rounded">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-secondary-700 text-secondary-900 dark:text-white transition-colors"
+                className="px-4 py-2 hover:bg-accent text-accent-foreground transition-colors"
                 disabled={isOutOfStock || !showPrices}
               >
                 -
@@ -141,20 +190,20 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
                 type="number"
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-16 text-center border-x dark:border-secondary-600 py-2 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white"
+                className="w-16 text-center border-x py-2 bg-transparent text-foreground"
                 min="1"
                 disabled={isOutOfStock || !showPrices}
               />
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-secondary-700 text-secondary-900 dark:text-white transition-colors"
+                className="px-4 py-2 hover:bg-accent text-accent-foreground transition-colors"
                 disabled={isOutOfStock || !showPrices}
               >
                 +
               </button>
             </div>
             {showPrices && quantity > 1 && (
-              <div className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="text-sm text-muted-foreground">
                 <p>Total: ZAR {totalPrice.toFixed(2)}</p>
               </div>
             )}
@@ -166,8 +215,8 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
                 disabled={isOutOfStock}
                 className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-colors ${
                   isOutOfStock
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-primary-600 text-white hover:bg-primary-700'
+                    ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                    : 'bg-primary text-primary-foreground hover:bg-primary/90'
                 }`}
               >
                 {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
@@ -175,7 +224,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
             )}
             <a
               href={ROUTES.QUOTE}
-              className={`${showPrices ? 'flex-1' : 'w-full'} py-3 px-6 rounded-lg font-semibold border-2 border-primary-600 dark:border-primary-500 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors text-center`}
+              className={`${showPrices ? 'flex-1' : 'w-full'} py-3 px-6 rounded-lg font-semibold border-2 border-primary text-primary hover:bg-primary/10 transition-colors text-center`}
             >
               Request Quote
             </a>
@@ -195,35 +244,35 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
         </div>
 
         {/* Specifications */}
-        <div className="border-t dark:border-secondary-700 pt-6">
-          <h3 className="text-lg font-semibold mb-4 text-secondary-900 dark:text-white">Specifications</h3>
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-semibold mb-4 text-foreground">Specifications</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="bg-gray-50 dark:bg-secondary-700 p-3 rounded">
-              <span className="text-sm text-gray-600 dark:text-gray-400">SKU</span>
-              <p className="font-semibold text-secondary-900 dark:text-white">{product.sku}</p>
+            <div className="bg-accent p-3 rounded">
+              <span className="text-sm text-muted-foreground">SKU</span>
+              <p className="font-semibold text-foreground">{product.sku}</p>
             </div>
             {product.material && (
-              <div className="bg-gray-50 dark:bg-secondary-700 p-3 rounded">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Material</span>
-                <p className="font-semibold text-secondary-900 dark:text-white">{product.material}</p>
+              <div className="bg-accent p-3 rounded">
+                <span className="text-sm text-muted-foreground">Material</span>
+                <p className="font-semibold text-foreground">{product.material}</p>
               </div>
             )}
             {product.diameter && (
-              <div className="bg-gray-50 dark:bg-secondary-700 p-3 rounded">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Diameter</span>
-                <p className="font-semibold text-secondary-900 dark:text-white">{product.diameter}mm</p>
+              <div className="bg-accent p-3 rounded">
+                <span className="text-sm text-muted-foreground">Diameter</span>
+                <p className="font-semibold text-foreground">{product.diameter}mm</p>
               </div>
             )}
             {product.length && (
-              <div className="bg-gray-50 dark:bg-secondary-700 p-3 rounded">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Length</span>
-                <p className="font-semibold text-secondary-900 dark:text-white">{product.length}m</p>
+              <div className="bg-accent p-3 rounded">
+                <span className="text-sm text-muted-foreground">Length</span>
+                <p className="font-semibold text-foreground">{product.length}m</p>
               </div>
             )}
             {product.strength_rating && (
-              <div className="bg-gray-50 dark:bg-secondary-700 p-3 rounded">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Strength Rating</span>
-                <p className="font-semibold text-secondary-900 dark:text-white">{product.strength_rating}</p>
+              <div className="bg-accent p-3 rounded">
+                <span className="text-sm text-muted-foreground">Strength Rating</span>
+                <p className="font-semibold text-foreground">{product.strength_rating}</p>
               </div>
             )}
           </div>

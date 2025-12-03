@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,6 +9,8 @@ import BackToTop from "@/components/BackToTop";
 import SkipLink from "@/components/SkipLink";
 import CompareBar from "@/components/CompareBar";
 import { featureFlags } from "@/config/featureFlags";
+
+const inter = Inter({ subsets: ["latin"] });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://twinesandstraps.netlify.app';
 
@@ -73,7 +76,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="flex flex-col min-h-screen bg-white dark:bg-secondary-900 text-secondary-900 dark:text-gray-100">
+      <body className={`${inter.className} flex flex-col min-h-screen bg-white dark:bg-secondary-900 text-secondary-900 dark:text-gray-100`}>
         <SkipLink />
         <Providers>
           <Header />

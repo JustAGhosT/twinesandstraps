@@ -1,19 +1,20 @@
-import React from 'react';
-import type { Metadata } from 'next';
-import prisma from '@/lib/prisma';
-import ProductView from '@/components/ProductView';
-import RelatedProducts from '@/components/RelatedProducts';
+import NotFound from '@/components/NotFound';
 import ProductReviews from '@/components/ProductReviews';
-import ViewHistoryTracker from '@/components/ViewHistoryTracker';
+import ProductView from '@/components/ProductView';
 import RecentlyViewed from '@/components/RecentlyViewed';
-import Link from 'next/link';
+import RelatedProducts from '@/components/RelatedProducts';
+import ViewHistoryTracker from '@/components/ViewHistoryTracker';
 import { featureFlags } from '@/config/featureFlags';
 import { STOCK_STATUS } from '@/constants';
+import { getProduct, getRelatedProducts } from '@/lib/data';
+import prisma from '@/lib/prisma';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import React from 'react';
 
-// Force dynamic rendering - data is fetched at request time
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every hour
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://twinesandstraps.netlify.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
 interface ProductDetailPageProps {
   params: {
@@ -30,110 +31,90 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
     };
   }
 
-  const product = await prisma.product.findUnique({
-    where: { id: productId },
-    include: { category: true },
-  });
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: { category: true },
+    });
 
-  if (!product) {
+    if (!product) {
+      return {
+        title: 'Product Not Found',
+      };
+    }
+
+    const description = `${product.description.slice(0, 150)}${product.description.length > 150 ? '...' : ''} - R${product.price.toFixed(2)}`;
+
     return {
-      title: 'Product Not Found',
+      title: product.name,
+      description,
+      openGraph: {
+        title: `${product.name} | TASSA`,
+        description,
+        url: `${siteUrl}/products/${product.id}`,
+        siteName: 'TASSA - Twines and Straps SA',
+        images: product.image_url ? [
+          {
+            url: product.image_url,
+            width: 800,
+            height: 600,
+            alt: product.name || 'Product image',
+          },
+        ] : [],
+        locale: 'en_ZA',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `${product.name} | TASSA`,
+        description,
+        images: product.image_url ? [product.image_url] : [],
+      },
+    };
+  } catch (error) {
+    console.error('Failed to generate metadata:', error);
+    return {
+      title: 'Error',
+      description: 'Could not generate metadata for this product.',
     };
   }
-
-  const description = `${product.description.slice(0, 150)}${product.description.length > 150 ? '...' : ''} - R${product.price.toFixed(2)}`;
-
-  return {
-    title: product.name,
-    description,
-    openGraph: {
-      title: `${product.name} | TASSA`,
-      description,
-      url: `${siteUrl}/products/${product.id}`,
-      siteName: 'TASSA - Twines and Straps SA',
-      images: product.image_url ? [
-        {
-          url: product.image_url,
-          width: 800,
-          height: 600,
-          alt: product.name,
-        },
-      ] : [],
-      locale: 'en_ZA',
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${product.name} | TASSA`,
-      description,
-      images: product.image_url ? [product.image_url] : [],
-    },
-  };
 }
 
-async function getProduct(id: string) {
-  const productId = parseInt(id, 10);
-
-  // Validate that the ID is a valid positive number
-  if (isNaN(productId) || productId <= 0 || !Number.isFinite(productId)) {
-    return null;
-  }
-
-  const product = await prisma.product.findUnique({
-    where: {
-      id: productId,
-    },
-    include: {
-      category: true,
-    },
-  });
-  return product;
-}
-
-async function getRelatedProducts(productId: number, categoryId: number) {
-  const relatedProducts = await prisma.product.findMany({
-    where: {
-      category_id: categoryId,
-      id: {
-        not: productId
-      },
-      stock_status: {
-        not: STOCK_STATUS.OUT_OF_STOCK
-      }
-    },
-    include: {
-      category: true,
-    },
-    take: 4,
-    orderBy: {
-      created_at: 'desc'
-    }
-  });
-  return relatedProducts;
-}
+const JsonLd = ({ data }: { data: object }) => (
+  <script
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+  />
+);
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
-  const product = await getProduct(params.id);
+  const productId = parseInt(params.id, 10);
 
-  if (!product) {
+  if (isNaN(productId) || productId <= 0) {
     return (
-      <div className="container mx-auto px-4 py-8 bg-gray-50 dark:bg-secondary-900 min-h-screen">
-        <div className="text-center py-12">
-          <h1 className="text-3xl font-bold mb-4 text-secondary-900 dark:text-white">Product Not Found</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-8">The product you are looking for does not exist.</p>
-          <Link href="/products" className="inline-block bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors">
-            Browse all products
-          </Link>
-        </div>
-      </div>
+      <NotFound
+        title="Invalid Product ID"
+        message="The product ID is not valid."
+      />
     );
   }
 
-  // Fetch related products from the same category
-  const relatedProducts = await getRelatedProducts(product.id, product.category_id);
+  const [product, relatedProducts] = await Promise.all([
+    getProduct(params.id),
+    getRelatedProducts(productId, undefined), // Fetch related products in parallel
+  ]);
+
+  if (!product) {
+    return (
+      <NotFound
+        title="Product Not Found"
+        message="The product you are looking for does not exist."
+      />
+    );
+  }
 
   // JSON-LD structured data for product
-  const jsonLd = {
+  const jsonLdData = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
@@ -168,54 +149,58 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     ...(product.material && { material: product.material }),
   };
 
+  const breadcrumbs = [
+    { name: 'Home', href: '/' },
+    { name: 'Products', href: '/products' },
+    { name: product.category.name, href: `/products?category=${product.category.slug}` },
+    { name: product.name },
+  ];
+
   return (
     <>
-      {/* JSON-LD Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLdData} />
 
-      {/* Track view history for authenticated users */}
       {featureFlags.viewHistory && (
         <ViewHistoryTracker productId={product.id} />
       )}
 
-      <div className="bg-gray-50 dark:bg-secondary-900 min-h-screen">
+      <div className="bg-background min-h-screen">
       <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumbs */}
         <nav className="mb-6 text-sm">
-          <ol className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
-            <li><Link href="/" className="hover:text-gray-900 dark:hover:text-white">Home</Link></li>
-            <li>/</li>
-            <li><Link href="/products" className="hover:text-gray-900 dark:hover:text-white">Products</Link></li>
-            <li>/</li>
-            <li><Link href={`/products?category=${product.category.slug}`} className="hover:text-gray-900 dark:hover:text-white">{product.category.name}</Link></li>
-            <li>/</li>
-            <li className="text-gray-900 dark:text-white font-semibold">{product.name}</li>
+          <ol className="flex items-center space-x-2 text-muted-foreground">
+            {breadcrumbs.map((crumb, index) => (
+              <React.Fragment key={crumb.name}>
+                <li>
+                  {crumb.href ? (
+                    <Link href={crumb.href} className="hover:text-foreground">
+                      {crumb.name}
+                    </Link>
+                  ) : (
+                    <span className="font-semibold text-foreground">{crumb.name}</span>
+                  )}
+                </li>
+                {index < breadcrumbs.length - 1 && <li aria-hidden="true">/</li>}
+              </React.Fragment>
+            ))}
           </ol>
         </nav>
 
-        {/* Product View */}
-        <div className="bg-white dark:bg-secondary-800 rounded-lg shadow-sm p-6 md:p-8">
+        <div className="bg-card text-card-foreground rounded-lg shadow-sm p-6 md:p-8">
           <ProductView product={product} />
 
-          {/* Product Reviews */}
           {featureFlags.productReviews && (
             <ProductReviews productId={product.id} productName={product.name} />
           )}
         </div>
 
-        {/* Related Products */}
         {featureFlags.relatedProducts && relatedProducts.length > 0 && (
-          <div className="bg-white dark:bg-secondary-800 rounded-lg shadow-sm p-6 md:p-8 mt-6">
+          <div className="bg-card text-card-foreground rounded-lg shadow-sm p-6 md:p-8 mt-6">
             <RelatedProducts products={relatedProducts} title="You May Also Like" />
           </div>
         )}
 
-        {/* Back to Products Link */}
         <div className="mt-8">
-          <Link href="/products" className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-semibold">
+          <Link href="/products" className="inline-flex items-center text-primary hover:text-primary/90 font-semibold">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -225,7 +210,6 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       </div>
     </div>
 
-      {/* Recently Viewed Products */}
       {featureFlags.recentlyViewed && (
         <RecentlyViewed excludeProductId={product.id} />
       )}
