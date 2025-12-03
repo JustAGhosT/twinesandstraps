@@ -31,11 +31,28 @@ export async function getProduct(id: string) {
   }
 }
 
-export async function getRelatedProducts(productId: number, categoryId: number) {
+export async function getRelatedProducts(productId: number, categoryId?: number) {
   try {
+    let finalCategoryId = categoryId;
+
+    // If categoryId is not provided, fetch it from the product
+    if (finalCategoryId === undefined) {
+      const product = await prisma.product.findUnique({
+        where: { id: productId },
+        select: { category_id: true },
+      });
+
+      if (product) {
+        finalCategoryId = product.category_id;
+      } else {
+        // If the product doesn't exist, there are no related products
+        return [];
+      }
+    }
+
     const relatedProducts = await prisma.product.findMany({
       where: {
-        category_id: categoryId,
+        category_id: finalCategoryId,
         id: {
           not: productId,
         },
@@ -54,6 +71,29 @@ export async function getRelatedProducts(productId: number, categoryId: number) 
     return relatedProducts;
   } catch (error) {
     console.error('Failed to fetch related products:', error);
+    return [];
+  }
+}
+
+export async function getFeaturedProducts(count: number = 4) {
+  try {
+    const featuredProducts = await prisma.product.findMany({
+      where: {
+        stock_status: {
+          not: STOCK_STATUS.OUT_OF_STOCK,
+        },
+      },
+      include: {
+        category: true,
+      },
+      take: count,
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+    return featuredProducts;
+  } catch (error) {
+    console.error('Failed to fetch featured products:', error);
     return [];
   }
 }

@@ -59,14 +59,24 @@ As part of a comprehensive analysis, several improvements have been implemented 
   - Optimized font loading with `next/font`.
 - **User Experience:**
   - Added a custom error boundary to provide a better user experience on data fetching errors.
+  - Implemented focus-trapping for the image zoom modal to improve accessibility.
+  - Added a custom `NotFound` component for a more consistent user experience.
 - **Code Quality:**
   - Created a dedicated `Button` component to ensure consistent button styles.
   - Centralized data fetching logic to improve maintainability.
+  - Implemented a CSS variable-based theming system for easier customization.
+  - Added the `ProductWithCategory` type for improved type safety.
+  - Refactored the JSON-LD script for better SEO.
+  - Fixed accessibility issues in the breadcrumbs.
   - Added the `NEXT_PUBLIC_SITE_URL` environment variable to the `.env.example` file.
 
 ## Design System
 
 The project's design system has been reverse-engineered from the existing UI. For a detailed overview of the color palette, typography, and component styles, please see the [Design System Documentation](./docs/DESIGN.md).
+
+## Theming
+
+The project uses a CSS variable-based theming system, defined in `src/styles/globals.css`. This allows for easy customization of the site's appearance. The theme can be updated by modifying the CSS variables in this file.
 
 ## Tech Stack
 
