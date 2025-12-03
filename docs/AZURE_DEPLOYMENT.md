@@ -20,23 +20,23 @@ This guide covers deploying the Twines and Straps SA platform to Microsoft Azure
 
 The Azure deployment uses the following services:
 
-| Service | Purpose |
-|---------|---------|
-| **Azure App Service** | Hosts the Next.js application |
-| **Azure Database for PostgreSQL** | Managed PostgreSQL database |
-| **Azure Blob Storage** | Product images and static assets |
-| **Azure Key Vault** | Secrets management |
-| **Azure Application Insights** | Monitoring and telemetry |
+| Service                           | Purpose                          |
+| --------------------------------- | -------------------------------- |
+| **Azure App Service**             | Hosts the Next.js application    |
+| **Azure Database for PostgreSQL** | Managed PostgreSQL database      |
+| **Azure Blob Storage**            | Product images and static assets |
+| **Azure Key Vault**               | Secrets management               |
+| **Azure Application Insights**    | Monitoring and telemetry         |
 
 ### Environments
 
 The infrastructure supports three environments:
 
-| Environment | Purpose | App Service Plan |
-|-------------|---------|-----------------|
-| `dev` | Development and testing | Basic (B1) |
-| `staging` | Pre-production validation | Basic (B1) |
-| `prod` | Production | Premium (P1v3) |
+| Environment | Purpose                   | App Service Plan |
+| ----------- | ------------------------- | ---------------- |
+| `dev`       | Development and testing   | Basic (B1)       |
+| `staging`   | Pre-production validation | Basic (B1)       |
+| `prod`      | Production                | Premium (P1v3)   |
 
 ---
 
@@ -45,7 +45,7 @@ The infrastructure supports three environments:
 ```
                                     ┌─────────────────────────────────────┐
                                     │          Azure Resource Group       │
-                                    │      (rg-twinesandstraps-{env})     │
+                                    │      ({env}-rg-san-tassa)           │
                                     └─────────────────────────────────────┘
                                                       │
                     ┌─────────────────────────────────┼─────────────────────────────────┐
@@ -127,14 +127,14 @@ If not using the setup script, manually add these secrets in GitHub:
 
 **Settings → Secrets and variables → Actions**
 
-| Secret | Description |
-|--------|-------------|
-| `AZURE_CREDENTIALS` | Service principal credentials (JSON) |
-| `AZURE_SUBSCRIPTION_ID` | Your Azure subscription ID |
-| `POSTGRES_ADMIN_LOGIN` | PostgreSQL admin username |
-| `POSTGRES_ADMIN_PASSWORD` | PostgreSQL admin password (strong!) |
-| `ADMIN_PASSWORD` | Application admin password |
-| `DATABASE_URL` | (Optional) Override database URL |
+| Secret                    | Description                          |
+| ------------------------- | ------------------------------------ |
+| `AZURE_CREDENTIALS`       | Service principal credentials (JSON) |
+| `AZURE_SUBSCRIPTION_ID`   | Your Azure subscription ID           |
+| `POSTGRES_ADMIN_LOGIN`    | PostgreSQL admin username            |
+| `POSTGRES_ADMIN_PASSWORD` | PostgreSQL admin password (strong!)  |
+| `ADMIN_PASSWORD`          | Application admin password           |
+| `DATABASE_URL`            | (Optional) Override database URL     |
 
 ---
 
@@ -170,15 +170,15 @@ cd infra/scripts
 
 ### Infrastructure Resources Created
 
-| Resource | Name Pattern |
-|----------|--------------|
-| Resource Group | `rg-twinesandstraps-{env}` |
-| App Service Plan | `asp-twinesandstraps-{env}` |
-| Web App | `app-twinesandstraps-{env}` |
-| PostgreSQL Server | `psql-twinesandstraps-{env}` |
-| Storage Account | `sttwinesandstraps{env}` |
-| Key Vault | `kv-twinesandstraps-{env}` |
-| Application Insights | `ai-twinesandstraps-{env}` |
+| Resource             | Name Pattern           |
+| -------------------- | ---------------------- |
+| Resource Group       | `{env}-rg-san-tassa`   |
+| App Service Plan     | `{env}-asp-san-tassa`  |
+| Web App              | `{env}-app-san-tassa`  |
+| PostgreSQL Server    | `{env}-psql-san-tassa` |
+| Storage Account      | `{env}stsan-tassa`     |
+| Key Vault            | `{env}-kv-san-tassa`   |
+| Application Insights | `{env}-ai-san-tassa`   |
 
 ---
 
@@ -223,11 +223,11 @@ cd infra/scripts
 
 ### Workflows
 
-| Workflow | File | Trigger | Purpose |
-|----------|------|---------|---------|
-| **Azure Infrastructure** | `azure-infra.yml` | Manual, `infra/**` changes | Deploy/update Azure resources |
-| **Deploy to Azure** | `azure-deploy.yml` | Push to main, Manual | Deploy application |
-| **Azure Health Check** | `azure-health-check.yml` | Every 15 min, Manual | Monitor environments |
+| Workflow                 | File                     | Trigger                    | Purpose                       |
+| ------------------------ | ------------------------ | -------------------------- | ----------------------------- |
+| **Azure Infrastructure** | `azure-infra.yml`        | Manual, `infra/**` changes | Deploy/update Azure resources |
+| **Deploy to Azure**      | `azure-deploy.yml`       | Push to main, Manual       | Deploy application            |
+| **Azure Health Check**   | `azure-health-check.yml` | Every 15 min, Manual       | Monitor environments          |
 
 ### Deployment Flow
 
@@ -347,8 +347,8 @@ az postgres flexible-server connect \
 ```bash
 # View logs
 az webapp log tail \
-  --name app-twinesandstraps-dev \
-  --resource-group rg-twinesandstraps-dev
+  --name dev-app-san-tassa \
+  --resource-group dev-rg-san-tassa
 ```
 
 #### "Image uploads failing"
@@ -366,13 +366,13 @@ This is expected in CI environments without internet access. The application use
 ```bash
 # Application logs
 az webapp log tail \
-  --name app-twinesandstraps-dev \
-  --resource-group rg-twinesandstraps-dev
+  --name dev-app-san-tassa \
+  --resource-group dev-rg-san-tassa
 
 # Deployment logs
 az webapp log download \
-  --name app-twinesandstraps-dev \
-  --resource-group rg-twinesandstraps-dev \
+  --name dev-app-san-tassa \
+  --resource-group dev-rg-san-tassa \
   --log-file deployment.zip
 ```
 
@@ -380,8 +380,8 @@ az webapp log download \
 
 ```bash
 az webapp restart \
-  --name app-twinesandstraps-dev \
-  --resource-group rg-twinesandstraps-dev
+  --name dev-app-san-tassa \
+  --resource-group dev-rg-san-tassa
 ```
 
 ### Scaling
@@ -389,14 +389,14 @@ az webapp restart \
 ```bash
 # Scale up (change SKU)
 az appservice plan update \
-  --name asp-twinesandstraps-dev \
-  --resource-group rg-twinesandstraps-dev \
+  --name dev-asp-san-tassa \
+  --resource-group dev-rg-san-tassa \
   --sku P1V3
 
 # Scale out (add instances)
 az webapp update \
-  --name app-twinesandstraps-dev \
-  --resource-group rg-twinesandstraps-dev \
+  --name dev-app-san-tassa \
+  --resource-group dev-rg-san-tassa \
   --set siteConfig.numberOfWorkers=3
 ```
 
@@ -419,13 +419,13 @@ az webapp update \
 
 ### Estimated Monthly Costs (South Africa North)
 
-| Resource | Dev | Prod |
-|----------|-----|------|
-| App Service | ~$13 | ~$70 |
-| PostgreSQL | ~$15 | ~$60 |
-| Storage (10GB) | ~$0.20 | ~$0.20 |
-| Application Insights | ~$2 | ~$5 |
-| **Total** | **~$30** | **~$135** |
+| Resource             | Dev      | Prod      |
+| -------------------- | -------- | --------- |
+| App Service          | ~$13     | ~$70      |
+| PostgreSQL           | ~$15     | ~$60      |
+| Storage (10GB)       | ~$0.20   | ~$0.20    |
+| Application Insights | ~$2      | ~$5       |
+| **Total**            | **~$30** | **~$135** |
 
 *Costs are approximate and may vary. Use the [Azure Pricing Calculator](https://azure.microsoft.com/en-us/pricing/calculator/) for accurate estimates.*
 

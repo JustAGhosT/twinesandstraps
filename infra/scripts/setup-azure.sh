@@ -94,6 +94,15 @@ check_github_cli() {
     return 0
 }
 
+# Parse JSON value without jq (simple grep/sed approach)
+# Handles both quoted strings and handles escaped quotes
+parse_json_value() {
+    local json="$1"
+    local key="$2"
+    # Match the key and extract the value (handles quoted strings)
+    echo "$json" | grep -o "\"$key\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | head -1 | sed -E "s/.*\"$key\"[[:space:]]*:[[:space:]]*\"([^\"]*)\".*/\1/"
+}
+
 # =============================================================================
 # Main Script
 # =============================================================================
@@ -126,6 +135,7 @@ EXISTING_SP=$(az ad sp list --display-name "$SP_NAME" --query "[0].appId" -o tsv
 
 if [[ -n "$EXISTING_SP" ]]; then
     log_warning "Service principal '$SP_NAME' already exists (App ID: $EXISTING_SP)"
+    CLIENT_ID="$EXISTING_SP"
     read -p "Do you want to reset the credentials? (y/N): " RESET_CREDS
     if [[ "$RESET_CREDS" =~ ^[Yy]$ ]]; then
         log_info "Resetting service principal credentials..."
@@ -135,23 +145,108 @@ if [[ -n "$EXISTING_SP" ]]; then
         SP_CREDENTIALS=""
     fi
 else
-    # Create service principal
+    # Create service principal without role assignment (we'll do that separately)
     log_info "Creating service principal..."
     SP_CREDENTIALS=$(az ad sp create-for-rbac \
         --name "$SP_NAME" \
-        --role "Contributor" \
-        --scopes "/subscriptions/$SUBSCRIPTION_ID" \
         --sdk-auth \
         --output json)
+    
+    # Get the service principal app ID (try parsing JSON, fallback to Azure CLI query)
+    CLIENT_ID=$(parse_json_value "$SP_CREDENTIALS" "clientId")
+    if [[ -z "$CLIENT_ID" ]]; then
+        # Fallback: get client ID directly from Azure
+        CLIENT_ID=$(az ad sp list --display-name "$SP_NAME" --query "[0].appId" -o tsv)
+    fi
+fi
+
+# Assign Contributor role to the subscription (if not already assigned)
+if [[ -n "$CLIENT_ID" ]]; then
+    log_info "Checking/assigning Contributor role to service principal..."
+    
+    # Ensure subscription is set in context
+    az account set --subscription "$SUBSCRIPTION_ID" >/dev/null 2>&1
+    
+    SUBSCRIPTION_SCOPE="/subscriptions/$SUBSCRIPTION_ID"
+    
+    # Check if role assignment already exists
+    ROLE_EXISTS=$(az role assignment list \
+        --assignee "$CLIENT_ID" \
+        --role "Contributor" \
+        --scope "$SUBSCRIPTION_SCOPE" \
+        --subscription "$SUBSCRIPTION_ID" \
+        --query "[].id" -o tsv 2>/dev/null || echo "")
+    
+    if [[ -z "$ROLE_EXISTS" ]]; then
+        log_info "Creating Contributor role assignment..."
+        # Try creating the role assignment with explicit subscription parameter
+        # Use subscription ID directly in scope to avoid path interpretation issues
+        ROLE_OUTPUT=$(az role assignment create \
+            --assignee "$CLIENT_ID" \
+            --role "Contributor" \
+            --scope "$SUBSCRIPTION_SCOPE" \
+            --subscription "$SUBSCRIPTION_ID" \
+            --output json 2>&1)
+        
+        if [[ $? -eq 0 ]]; then
+            log_success "Role assignment created successfully"
+        else
+            # Try alternative: use subscription ID without /subscriptions/ prefix in scope
+            log_info "Trying alternative scope format..."
+            if az role assignment create \
+                --assignee "$CLIENT_ID" \
+                --role "Contributor" \
+                --scope "/subscriptions/${SUBSCRIPTION_ID}" \
+                --subscription "$SUBSCRIPTION_ID" \
+                --output none 2>/dev/null; then
+                log_success "Role assignment created successfully (using alternative method)"
+            else
+                log_warning "Failed to create role assignment automatically."
+                log_warning ""
+                log_warning "This may be due to:"
+                log_warning "  1. Insufficient permissions (need 'Owner' or 'User Access Administrator')"
+                log_warning "  2. Git Bash path interpretation issues on Windows"
+                log_warning ""
+                log_warning "To assign the role manually:"
+                log_warning ""
+                log_warning "  Option 1 - Bash/Git Bash:"
+                log_warning "    az role assignment create \\"
+                log_warning "      --assignee $CLIENT_ID \\"
+                log_warning "      --role Contributor \\"
+                log_warning "      --scope /subscriptions/$SUBSCRIPTION_ID \\"
+                log_warning "      --subscription $SUBSCRIPTION_ID"
+                log_warning ""
+                log_warning "  Option 2 - PowerShell (recommended for Windows):"
+                log_warning "    az role assignment create \`"
+                log_warning "      --assignee $CLIENT_ID \`"
+                log_warning "      --role Contributor \`"
+                log_warning "      --scope \"/subscriptions/$SUBSCRIPTION_ID\" \`"
+                log_warning "      --subscription $SUBSCRIPTION_ID"
+            fi
+        fi
+    else
+        log_success "Role assignment already exists"
+    fi
 fi
 
 if [[ -n "$SP_CREDENTIALS" ]]; then
     log_success "Service principal configured successfully!"
     
-    # Parse credentials
-    CLIENT_ID=$(echo "$SP_CREDENTIALS" | jq -r '.clientId')
-    CLIENT_SECRET=$(echo "$SP_CREDENTIALS" | jq -r '.clientSecret')
-    TENANT_ID=$(echo "$SP_CREDENTIALS" | jq -r '.tenantId')
+    # Parse credentials (using helper function that doesn't require jq)
+    # If CLIENT_ID wasn't set earlier, parse it now
+    if [[ -z "${CLIENT_ID:-}" ]]; then
+        CLIENT_ID=$(parse_json_value "$SP_CREDENTIALS" "clientId")
+    fi
+    CLIENT_SECRET=$(parse_json_value "$SP_CREDENTIALS" "clientSecret")
+    TENANT_ID=$(parse_json_value "$SP_CREDENTIALS" "tenantId")
+    
+    # Fallback: get values from Azure CLI if parsing failed
+    if [[ -z "$CLIENT_ID" ]]; then
+        CLIENT_ID=$(az ad sp list --display-name "$SP_NAME" --query "[0].appId" -o tsv)
+    fi
+    if [[ -z "$TENANT_ID" ]]; then
+        TENANT_ID=$(az account show --query "tenantId" -o tsv)
+    fi
     
     echo ""
     log_info "Service Principal Details:"

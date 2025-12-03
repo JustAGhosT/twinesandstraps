@@ -120,8 +120,8 @@ validate_environment "$ENVIRONMENT"
 check_azure_cli
 
 # Resource names
-RESOURCE_GROUP="rg-${BASE_NAME}-${ENVIRONMENT}"
-KEYVAULT_NAME="kv-${BASE_NAME}-${ENVIRONMENT}"
+RESOURCE_GROUP="${ENVIRONMENT}-rg-san-tassa"
+KEYVAULT_NAME="${ENVIRONMENT}-kv-san-tassa"
 
 log_info "Migration Configuration:"
 echo "  Environment:    $ENVIRONMENT"
@@ -144,7 +144,7 @@ if [[ -z "$DATABASE_URL" ]]; then
     log_info "Constructing DATABASE_URL from PostgreSQL server details..."
     
     # Get PostgreSQL server details
-    POSTGRES_SERVER="psql-${BASE_NAME}-${ENVIRONMENT}"
+    POSTGRES_SERVER="${ENVIRONMENT}-psql-san-tassa"
     POSTGRES_FQDN=$(az postgres flexible-server show \
         --name "$POSTGRES_SERVER" \
         --resource-group "$RESOURCE_GROUP" \

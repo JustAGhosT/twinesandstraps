@@ -53,23 +53,6 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01'
       enabled: true
       days: 7
     }
-  }
-}
-
-// Container for images
-resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
-  parent: blobService
-  name: containerName
-  properties: {
-    publicAccess: 'Blob'
-  }
-}
-
-// CORS rules for web access
-resource corsRules 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' = {
-  parent: storageAccount
-  name: 'default'
-  properties: {
     cors: {
       corsRules: [
         {
@@ -81,6 +64,15 @@ resource corsRules 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01' =
         }
       ]
     }
+  }
+}
+
+// Container for images
+resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  parent: blobService
+  name: containerName
+  properties: {
+    publicAccess: 'Blob'
   }
 }
 

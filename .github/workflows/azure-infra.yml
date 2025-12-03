@@ -65,7 +65,7 @@ jobs:
       - name: Create Resource Group (if not exists)
         run: |
           az group create \
-            --name "rg-twinesandstraps-${{ inputs.environment }}" \
+            --name "${{ inputs.environment }}-rg-san-tassa" \
             --location "${{ inputs.location }}" \
             --tags Environment="${{ inputs.environment }}" Application="TwinesAndStraps"
             
@@ -73,10 +73,9 @@ jobs:
         run: |
           az deployment group what-if \
             --name "whatif-${{ inputs.environment }}-${{ github.run_number }}" \
-            --resource-group "rg-twinesandstraps-${{ inputs.environment }}" \
+            --resource-group "${{ inputs.environment }}-rg-san-tassa" \
             --template-file ${{ env.BICEP_PATH }}/main.bicep \
             --parameters environment="${{ inputs.environment }}" \
-            --parameters baseName="twinesandstraps" \
             --parameters location="${{ inputs.location }}" \
             --parameters postgresAdminLogin="${{ secrets.POSTGRES_ADMIN_LOGIN }}" \
             --parameters postgresAdminPassword="${{ secrets.POSTGRES_ADMIN_PASSWORD }}" \
@@ -110,10 +109,9 @@ jobs:
           
           az deployment group create \
             --name "$DEPLOYMENT_NAME" \
-            --resource-group "rg-twinesandstraps-${{ inputs.environment }}" \
+            --resource-group "${{ inputs.environment }}-rg-san-tassa" \
             --template-file ${{ env.BICEP_PATH }}/main.bicep \
             --parameters environment="${{ inputs.environment }}" \
-            --parameters baseName="twinesandstraps" \
             --parameters location="${{ inputs.location }}" \
             --parameters postgresAdminLogin="${{ secrets.POSTGRES_ADMIN_LOGIN }}" \
             --parameters postgresAdminPassword="${{ secrets.POSTGRES_ADMIN_PASSWORD }}" \
@@ -124,7 +122,7 @@ jobs:
           # Get outputs
           OUTPUTS=$(az deployment group show \
             --name "$DEPLOYMENT_NAME" \
-            --resource-group "rg-twinesandstraps-${{ inputs.environment }}" \
+            --resource-group "${{ inputs.environment }}-rg-san-tassa" \
             --query "properties.outputs" \
             -o json)
           
@@ -144,7 +142,7 @@ jobs:
         run: |
           # Get database URL from Key Vault
           DATABASE_URL=$(az keyvault secret show \
-            --vault-name "kv-twinesandstraps-${{ inputs.environment }}" \
+            --vault-name "${{ inputs.environment }}-kv-san-tassa" \
             --name "database-url" \
             --query "value" \
             -o tsv)

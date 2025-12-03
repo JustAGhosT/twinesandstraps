@@ -175,13 +175,13 @@ jobs:
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'app-twinesandstraps-dev'
+          app-name: 'dev-app-san-tassa'
           package: deploy.zip
           
       - name: Run database migrations
         run: |
           DATABASE_URL=$(az keyvault secret show \
-            --vault-name "kv-twinesandstraps-dev" \
+            --vault-name "dev-kv-san-tassa" \
             --name "database-url" \
             --query "value" \
             -o tsv)
@@ -226,7 +226,7 @@ jobs:
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'app-twinesandstraps-staging'
+          app-name: 'staging-app-san-tassa'
           package: deploy.zip
 
   deploy-prod:
@@ -264,14 +264,14 @@ jobs:
       - name: Deploy to Azure App Service (Staging Slot)
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'app-twinesandstraps-prod'
+          app-name: 'prod-app-san-tassa'
           slot-name: 'staging'
           package: deploy.zip
           
       - name: Health check on staging slot
         run: |
           sleep 30
-          STAGING_URL="https://app-twinesandstraps-prod-staging.azurewebsites.net"
+          STAGING_URL="https://prod-app-san-tassa-staging.azurewebsites.net"
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$STAGING_URL/api/health")
           if [ "$STATUS" != "200" ]; then
             echo "Health check failed with status $STATUS"
@@ -282,8 +282,8 @@ jobs:
       - name: Swap staging to production
         run: |
           az webapp deployment slot swap \
-            --name "app-twinesandstraps-prod" \
-            --resource-group "rg-twinesandstraps-prod" \
+            --name "prod-app-san-tassa" \
+            --resource-group "prod-rg-san-tassa" \
             --slot "staging" \
             --target-slot "production"
           echo "✓ Slot swap completed"
@@ -300,13 +300,13 @@ jobs:
         run: |
           if [ "${{ needs.deploy-prod.result }}" == "success" ]; then
             echo "env=prod" >> $GITHUB_OUTPUT
-            echo "url=https://app-twinesandstraps-prod.azurewebsites.net" >> $GITHUB_OUTPUT
+            echo "url=https://prod-app-san-tassa.azurewebsites.net" >> $GITHUB_OUTPUT
           elif [ "${{ needs.deploy-staging.result }}" == "success" ]; then
             echo "env=staging" >> $GITHUB_OUTPUT
-            echo "url=https://app-twinesandstraps-staging.azurewebsites.net" >> $GITHUB_OUTPUT
+            echo "url=https://staging-app-san-tassa.azurewebsites.net" >> $GITHUB_OUTPUT
           else
             echo "env=dev" >> $GITHUB_OUTPUT
-            echo "url=https://app-twinesandstraps-dev.azurewebsites.net" >> $GITHUB_OUTPUT
+            echo "url=https://dev-app-san-tassa.azurewebsites.net" >> $GITHUB_OUTPUT
           fi
           
       - name: Wait for deployment to stabilize

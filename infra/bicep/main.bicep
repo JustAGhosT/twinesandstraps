@@ -12,9 +12,6 @@ param environment string
 @description('The Azure region for all resources')
 param location string = resourceGroup().location
 
-@description('The base name for all resources')
-param baseName string = 'twinesandstraps'
-
 @description('The PostgreSQL administrator login')
 @secure()
 param postgresAdminLogin string
@@ -44,7 +41,8 @@ param azureAiDeploymentName string = 'gpt-4o'
 // Variables
 // =============================================================================
 
-var resourceSuffix = '${baseName}-${environment}'
+// Region abbreviation: san = South Africa North
+var regionAbbr = 'san'
 var tags = {
   Environment: environment
   Application: 'TwinesAndStraps'
@@ -59,17 +57,18 @@ var tags = {
 module appInsights 'modules/app-insights.bicep' = {
   name: 'appInsights-${environment}'
   params: {
-    name: 'ai-${resourceSuffix}'
+    name: '${environment}-ai-${regionAbbr}-tassa'
     location: location
     tags: tags
   }
 }
 
 // Storage Account for blob storage (images)
+// Storage accounts: lowercase, no hyphens, max 24 chars
 module storage 'modules/storage.bicep' = {
   name: 'storage-${environment}'
   params: {
-    name: replace('st${baseName}${environment}', '-', '')
+    name: replace('${environment}st${regionAbbr}tassa', '-', '')
     location: location
     tags: tags
     containerName: 'images'
@@ -80,7 +79,7 @@ module storage 'modules/storage.bicep' = {
 module postgres 'modules/postgres.bicep' = {
   name: 'postgres-${environment}'
   params: {
-    name: 'psql-${resourceSuffix}'
+    name: '${environment}-psql-${regionAbbr}-tassa'
     location: location
     tags: tags
     administratorLogin: postgresAdminLogin
@@ -96,7 +95,7 @@ module postgres 'modules/postgres.bicep' = {
 module keyVault 'modules/key-vault.bicep' = {
   name: 'keyVault-${environment}'
   params: {
-    name: 'kv-${resourceSuffix}'
+    name: '${environment}-kv-${regionAbbr}-tassa'
     location: location
     tags: tags
   }
@@ -106,7 +105,7 @@ module keyVault 'modules/key-vault.bicep' = {
 module appServicePlan 'modules/app-service-plan.bicep' = {
   name: 'appServicePlan-${environment}'
   params: {
-    name: 'asp-${resourceSuffix}'
+    name: '${environment}-asp-${regionAbbr}-tassa'
     location: location
     tags: tags
     skuName: environment == 'prod' ? 'P1v3' : 'B1'
@@ -118,7 +117,7 @@ module appServicePlan 'modules/app-service-plan.bicep' = {
 module webApp 'modules/web-app.bicep' = {
   name: 'webApp-${environment}'
   params: {
-    name: 'app-${resourceSuffix}'
+    name: '${environment}-app-${regionAbbr}-tassa'
     location: location
     tags: tags
     appServicePlanId: appServicePlan.outputs.id

@@ -155,7 +155,7 @@ CURRENT_SUB=$(az account show --query "{name:name, id:id}" -o tsv)
 log_info "Using Azure subscription: $CURRENT_SUB"
 
 # Resource group name
-RESOURCE_GROUP="rg-${BASE_NAME}-${ENVIRONMENT}"
+RESOURCE_GROUP="${ENVIRONMENT}-rg-san-tassa"
 
 log_info "Deployment Configuration:"
 echo "  Environment:      $ENVIRONMENT"
@@ -183,7 +183,6 @@ DEPLOYMENT_NAME="deploy-${ENVIRONMENT}-$(date +%Y%m%d%H%M%S)"
 
 DEPLOYMENT_PARAMS=(
     "environment=$ENVIRONMENT"
-    "baseName=$BASE_NAME"
     "location=$LOCATION"
     "postgresAdminLogin=$POSTGRES_ADMIN_LOGIN"
     "postgresAdminPassword=$POSTGRES_ADMIN_PASSWORD"
@@ -196,12 +195,19 @@ if [[ -n "${AZURE_AI_ENDPOINT:-}" ]]; then
     DEPLOYMENT_PARAMS+=("azureAiDeploymentName=$AZURE_AI_DEPLOYMENT")
 fi
 
-az deployment group create \
+log_info "Running deployment: $DEPLOYMENT_NAME"
+if ! az deployment group create \
     --name "$DEPLOYMENT_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --template-file "$BICEP_DIR/main.bicep" \
     --parameters "${DEPLOYMENT_PARAMS[@]}" \
-    --output table
+    --output table; then
+    log_error "Deployment failed!"
+    log_error "Check the deployment status in Azure Portal."
+    exit 1
+fi
+
+log_success "Deployment completed successfully!"
 
 # Get deployment outputs
 log_info "Retrieving deployment outputs..."
@@ -210,13 +216,23 @@ OUTPUTS=$(az deployment group show \
     --name "$DEPLOYMENT_NAME" \
     --resource-group "$RESOURCE_GROUP" \
     --query "properties.outputs" \
-    -o json)
+    -o json 2>/dev/null)
 
-WEB_APP_URL=$(echo "$OUTPUTS" | jq -r '.webAppUrl.value')
-WEB_APP_NAME=$(echo "$OUTPUTS" | jq -r '.webAppName.value')
-STORAGE_NAME=$(echo "$OUTPUTS" | jq -r '.storageAccountName.value')
-POSTGRES_FQDN=$(echo "$OUTPUTS" | jq -r '.postgresServerFqdn.value')
-KEYVAULT_NAME=$(echo "$OUTPUTS" | jq -r '.keyVaultName.value')
+if [[ -z "$OUTPUTS" ]]; then
+    log_warning "Could not retrieve deployment outputs. Deployment may have failed."
+    log_warning "Check the deployment status in Azure Portal."
+    WEB_APP_URL=""
+    WEB_APP_NAME=""
+    STORAGE_NAME=""
+    POSTGRES_FQDN=""
+    KEYVAULT_NAME=""
+else
+    WEB_APP_URL=$(echo "$OUTPUTS" | jq -r '.webAppUrl.value')
+    WEB_APP_NAME=$(echo "$OUTPUTS" | jq -r '.webAppName.value')
+    STORAGE_NAME=$(echo "$OUTPUTS" | jq -r '.storageAccountName.value')
+    POSTGRES_FQDN=$(echo "$OUTPUTS" | jq -r '.postgresServerFqdn.value')
+    KEYVAULT_NAME=$(echo "$OUTPUTS" | jq -r '.keyVaultName.value')
+fi
 
 echo ""
 log_success "=========================================="

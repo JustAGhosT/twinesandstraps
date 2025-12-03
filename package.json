@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "tsx prisma/seed.ts",
+    "seed:reset": "npx prisma generate && npm run seed",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"

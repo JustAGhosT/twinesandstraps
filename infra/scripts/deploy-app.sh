@@ -116,8 +116,8 @@ check_azure_cli
 check_node
 
 # Resource names
-RESOURCE_GROUP="rg-${BASE_NAME}-${ENVIRONMENT}"
-WEB_APP_NAME="app-${BASE_NAME}-${ENVIRONMENT}"
+RESOURCE_GROUP="${ENVIRONMENT}-rg-san-tassa"
+WEB_APP_NAME="${ENVIRONMENT}-app-san-tassa"
 
 log_info "Deployment Configuration:"
 echo "  Environment:    $ENVIRONMENT"
