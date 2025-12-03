@@ -1,9 +1,14 @@
 name: Azure Health Check
 
 on:
-  schedule:
-    # Run every 15 minutes
-    - cron: "*/15 * * * *"
+  # NOTE: Scheduled health checks are disabled until Azure infrastructure is deployed.
+  # The Azure App Services (dev, staging, prod) don't exist yet.
+  # Once infrastructure is provisioned via the Azure Infrastructure workflow,
+  # uncomment the schedule trigger below to enable automated health checks.
+  #
+  # schedule:
+  #   # Run every 15 minutes
+  #   - cron: "*/15 * * * *"
   workflow_dispatch:
     inputs:
       environment:
