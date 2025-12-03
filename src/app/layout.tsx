@@ -1,14 +1,14 @@
+import BackToTop from "@/components/BackToTop";
+import CompareBar from "@/components/CompareBar";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import { Providers } from "@/components/Providers";
+import SkipLink from "@/components/SkipLink";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import { featureFlags } from "@/config/featureFlags";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { Providers } from "@/components/Providers";
-import WhatsAppButton from "@/components/WhatsAppButton";
-import BackToTop from "@/components/BackToTop";
-import SkipLink from "@/components/SkipLink";
-import CompareBar from "@/components/CompareBar";
-import { featureFlags } from "@/config/featureFlags";
 
 const inter = Inter({ subsets: ["latin"] });
 

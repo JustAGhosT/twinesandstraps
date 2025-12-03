@@ -104,16 +104,16 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 
 ## Documentation
 
-| Document                                   | Description                                               |
-| ------------------------------------------ | --------------------------------------------------------- |
-| [Setup Guide](./docs/SETUP.md)             | Environment setup, database configuration, and deployment |
-| [Azure Deployment](./docs/AZURE_DEPLOYMENT.md) | Deploy to Azure with Bicep infrastructure and CI/CD   |
-| [Design System](./docs/DESIGN.md)          | Color palette, typography, and component styles           |
-| [Best Practices](./docs/BEST_PRACTICES.md) | Industry standards for the project's tech stack           |
-| [Product Requirements](./docs/PRD.md)      | Full product vision and business requirements             |
-| [Feature Flags](./docs/FEATURE_FLAGS.md)   | Toggle features on/off without code changes               |
-| [API Reference](./docs/API.md)             | REST API documentation for developers                     |
-| [All Documentation](./docs/README.md)      | Complete documentation index                              |
+| Document                                       | Description                                               |
+| ---------------------------------------------- | --------------------------------------------------------- |
+| [Setup Guide](./docs/SETUP.md)                 | Environment setup, database configuration, and deployment |
+| [Azure Deployment](./docs/AZURE_DEPLOYMENT.md) | Deploy to Azure with Bicep infrastructure and CI/CD       |
+| [Design System](./docs/DESIGN.md)              | Color palette, typography, and component styles           |
+| [Best Practices](./docs/BEST_PRACTICES.md)     | Industry standards for the project's tech stack           |
+| [Product Requirements](./docs/PRD.md)          | Full product vision and business requirements             |
+| [Feature Flags](./docs/FEATURE_FLAGS.md)       | Toggle features on/off without code changes               |
+| [API Reference](./docs/API.md)                 | REST API documentation for developers                     |
+| [All Documentation](./docs/README.md)          | Complete documentation index                              |
 
 ## Future Development Guidance
 

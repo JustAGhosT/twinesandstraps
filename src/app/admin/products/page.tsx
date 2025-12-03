@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 import { STOCK_STATUS, STOCK_STATUS_LABELS } from '@/constants';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 interface Product {
   id: number;
@@ -96,7 +96,7 @@ export default function ProductsPage() {
       'vercel-storage.com',         // Vercel Blob
       's3.amazonaws.com',           // AWS S3
       'storage.googleapis.com',     // Google Cloud Storage
-      'netlify',                    // Netlify (assets/functions)
+      'azurewebsites.net',         // Azure App Service
       'cloudinary.com',             // Cloudinary
     ];
     

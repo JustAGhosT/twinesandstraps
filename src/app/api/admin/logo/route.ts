@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { getStorageStatus, isBlobStorageConfigured, uploadFile } from '@/lib/blob-storage';
 import prisma from '@/lib/prisma';
-import { uploadFile, isBlobStorageConfigured, getStorageStatus } from '@/lib/blob-storage';
 import type { UploadData } from '@/types/api';
-import { successResponse, errorResponse } from '@/types/api';
+import { errorResponse, successResponse } from '@/types/api';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Only allow SVG format for logos
 const ALLOWED_MIME_TYPE = 'image/svg+xml';
@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
           { 
             configuration: 'Azure Blob Storage is required for logo uploads in production.',
             missing: status.missingVariables.join(', '),
-            help: 'Please configure Azure Blob Storage environment variables in Netlify dashboard.'
+            help: 'Please configure Azure Blob Storage environment variables in Azure App Service.'
           }
         ),
         { status: 503 }

@@ -265,14 +265,14 @@ describe('Azure Blob Storage Configuration', () => {
   describe('Production Environment', () => {
     it('should require Azure Blob Storage configuration', () => {
       // In production, Azure Blob Storage is REQUIRED
-      // Base64 fallback is NOT allowed to prevent Netlify size limits
+      // Base64 fallback is NOT allowed in production
       const productionError = {
         status: 503,
         error: 'Azure Blob Storage configuration required',
         details: {
           configuration: 'Azure Blob Storage is required in production but not configured.',
           missing: 'AZURE_STORAGE_ACCOUNT_NAME, AZURE_STORAGE_ACCOUNT_KEY, AZURE_STORAGE_CONTAINER_NAME',
-          help: 'Please configure Azure Blob Storage environment variables in Netlify dashboard.',
+          help: 'Please configure Azure Blob Storage environment variables in Azure App Service.',
         },
       };
       expect(productionError.status).toBe(503);

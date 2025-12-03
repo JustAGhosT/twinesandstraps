@@ -54,7 +54,8 @@
 # =============================================================================
 # REQUIRED ENVIRONMENT VARIABLES
 # =============================================================================
-# You MUST configure these in Netlify dashboard (Site Settings → Environment Variables):
+# NOTE: This file is kept for legacy reference. The application is now deployed on Azure App Service.
+# Environment variables should be configured in Azure App Service (Configuration → Application settings):
 #
 # DATABASE_URL (REQUIRED)
 #   - PostgreSQL connection string from Neon or Supabase

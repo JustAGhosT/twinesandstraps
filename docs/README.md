@@ -53,5 +53,5 @@ Welcome to the Twines and Straps SA documentation. This index helps you find the
 
 ## Quick Links
 
-- 🌐 **Live Site:** [twinesandstraps.netlify.app](https://twinesandstraps.netlify.app)
+- 🌐 **Live Site:** Deployed on Azure App Service
 - 💻 **Repository:** [github.com/JustAGhosT/twinesandstraps](https://github.com/JustAGhosT/twinesandstraps)

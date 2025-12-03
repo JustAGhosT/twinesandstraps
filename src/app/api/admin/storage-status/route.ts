@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { getStorageStatus } from '@/lib/blob-storage';
-import { successResponse, errorResponse } from '@/types/api';
+import { errorResponse, successResponse } from '@/types/api';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * GET /api/admin/storage-status
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     if (status.configured) {
       recommendation = `Azure Blob Storage is properly configured. Images will be uploaded to container "${status.containerName}" in account "${status.accountName}". Note: Images are stored in the "products/" virtual folder within the container.`;
     } else if (status.isProduction) {
-      recommendation = 'CRITICAL: Configure Azure Blob Storage in Netlify environment variables to enable image uploads.';
+      recommendation = 'CRITICAL: Configure Azure Blob Storage in Azure App Service environment variables to enable image uploads.';
     } else {
       recommendation = 'Configure Azure Blob Storage before deploying to production.';
     }

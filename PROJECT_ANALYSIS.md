@@ -25,7 +25,7 @@ The platform provides a 24/7 digital storefront that simplifies the process of d
 - **Language:** TypeScript
 - **Database:** PostgreSQL with Prisma ORM
 - **Styling:** Tailwind CSS
-- **Deployment:** Netlify
+- **Deployment:** Azure App Service
 - **Testing:** Jest and React Testing Library
 - **Linting:** ESLint
 - **Package Manager:** npm
