@@ -1,0 +1,21 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "nextjs",
+    "creds",
+    "webapps",
+    "tassa",
+    "elif"
+  ],
+  "ignoreWords": [],
+  "flagWords": [],
+  "ignorePaths": [
+    "node_modules/**",
+    ".git/**",
+    "dist/**",
+    "build/**",
+    ".next/**"
+  ]
+}
+

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment'
+        description: "Target environment"
         required: true
         type: choice
         options:
@@ -14,10 +14,10 @@ on:
   push:
     branches: [main]
     paths-ignore:
-      - 'infra/**'
-      - 'docs/**'
-      - '*.md'
-      - '.github/workflows/azure-infra.yml'
+      - "infra/**"
+      - "docs/**"
+      - "*.md"
+      - ".github/workflows/azure-infra.yml"
 
 permissions:
   contents: read
@@ -27,66 +27,66 @@ jobs:
   lint:
     name: Lint Code
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
-          
+          node-version: "18"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run ESLint
         run: npm run lint
 
   type-check:
     name: TypeScript Type Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
-          
+          node-version: "18"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Generate Prisma Client
         run: npx prisma generate
-        
+
       - name: Run TypeScript compiler
         run: npx tsc --noEmit
 
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
-          
+          node-version: "18"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Generate Prisma Client
         run: npx prisma generate
-        
+
       - name: Run tests
         run: npm test -- --ci --passWithNoTests
 
@@ -94,33 +94,33 @@ jobs:
     name: Build Application
     runs-on: ubuntu-latest
     needs: [lint, type-check, test]
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
-          
+          node-version: "18"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Generate Prisma Client
         run: npx prisma generate
-        
+
       - name: Get version from package.json
         id: version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-        
+
       - name: Build Next.js app
         run: npx next build
         env:
           DATABASE_URL: postgresql://placeholder:placeholder@localhost:5432/placeholder
           APP_VERSION: ${{ steps.version.outputs.version }}
-          
+
       - name: Create deployment package
         run: |
           mkdir -p deploy-package
@@ -130,7 +130,7 @@ jobs:
           cp package.json deploy-package/
           cp package-lock.json deploy-package/
           cp next.config.js deploy-package/
-          
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
@@ -146,38 +146,37 @@ jobs:
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev')
     environment: dev
-    
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: nextjs-build
           path: deploy-package/
-          
+
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
+
       - name: Setup Node.js for deployment
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          
+          node-version: "18"
+
       - name: Install production dependencies
         working-directory: deploy-package
         run: npm ci --production
-        
+
       - name: Create deployment zip
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
-        
+
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'dev-app-san-tassa'
+          app-name: "dev-app-san-tassa"
           package: deploy.zip
-          
+
       - name: Run database migrations
         run: |
           DATABASE_URL=$(az keyvault secret show \
@@ -185,7 +184,7 @@ jobs:
             --name "database-url" \
             --query "value" \
             -o tsv)
-          
+
           cd deploy-package
           npx prisma migrate deploy
         env:
@@ -197,36 +196,36 @@ jobs:
     needs: [build, deploy-dev]
     if: github.event_name == 'workflow_dispatch' && inputs.environment == 'staging'
     environment: staging
-    
+
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: nextjs-build
           path: deploy-package/
-          
+
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
+
       - name: Setup Node.js for deployment
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          
+          node-version: "18"
+
       - name: Install production dependencies
         working-directory: deploy-package
         run: npm ci --production
-        
+
       - name: Create deployment zip
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
-        
+
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'staging-app-san-tassa'
+          app-name: "staging-app-san-tassa"
           package: deploy.zip
 
   deploy-prod:
@@ -235,39 +234,39 @@ jobs:
     needs: [build, deploy-staging]
     if: github.event_name == 'workflow_dispatch' && inputs.environment == 'prod'
     environment: prod
-    
+
     steps:
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
           name: nextjs-build
           path: deploy-package/
-          
+
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
+
       - name: Setup Node.js for deployment
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          
+          node-version: "18"
+
       - name: Install production dependencies
         working-directory: deploy-package
         run: npm ci --production
-        
+
       - name: Create deployment zip
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
-        
+
       - name: Deploy to Azure App Service (Staging Slot)
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'prod-app-san-tassa'
-          slot-name: 'staging'
+          app-name: "prod-app-san-tassa"
+          slot-name: "staging"
           package: deploy.zip
-          
+
       - name: Health check on staging slot
         run: |
           sleep 30
@@ -278,7 +277,7 @@ jobs:
             exit 1
           fi
           echo "✓ Health check passed"
-          
+
       - name: Swap staging to production
         run: |
           az webapp deployment slot swap \
@@ -293,7 +292,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy-dev, deploy-staging, deploy-prod]
     if: always() && (needs.deploy-dev.result == 'success' || needs.deploy-staging.result == 'success' || needs.deploy-prod.result == 'success')
-    
+
     steps:
       - name: Determine environment
         id: env
@@ -308,28 +307,28 @@ jobs:
             echo "env=dev" >> $GITHUB_OUTPUT
             echo "url=https://dev-app-san-tassa.azurewebsites.net" >> $GITHUB_OUTPUT
           fi
-          
+
       - name: Wait for deployment to stabilize
         run: sleep 60
-        
+
       - name: Check application health
         run: |
           URL="${{ steps.env.outputs.url }}"
           echo "Checking health at: $URL"
-          
+
           STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
           echo "Homepage status: $STATUS"
-          
+
           HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL/api/health")
           echo "Health endpoint status: $HEALTH_STATUS"
-          
+
           if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
             echo "✓ Application is responding"
           else
             echo "✗ Application returned unexpected status"
             exit 1
           fi
-          
+
       - name: Create summary
         run: |
           echo "## 🚀 Deployment Complete" >> $GITHUB_STEP_SUMMARY
