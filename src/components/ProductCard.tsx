@@ -200,7 +200,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
                     Add
                   </span>
                 )}
-              </button>
+              </Button>
             </div>
           )}
         </div>
