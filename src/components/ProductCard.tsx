@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import type { Product, Category } from '@/types/database';
+import type { ProductWithCategory, Product, Category } from '@/types/database';
 import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { STOCK_STATUS, STOCK_STATUS_LABELS, ROUTES, TIMEOUTS } from '@/constants';
 
 interface ProductCardProps {
-  product: Product & { category?: Category };
+  product: ProductWithCategory;
   showAddToCart?: boolean;
 }
 

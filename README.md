@@ -48,14 +48,43 @@ Twines and Straps SA manufactures and supplies high-quality industrial twines, r
 - Touch-friendly interface
 - Fast loading times
 
-## Industries We Serve
+## Recent Improvements
 
-- Agriculture & Farming
-- Marine & Boating
-- Construction & Scaffolding
-- Recycling & Waste Management
-- Transport & Logistics
-- Mining & Manufacturing
+As part of a comprehensive analysis, several improvements have been implemented to enhance the project's performance, user experience, and code quality:
+
+- **Performance:**
+  - Implemented a loading skeleton for the product detail page to provide immediate feedback to users.
+  - Parallelized data fetching to reduce page load times.
+  - Implemented Incremental Static Regeneration (ISR) to serve static content with periodic revalidation.
+  - Optimized font loading with `next/font`.
+- **User Experience:**
+  - Added a custom error boundary to provide a better user experience on data fetching errors.
+  - Implemented focus-trapping for the image zoom modal to improve accessibility.
+  - Added a custom `NotFound` component for a more consistent user experience.
+- **Code Quality:**
+  - Created a dedicated `Button` component to ensure consistent button styles.
+  - Centralized data fetching logic to improve maintainability.
+  - Implemented a CSS variable-based theming system for easier customization.
+  - Added the `ProductWithCategory` type for improved type safety.
+  - Refactored the JSON-LD script for better SEO.
+  - Fixed accessibility issues in the breadcrumbs.
+  - Added the `NEXT_PUBLIC_SITE_URL` environment variable to the `.env.example` file.
+
+## Design System
+
+The project's design system has been reverse-engineered from the existing UI. For a detailed overview of the color palette, typography, and component styles, please see the [Design System Documentation](./docs/DESIGN.md).
+
+## Theming
+
+The project uses a CSS variable-based theming system, defined in `src/styles/globals.css`. This allows for easy customization of the site's appearance. The theme can be updated by modifying the CSS variables in this file.
+
+## Tech Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript
+- **Database:** PostgreSQL via Prisma ORM
+- **Styling:** Tailwind CSS
+- **Hosting:** Netlify
 
 ---
 
@@ -80,20 +109,21 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 | Document | Description |
 |----------|-------------|
 | [Setup Guide](./docs/SETUP.md) | Environment setup, database configuration, and deployment |
+| [Design System](./docs/DESIGN.md) | Color palette, typography, and component styles |
+| [Best Practices](./docs/BEST_PRACTICES.md) | Industry standards for the project's tech stack |
 | [Product Requirements](./docs/PRD.md) | Full product vision and business requirements |
 | [Feature Flags](./docs/FEATURE_FLAGS.md) | Toggle features on/off without code changes |
 | [API Reference](./docs/API.md) | REST API documentation for developers |
 | [All Documentation](./docs/README.md) | Complete documentation index |
 
-## Tech Stack
+## Future Development Guidance
 
-- **Framework:** Next.js 14 (App Router)
-- **Language:** TypeScript
-- **Database:** PostgreSQL via Prisma ORM
-- **Styling:** Tailwind CSS
-- **Hosting:** Netlify
+For future development, please adhere to the following guidelines:
 
----
+- **Component Library:** Utilize the existing component library and contribute to it when creating new UI elements.
+- **Data Fetching:** Use the centralized data fetching functions in `src/lib/data.ts`.
+- **Error Handling:** Implement error boundaries for all pages that fetch data.
+- **Testing:** Write unit tests for all new components and business logic.
 
 ## Contributing
 
