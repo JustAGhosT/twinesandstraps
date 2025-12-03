@@ -7,17 +7,19 @@
 
 ## Context and Problem Statement
 
-Twines and Straps SA needs to select a hosting infrastructure that balances cost, performance, reliability, and operational complexity. The current stack uses Netlify for frontend hosting with Neon PostgreSQL as the database. With the addition of Azure Blob Storage for image hosting, we should evaluate whether to consolidate on Azure or continue with the current multi-provider approach.
+Twines and Straps SA has selected Azure as the hosting infrastructure to balance cost, performance, reliability, and operational complexity. The application is now deployed on Azure App Service with Azure PostgreSQL and Azure Blob Storage, providing a unified Azure stack.
 
-> **Note:** If you're seeing a 503 error on `/api/admin/upload`, this is a configuration issue, not a hosting issue. Azure Blob Storage environment variables need to be configured in Netlify. See [docs/SETUP.md](../SETUP.md#azure-blob-storage-required-for-production) for setup instructions.
+> **Note:** If you're seeing a 503 error on `/api/admin/upload`, this is a configuration issue, not a hosting issue. Azure Blob Storage environment variables need to be configured in Azure App Service. See [docs/SETUP.md](../SETUP.md#azure-blob-storage-required-for-production) for setup instructions.
 
 ### Current Architecture
 
 | Component | Current Provider | Monthly Cost (Est.) |
 |-----------|-----------------|---------------------|
-| Frontend Hosting | Netlify | Free tier / $19 Pro |
-| Database | Neon PostgreSQL | Free tier / $19 Pro |
-| Image Storage | Azure Blob Storage | ~$5-20 |
+| Frontend Hosting | Azure App Service | ~$13 (dev) / ~$70 (prod) |
+| Database | Azure PostgreSQL Flexible Server | ~$15 (dev) / ~$60 (prod) |
+| Image Storage | Azure Blob Storage | ~$0.20 (10GB) |
+| Key Vault | Azure Key Vault | Included |
+| Monitoring | Azure Application Insights | ~$2-5 |
 | Domain/DNS | External | ~$10/year |
 
 ## Decision Drivers
@@ -32,42 +34,45 @@ Twines and Straps SA needs to select a hosting infrastructure that balances cost
 
 ## Considered Options
 
-### Option 1: Current Stack (Netlify + Neon + Azure Blob)
+### Option 1: Full Azure Stack (Current Implementation)
 
-**Description:** Maintain current multi-provider architecture.
+**Description:** Unified Azure infrastructure for all services.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         Architecture                             │
 ├─────────────────────────────────────────────────────────────────┤
-│  User → Netlify CDN → Next.js (Serverless)                      │
+│  User → Azure Front Door → Azure App Service (Next.js)          │
 │                           │                                      │
 │                    ┌──────┴──────┐                               │
 │                    ↓             ↓                               │
-│              Neon PostgreSQL   Azure Blob                        │
-│              (Database)        (Images)                          │
+│         Azure PostgreSQL    Azure Blob Storage                  │
+│         Flexible Server     (Images)                            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 | Aspect | Details |
 |--------|---------|
-| **Monthly Cost** | Free-$40 (starter), $50-100 (production) |
-| **Providers** | 3 separate providers |
-| **Deployment** | Git push to Netlify |
-| **Database** | Serverless PostgreSQL with autoscaling |
-| **CDN** | Netlify Edge (global) |
-| **SA Latency** | Good (Netlify has African PoPs) |
+| **Monthly Cost** | ~$30 (dev), ~$135 (production) |
+| **Providers** | Single unified provider (Azure) |
+| **Deployment** | GitHub Actions → Azure App Service |
+| **Database** | Azure PostgreSQL Flexible Server |
+| **CDN** | Azure Front Door (global) |
+| **SA Latency** | Excellent (Azure South Africa regions) |
 
 **Pros:**
-- Already implemented and working
-- Each provider specializes in their domain
-- Free tiers cover development/staging
-- Netlify has excellent Next.js support
-- Neon offers serverless PostgreSQL with branching
-- Minimal vendor lock-in
+- Single provider for all services
+- Unified billing and management
+- Azure South Africa region for low latency
+- Integrated monitoring (Azure Monitor)
+- Enterprise-grade SLAs
+- Infrastructure as Code (Bicep templates)
+- Automated CI/CD via GitHub Actions
 
 **Cons:**
-- Three separate dashboards to manage
+- Higher base cost than free tiers
+- More complex initial setup
+- Requires Azure expertise
 - Three separate billing relationships
 - Potential latency between services
 - Cross-provider debugging is harder
@@ -253,7 +258,7 @@ Twines and Straps SA needs to select a hosting infrastructure that balances cost
 
 ## Decision Outcome
 
-**Chosen Option: Option 1 - Current Stack (Netlify + Neon + Azure Blob)**
+**Chosen Option: Option 2 - Full Azure Stack**
 
 ### Rationale
 
@@ -289,10 +294,10 @@ Consider Vercel (Option 3) when:
 
 2. **Configure Neon for South Africa** by selecting appropriate region
 
-3. **Monitor costs** using each provider's dashboard:
-   - Netlify: Analytics dashboard
-   - Neon: Usage metrics
-   - Azure: Cost Management
+3. **Monitor costs** using Azure Cost Management:
+   - Azure Portal → Cost Management + Billing
+   - Set up budgets and alerts
+   - Track spending by resource group
 
 4. **Set up unified logging** using external service (e.g., Axiom, LogRocket) if needed
 
@@ -329,7 +334,8 @@ Phase 5: Full Azure Stack (if justified by scale)
 
 ## Links
 
-- [Netlify Pricing](https://www.netlify.com/pricing/)
+- [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/)
+- [Azure App Service Pricing](https://azure.microsoft.com/pricing/details/app-service/windows/)
 - [Neon Pricing](https://neon.tech/pricing)
 - [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/)
 - [Vercel Pricing](https://vercel.com/pricing)

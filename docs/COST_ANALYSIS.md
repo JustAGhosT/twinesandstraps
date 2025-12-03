@@ -39,7 +39,7 @@ Comprehensive cost evaluation for building, deploying, and maintaining the platf
 ### Budget Tier (Development/Low Traffic)
 | Service | Monthly Cost | Annual Cost |
 |---------|--------------|-------------|
-| Netlify Hosting | R0 (free tier) | R0 |
+| Azure App Service (Dev) | ~R250 | ~R3,000 |
 | PostgreSQL (Supabase/Neon free tier) | R0 | R0 |
 | Domain (.co.za) | ~R15 | ~R180 |
 | SSL Certificate | R0 (included) | R0 |
@@ -48,7 +48,7 @@ Comprehensive cost evaluation for building, deploying, and maintaining the platf
 ### Production Tier (Moderate Traffic)
 | Service | Monthly Cost | Annual Cost |
 |---------|--------------|-------------|
-| Netlify Pro | R350 - R700 | R4,200 - R8,400 |
+| Azure App Service (Prod) | ~R1,200 - R2,000 | R14,400 - R24,000 |
 | PostgreSQL (Supabase Pro/Neon) | R300 - R900 | R3,600 - R10,800 |
 | Domain (.co.za) | ~R15 | ~R180 |
 | SSL Certificate | R0 (included) | R0 |
@@ -57,7 +57,7 @@ Comprehensive cost evaluation for building, deploying, and maintaining the platf
 ### Enterprise Tier (High Traffic)
 | Service | Monthly Cost | Annual Cost |
 |---------|--------------|-------------|
-| Netlify Enterprise | R1,500+ | R18,000+ |
+| Azure App Service (Enterprise) | R2,500+ | R30,000+ |
 | Managed PostgreSQL (AWS RDS/GCP) | R1,000 - R3,000 | R12,000 - R36,000 |
 | Domain (.co.za) | ~R15 | ~R180 |
 | CDN (Cloudflare Pro) | R350 | R4,200 |
@@ -98,7 +98,7 @@ Comprehensive cost evaluation for building, deploying, and maintaining the platf
 | Cloudinary Free | R0 | 25GB storage |
 | Cloudinary Plus | R175 | 225GB storage |
 | AWS S3 | R50 - R200 | Pay as you go |
-| Netlify Large Media | Included in Pro | Simple integration |
+| Azure Blob Storage | Included in App Service | Simple integration |
 
 ---
 
@@ -171,12 +171,12 @@ This codebase includes the following features (estimated agency value):
 ## Recommendations
 
 ### For Small Business / Startup
-- Use free tiers (Netlify, Supabase/Neon)
+- Use Azure free tier for development
 - Start with WhatsApp/email for orders
 - **Budget: R200-500/year**
 
 ### For Growing Business
-- Upgrade to Netlify Pro + managed database
+- Upgrade to Azure App Service production tier + Azure PostgreSQL
 - Implement payment gateway
 - Add email marketing integration
 - **Budget: R1,000-2,000/month**

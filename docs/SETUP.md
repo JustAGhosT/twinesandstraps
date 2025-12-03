@@ -8,7 +8,7 @@ This guide covers everything you need to get the Twines and Straps SA platform r
 - [Local Development Setup](#local-development-setup)
 - [Database Configuration](#database-configuration)
 - [Environment Variables](#environment-variables)
-- [Deployment to Netlify](#deployment-to-netlify)
+- [Deployment to Azure](#deployment-to-azure)
 - [AI Image Generation (Optional)](#ai-image-generation-optional)
 - [Troubleshooting](#troubleshooting)
 
@@ -146,37 +146,39 @@ See [Feature Flags](./FEATURE_FLAGS.md) for a complete list of toggleable featur
 
 ---
 
-## Deployment to Netlify
+## Deployment to Azure
 
-### 1. Connect Repository
+The application is deployed to Azure App Service. For detailed deployment instructions, see [Azure Deployment Guide](./AZURE_DEPLOYMENT.md).
 
-1. Log in to [Netlify](https://app.netlify.com/)
-2. Click "Add new site" → "Import an existing project"
-3. Connect your GitHub repository
+### Quick Deployment Steps
 
-### 2. Configure Build Settings
+1. **Deploy Infrastructure:**
+   ```bash
+   .\infra\scripts\deploy-infra.ps1 dev
+   ```
 
-The `netlify.toml` file automatically configures:
-- **Build command:** `npm run lint && npm run build`
-- **Publish directory:** `.next`
-- **Node.js version:** 18
-- **Security headers** (X-Frame-Options, CSP, etc.)
+2. **Run Database Migrations:**
+   ```bash
+   .\infra\scripts\migrate-db.ps1 dev
+   ```
 
-### 3. Set Environment Variables
+3. **Seed Database (Optional):**
+   ```bash
+   npm run seed
+   ```
 
-In Netlify dashboard: **Site settings → Build & deploy → Environment variables**
+4. **Deploy Application:**
+   ```bash
+   .\infra\scripts\deploy-app.ps1 dev
+   ```
 
-Add:
-- `DATABASE_URL` — Your cloud database connection string
-- `NEXT_PUBLIC_WHATSAPP_NUMBER` — Your WhatsApp Business number
-- `ADMIN_PASSWORD` — Secure password for admin access
+### Environment Variables
 
-### 4. Deploy
+Environment variables are configured in Azure App Service:
+- **Azure Portal** → Your App Service → Configuration → Application settings
+- Or via Azure CLI / Bicep templates during infrastructure deployment
 
-Push to your connected branch, and Netlify will automatically:
-1. Run linting and build
-2. Apply database migrations
-3. Deploy to the CDN
+See [Azure Deployment Guide](./AZURE_DEPLOYMENT.md) for complete setup instructions.
 
 ### GitHub Actions CI/CD
 
@@ -224,14 +226,15 @@ Azure Blob Storage is **required** for image uploads in production. Without it, 
    - Set "Public access level" to **Blob** (for public image access)
    - Copy container name → `AZURE_STORAGE_CONTAINER_NAME`
 
-5. **Add to Netlify:**
-   - Go to Netlify: **Site settings → Environment variables**
+5. **Add to Azure App Service:**
+   - Go to Azure Portal → Your App Service → Configuration → Application settings
    - Add all three variables:
      - `AZURE_STORAGE_ACCOUNT_NAME`
      - `AZURE_STORAGE_ACCOUNT_KEY`
      - `AZURE_STORAGE_CONTAINER_NAME`
+   - Or configure via Bicep templates during infrastructure deployment
 
-6. **Redeploy your site** to pick up the new environment variables.
+6. **Restart your App Service** to pick up the new environment variables.
 
 ### Verify Configuration
 
@@ -277,11 +280,11 @@ This error occurs when Azure Blob Storage is not configured in production.
 
 **Error message in browser console:**
 ```
-POST https://yoursite.netlify.app/api/admin/upload 503 (Service Unavailable)
+POST https://your-app.azurewebsites.net/api/admin/upload 503 (Service Unavailable)
 ```
 
 **Solution:**
-1. Configure Azure Blob Storage environment variables in Netlify. See [Azure Blob Storage Setup](#azure-blob-storage-required-for-production).
+1. Configure Azure Blob Storage environment variables in Azure App Service. See [Azure Blob Storage Setup](#azure-blob-storage-required-for-production).
 2. Ensure all three variables are set:
    - `AZURE_STORAGE_ACCOUNT_NAME`
    - `AZURE_STORAGE_ACCOUNT_KEY`
@@ -328,10 +331,11 @@ rm -rf .next
 npm run build
 ```
 
-### Build Fails on Netlify
+### Build Fails on Azure
 
-1. Check that `DATABASE_URL` is set in Netlify environment variables
-2. Verify the database is accessible from Netlify's build servers
+1. Check that `DATABASE_URL` is set in Azure App Service configuration
+2. Verify the database is accessible from Azure App Service (check firewall rules)
+3. Ensure PostgreSQL server allows connections from Azure services
 3. Check build logs for specific error messages
 
 ---

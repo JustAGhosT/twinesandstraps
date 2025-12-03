@@ -5,7 +5,7 @@
  * 
  * IMPORTANT: Azure Blob Storage is REQUIRED for production deployments.
  * Base64 fallback is only allowed in development mode to prevent hitting
- * Netlify size limits and to ensure proper image storage.
+ * Azure App Service limits and to ensure proper image storage.
  * 
  * Required environment variables:
  * - AZURE_STORAGE_ACCOUNT_NAME
@@ -231,7 +231,7 @@ export async function uploadFile(
     throw new Error(
       `Azure Blob Storage is required in production but not configured. ` +
       `Missing environment variables: ${missing.join(', ')}. ` +
-      `Please configure Azure Blob Storage in your Netlify environment variables.`
+      `Please configure Azure Blob Storage in your Azure App Service environment variables.`
     );
   }
 

@@ -1,10 +1,8 @@
 # Twines and Straps SA
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/27ce6415-e0b4-4dd5-abdd-def736b7f6b4/deploy-status)](https://app.netlify.com/projects/twinesandstraps/deploys)
-
 **An e-commerce platform for South Africa's premier industrial twines and ropes manufacturer.**
 
-🌐 **Live Site:** [twinesandstraps.netlify.app](https://twinesandstraps.netlify.app)
+🌐 **Live Site:** Deployed on Azure App Service
 
 ---
 
@@ -84,7 +82,7 @@ The project uses a CSS variable-based theming system, defined in `src/styles/glo
 - **Language:** TypeScript
 - **Database:** PostgreSQL via Prisma ORM
 - **Styling:** Tailwind CSS
-- **Hosting:** Azure App Service (primary) / Netlify (legacy)
+- **Hosting:** Azure App Service
 
 ---
 

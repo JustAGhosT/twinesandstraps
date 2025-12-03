@@ -247,8 +247,8 @@ Briefly mention:
 Be prepared to discuss:
 
 1. **Hosting**
-   - Currently deployed on Netlify
-   - Alternative: Vercel, Self-hosted
+   - Currently deployed on Azure App Service
+   - Infrastructure managed via Bicep templates
 
 2. **Payment Integration**
    - PayFast (SA popular)

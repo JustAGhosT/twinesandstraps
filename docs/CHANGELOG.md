@@ -20,7 +20,7 @@ Notable changes to the Twines and Straps SA platform.
      - Database connection strings (Neon, PlanetScale, Supabase, Turso)
      - WhatsApp Business number configuration
      - Azure AI Foundry credentials
-     - Netlify deployment credentials
+     - Azure deployment credentials
    - Updated README.md with environment variables table and setup guides
    - Updated DEPLOYMENT_PIPELINE.md with complete credentials documentation
 
@@ -61,7 +61,7 @@ Based on client feedback, the business model has been updated to emphasize quote
    - Business buyer section updated to mention WhatsApp for personalized quotes
 
 #### Configuration Required:
-Set the following environment variable in Netlify:
+Set the following environment variable in Azure App Service:
 - `NEXT_PUBLIC_WHATSAPP_NUMBER`: Your WhatsApp business number (format: 27XXXXXXXXX without + or spaces)
 
 #### Notes:

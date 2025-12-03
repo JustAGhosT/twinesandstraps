@@ -9,8 +9,8 @@ Technical documentation for the CI/CD pipeline and deployment infrastructure.
 ## Overview
 
 The deployment pipeline ensures code quality and reliable deployments through:
-1. **GitHub Actions** — Automated testing on every push/PR
-2. **Netlify** — Automated builds and deployments
+1. **GitHub Actions** — Automated testing and CI/CD
+2. **Azure App Service** — Automated builds and deployments
 3. **Health Checks** — Post-deployment validation
 
 ---
@@ -26,11 +26,11 @@ Runs on pushes to `main`/`develop` and on pull requests.
 | Lint Check | ESLint validation for code quality |
 | Type Check | TypeScript type safety verification |
 | Build Test | Ensures the application compiles |
-| Config Validation | Validates `netlify.toml` and `package.json` |
+| Config Validation | Validates `package.json` and infrastructure configs |
 
 ### Deployment Health Check (`deployment-health.yml`)
 
-Runs automatically after Netlify deployment completes.
+Runs automatically after Azure deployment completes.
 
 | Check | Purpose |
 |-------|---------|
@@ -44,14 +44,16 @@ Configure in **Settings → Secrets and variables → Actions**:
 
 | Secret | Where to Find |
 |--------|---------------|
-| `NETLIFY_SITE_ID` | Netlify → Site Settings → General → Site ID |
-| `NETLIFY_AUTH_TOKEN` | Netlify → User Settings → Applications → Personal access tokens |
+| `AZURE_CREDENTIALS` | Service principal credentials (JSON) - see [Azure Setup](./AZURE_DEPLOYMENT.md#setup) |
+| `AZURE_SUBSCRIPTION_ID` | Azure subscription ID |
+| `AZURE_RG_DEV` | Resource group name (e.g., `dev-rg-san-tassa`) |
+| `AZURE_WEBAPP_NAME_DEV` | Web app name (e.g., `dev-app-san-tassa`) |
 
 ---
 
-## Netlify Configuration
+## Azure Configuration
 
-The `netlify.toml` file configures all build and deployment settings.
+The infrastructure is configured using Bicep templates in `infra/bicep/`. See [Azure Deployment Guide](./AZURE_DEPLOYMENT.md) for details.
 
 ### Build Pipeline
 
@@ -85,15 +87,15 @@ Applied automatically to all responses:
 ### Performance Optimization
 
 - **Static Asset Caching** — `/_next/static/*` cached for 1 year (immutable)
-- **Automatic Compression** — gzip/brotli handled by Netlify
-- **Global CDN** — Fast access worldwide
-- **www Redirect** — Canonical URL enforcement
+- **Automatic Compression** — gzip/brotli handled by Azure App Service
+- **Global CDN** — Azure Front Door for fast access worldwide
+- **SSL/TLS** — Automatic certificate management
 
 ---
 
 ## Rendering Strategy
 
-The application uses **dynamic rendering** for database-driven pages to ensure compatibility with Netlify's serverless architecture:
+The application uses **dynamic rendering** for database-driven pages to ensure real-time data:
 
 - **Home page** (`/`): Dynamic rendering - fetches featured products and categories at request time
 - **Products page** (`/products`): Dynamic rendering - fetches all products at request time  
@@ -102,7 +104,7 @@ The application uses **dynamic rendering** for database-driven pages to ensure c
 This approach:
 - Eliminates build-time database requirements
 - Ensures fresh data on every request
-- Works seamlessly with Netlify's serverless functions
+- Works seamlessly with Azure App Service
 - Avoids static generation errors when database is unavailable during build
 
 Pages are marked with `export const dynamic = 'force-dynamic'` to explicitly enable server-side rendering on demand.
@@ -114,11 +116,11 @@ Pages are marked with `export const dynamic = 'force-dynamic'` to explicitly ena
    ↓
 2. GitHub Actions CI runs (lint, type-check, build)
    ↓
-3. If CI passes, Netlify detects changes
+3. If CI passes, GitHub Actions triggers Azure deployment
    ↓
-4. Netlify runs build command (with lint)
+4. Azure runs build and deployment
    ↓
-5. Netlify deploys to CDN
+5. Application deployed to Azure App Service
    ↓
 6. Deployment health check runs
    ↓
@@ -138,7 +140,7 @@ Pages are marked with `export const dynamic = 'force-dynamic'` to explicitly ena
 ## Monitoring and Alerts
 
 - GitHub Actions provides build status badges
-- Netlify provides deployment notifications
+- Azure provides deployment notifications via GitHub Actions
 - Failed deployments trigger notifications
 - Health check failures are logged in GitHub Actions
 
@@ -156,7 +158,7 @@ Error querying the database: Error code 14: Unable to open the database file
 ```
 
 **Cause:**
-SQLite file-based databases (`file:./dev.db`) do not work in serverless environments like Netlify because:
+SQLite file-based databases (`file:./dev.db`) do not work in cloud environments like Azure App Service because:
 - Serverless functions are ephemeral (they shut down between requests)
 - Local files are not persisted between function invocations
 - Each function invocation starts with a fresh filesystem
@@ -187,13 +189,13 @@ You must configure a cloud database for production. The CI/CD pipeline now valid
    }
    ```
 
-4. **Configure environment variable in Netlify:**
-   - Go to Netlify dashboard → Site Settings → Environment variables
+4. **Configure environment variable in Azure:**
+   - Go to Azure Portal → App Service → Configuration → Application settings
    - Add `DATABASE_URL` with your cloud database connection string
    - Redeploy the application
 
 5. **Run migrations** on your production database:
-   > **Note:** With the latest pipeline configuration, migrations are automatically applied during Netlify builds via `prisma migrate deploy`. However, you can also run them manually if needed:
+   > **Note:** With the latest pipeline configuration, migrations are automatically applied during Azure deployments. However, you can also run them manually using `.\infra\scripts\migrate-db.ps1 dev`:
    ```bash
    # For production deployments (applies migration files)
    DATABASE_URL="your-prod-url" npx prisma migrate deploy
@@ -203,25 +205,25 @@ You must configure a cloud database for production. The CI/CD pipeline now valid
 
 ### "Unauthorized: could not retrieve project" Error
 
-This error occurs when the Netlify deployment fails due to authentication issues. Common causes and solutions:
+This error occurs when the Azure deployment fails due to authentication issues. Common causes and solutions:
 
 1. **Missing GitHub Secrets**
-   - Ensure both `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` are set in your GitHub repository secrets
+   - Ensure `AZURE_CREDENTIALS` and `AZURE_SUBSCRIPTION_ID` are set in your GitHub repository secrets
    - Go to: Repository → Settings → Secrets and variables → Actions
    - Add/verify the secrets are present
 
 2. **Invalid or Expired Token**
-   - Netlify personal access tokens can expire or be revoked
-   - Generate a new token: Netlify → User Settings → Applications → Personal access tokens
-   - Update the `NETLIFY_AUTH_TOKEN` secret in GitHub
+   - Azure service principal credentials can expire or be revoked
+   - Regenerate credentials: Run `.\infra\scripts\setup-azure.ps1 <subscription-id>`
+   - Update the `AZURE_CREDENTIALS` secret in GitHub
 
 3. **Incorrect Site ID**
-   - Verify the Site ID matches your Netlify site
-   - Find it: Netlify dashboard → Site Settings → General → Site ID
-   - Update the `NETLIFY_SITE_ID` secret if incorrect
+   - Verify the subscription ID and resource group names match your Azure setup
+   - Check: Azure Portal → Subscriptions
+   - Update the `AZURE_SUBSCRIPTION_ID` and resource group secrets if incorrect
 
 4. **Token Lacks Site Access**
-   - The token must belong to a user with access to the Netlify site
+   - The service principal must have Contributor role on the subscription
    - Ensure the token owner is a team member with deploy permissions
 
 ### Verifying Secrets Are Set

@@ -77,8 +77,8 @@ This document summarizes the WhatsApp-based quote system implemented for Twines 
 
 ### Configuration Required
 
-#### Netlify Environment Variables
-Set the following in your Netlify dashboard (Site settings → Environment variables):
+#### Azure App Service Configuration
+Set the following in Azure Portal (App Service → Configuration → Application settings):
 
 ```
 NEXT_PUBLIC_WHATSAPP_NUMBER=27821234567
@@ -137,10 +137,10 @@ If the WhatsApp number is not configured or contains the placeholder value, user
 ## Next Steps for Client
 
 1. **Set WhatsApp Number**
-   - Log into Netlify dashboard
-   - Navigate to Site settings → Environment variables
+   - Log into Azure Portal
+   - Navigate to App Service → Configuration → Application settings
    - Add `NEXT_PUBLIC_WHATSAPP_NUMBER` with your WhatsApp business number
-   - Redeploy site for changes to take effect
+   - Restart App Service for changes to take effect
 
 2. **Test the Integration**
    - Visit a product page
@@ -156,7 +156,7 @@ If the WhatsApp number is not configured or contains the placeholder value, user
 ## Support
 
 If you need assistance with:
-- Setting up the WhatsApp number in Netlify
+- Setting up the WhatsApp number in Azure App Service
 - Testing the integration
 - Making further modifications
 

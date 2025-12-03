@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import prisma from '@/lib/prisma';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://twinesandstraps.netlify.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 // Force dynamic generation at runtime (not build time)
 export const dynamic = 'force-dynamic';
