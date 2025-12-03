@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
           { 
             configuration: errorMessage,
             missing: status.missingVariables.join(', '),
-            help: 'Please configure Azure Blob Storage environment variables in Netlify dashboard. See docs/SETUP.md for detailed setup instructions.',
+            help: 'Please configure Azure Blob Storage environment variables in Azure App Service. See docs/SETUP.md for detailed setup instructions.',
             setupGuide: 'docs/SETUP.md#azure-blob-storage-required-for-production'
           }
         ),
