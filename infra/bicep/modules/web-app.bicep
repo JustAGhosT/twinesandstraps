@@ -56,6 +56,9 @@ param azureAiDeploymentName string = ''
 @description('Environment name')
 param environment string
 
+@description('Application version (for health check)')
+param appVersion string = '0.1.0'
+
 // Web App
 resource webApp 'Microsoft.Web/sites@2023-12-01' = {
   name: name
@@ -141,6 +144,10 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
         {
           name: 'NODE_ENV'
           value: 'production'
+        }
+        {
+          name: 'APP_VERSION'
+          value: appVersion
         }
       ]
     }

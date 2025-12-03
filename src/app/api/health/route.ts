@@ -3,6 +3,10 @@ import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+// Version is read from package.json at build time via next.config.js
+// or from APP_VERSION environment variable set during deployment
+const APP_VERSION = process.env.APP_VERSION || '0.1.0';
+
 interface HealthStatus {
   status: 'healthy' | 'unhealthy' | 'degraded';
   timestamp: string;
@@ -24,12 +28,10 @@ interface HealthStatus {
  * Health check endpoint for Azure App Service and monitoring
  */
 export async function GET(): Promise<NextResponse<HealthStatus>> {
-  const startTime = Date.now();
-  
   const healthStatus: HealthStatus = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '0.1.0',
+    version: APP_VERSION,
     checks: {
       database: {
         status: 'ok',
