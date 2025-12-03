@@ -3,11 +3,11 @@ name: Azure Health Check
 on:
   schedule:
     # Run every 15 minutes
-    - cron: '*/15 * * * *'
+    - cron: "*/15 * * * *"
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to check'
+        description: "Environment to check"
         required: true
         type: choice
         options:
@@ -27,47 +27,47 @@ jobs:
       matrix:
         include:
           - environment: dev
-            url: https://app-twinesandstraps-dev.azurewebsites.net
+            url: https://dev-app-san-tassa.azurewebsites.net
           - environment: staging
-            url: https://app-twinesandstraps-staging.azurewebsites.net
+            url: https://staging-app-san-tassa.azurewebsites.net
           - environment: prod
-            url: https://app-twinesandstraps-prod.azurewebsites.net
+            url: https://prod-app-san-tassa.azurewebsites.net
       fail-fast: false
-    
+
     steps:
       - name: Check if environment should be tested
         id: should-test
         run: |
           INPUT_ENV="${{ github.event.inputs.environment || 'all' }}"
           MATRIX_ENV="${{ matrix.environment }}"
-          
+
           if [ "$INPUT_ENV" == "all" ] || [ "$INPUT_ENV" == "$MATRIX_ENV" ]; then
             echo "test=true" >> $GITHUB_OUTPUT
           else
             echo "test=false" >> $GITHUB_OUTPUT
           fi
-          
+
       - name: Health check - ${{ matrix.environment }}
         if: steps.should-test.outputs.test == 'true'
         run: |
           URL="${{ matrix.url }}"
-          
+
           echo "Checking ${{ matrix.environment }} environment..."
           echo "URL: $URL"
           echo ""
-          
+
           # Check homepage
           HOMEPAGE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$URL" || echo "000")
           echo "Homepage: HTTP $HOMEPAGE_STATUS"
-          
+
           # Check health endpoint
           HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$URL/api/health" || echo "000")
           echo "Health endpoint: HTTP $HEALTH_STATUS"
-          
+
           # Check API products endpoint
           API_STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$URL/api/products" || echo "000")
           echo "Products API: HTTP $API_STATUS"
-          
+
           # Determine overall health
           if [ "$HOMEPAGE_STATUS" -ge 200 ] && [ "$HOMEPAGE_STATUS" -lt 400 ] && \
              [ "$HEALTH_STATUS" -ge 200 ] && [ "$HEALTH_STATUS" -lt 400 ]; then
@@ -79,7 +79,7 @@ jobs:
             echo "✗ ${{ matrix.environment }} environment has issues"
             exit 1
           fi
-          
+
       - name: Report status
         if: steps.should-test.outputs.test == 'true' && always()
         run: |
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: health-check
     if: failure()
-    
+
     steps:
       - name: Create failure alert
         run: |
