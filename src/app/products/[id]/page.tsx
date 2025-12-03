@@ -1,16 +1,16 @@
-import React from 'react';
-import type { Metadata } from 'next';
-import prisma from '@/lib/prisma';
-import ProductView from '@/components/ProductView';
-import RelatedProducts from '@/components/RelatedProducts';
+import NotFound from '@/components/NotFound';
 import ProductReviews from '@/components/ProductReviews';
-import ViewHistoryTracker from '@/components/ViewHistoryTracker';
+import ProductView from '@/components/ProductView';
 import RecentlyViewed from '@/components/RecentlyViewed';
-import Link from 'next/link';
+import RelatedProducts from '@/components/RelatedProducts';
+import ViewHistoryTracker from '@/components/ViewHistoryTracker';
 import { featureFlags } from '@/config/featureFlags';
 import { STOCK_STATUS } from '@/constants';
 import { getProduct, getRelatedProducts } from '@/lib/data';
-import NotFound from '@/components/NotFound';
+import prisma from '@/lib/prisma';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import React from 'react';
 
 export const revalidate = 3600; // Revalidate every hour
 

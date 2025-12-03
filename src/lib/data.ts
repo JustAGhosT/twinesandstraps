@@ -3,8 +3,8 @@
 // caching, and potentially a more structured approach with a dedicated
 // services directory.
 
-import prisma from './prisma';
 import { STOCK_STATUS } from '@/constants';
+import prisma from './prisma';
 
 export async function getProduct(id: string) {
   const productId = parseInt(id, 10);

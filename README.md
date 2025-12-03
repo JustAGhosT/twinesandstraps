@@ -18,11 +18,11 @@ Twines and Straps SA manufactures and supplies high-quality industrial twines, r
 
 ## Who It's For
 
-| Customer Type | How We Help |
-|---------------|-------------|
-| **Retail Buyers** | Browse products, view prices, and request quotes for smaller orders |
-| **Business Buyers (B2B)** | Explore bulk options, compare specs, and get personalized quotes for large orders |
-| **Procurement Teams** | Access technical specifications, product datasheets, and streamlined quote requests |
+| Customer Type             | How We Help                                                                         |
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| **Retail Buyers**         | Browse products, view prices, and request quotes for smaller orders                 |
+| **Business Buyers (B2B)** | Explore bulk options, compare specs, and get personalized quotes for large orders   |
+| **Procurement Teams**     | Access technical specifications, product datasheets, and streamlined quote requests |
 
 ## Key Features
 
@@ -106,15 +106,15 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [Setup Guide](./docs/SETUP.md) | Environment setup, database configuration, and deployment |
-| [Design System](./docs/DESIGN.md) | Color palette, typography, and component styles |
-| [Best Practices](./docs/BEST_PRACTICES.md) | Industry standards for the project's tech stack |
-| [Product Requirements](./docs/PRD.md) | Full product vision and business requirements |
-| [Feature Flags](./docs/FEATURE_FLAGS.md) | Toggle features on/off without code changes |
-| [API Reference](./docs/API.md) | REST API documentation for developers |
-| [All Documentation](./docs/README.md) | Complete documentation index |
+| Document                                   | Description                                               |
+| ------------------------------------------ | --------------------------------------------------------- |
+| [Setup Guide](./docs/SETUP.md)             | Environment setup, database configuration, and deployment |
+| [Design System](./docs/DESIGN.md)          | Color palette, typography, and component styles           |
+| [Best Practices](./docs/BEST_PRACTICES.md) | Industry standards for the project's tech stack           |
+| [Product Requirements](./docs/PRD.md)      | Full product vision and business requirements             |
+| [Feature Flags](./docs/FEATURE_FLAGS.md)   | Toggle features on/off without code changes               |
+| [API Reference](./docs/API.md)             | REST API documentation for developers                     |
+| [All Documentation](./docs/README.md)      | Complete documentation index                              |
 
 ## Future Development Guidance
 
