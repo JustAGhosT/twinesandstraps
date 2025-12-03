@@ -1,0 +1,179 @@
+name: Azure Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      location:
+        description: 'Azure region'
+        required: true
+        default: 'southafricanorth'
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - 'infra/bicep/**'
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  BICEP_PATH: infra/bicep
+
+jobs:
+  validate:
+    name: Validate Bicep Templates
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Validate main template
+        run: |
+          az bicep build --file ${{ env.BICEP_PATH }}/main.bicep
+          echo "✓ Bicep template is valid"
+
+  what-if:
+    name: What-If Analysis
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Create Resource Group (if not exists)
+        run: |
+          az group create \
+            --name "rg-twinesandstraps-${{ inputs.environment }}" \
+            --location "${{ inputs.location }}" \
+            --tags Environment="${{ inputs.environment }}" Application="TwinesAndStraps"
+            
+      - name: Run What-If Analysis
+        run: |
+          az deployment group what-if \
+            --name "whatif-${{ inputs.environment }}-${{ github.run_number }}" \
+            --resource-group "rg-twinesandstraps-${{ inputs.environment }}" \
+            --template-file ${{ env.BICEP_PATH }}/main.bicep \
+            --parameters environment="${{ inputs.environment }}" \
+            --parameters baseName="twinesandstraps" \
+            --parameters location="${{ inputs.location }}" \
+            --parameters postgresAdminLogin="${{ secrets.POSTGRES_ADMIN_LOGIN }}" \
+            --parameters postgresAdminPassword="${{ secrets.POSTGRES_ADMIN_PASSWORD }}" \
+            --parameters adminPassword="${{ secrets.ADMIN_PASSWORD }}"
+
+  deploy-infra:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+    needs: [validate, what-if]
+    if: github.event_name == 'workflow_dispatch'
+    environment: ${{ inputs.environment }}
+    
+    outputs:
+      webAppName: ${{ steps.deploy.outputs.webAppName }}
+      webAppUrl: ${{ steps.deploy.outputs.webAppUrl }}
+      storageAccountName: ${{ steps.deploy.outputs.storageAccountName }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Deploy Infrastructure
+        id: deploy
+        run: |
+          DEPLOYMENT_NAME="deploy-${{ inputs.environment }}-${{ github.run_number }}"
+          
+          az deployment group create \
+            --name "$DEPLOYMENT_NAME" \
+            --resource-group "rg-twinesandstraps-${{ inputs.environment }}" \
+            --template-file ${{ env.BICEP_PATH }}/main.bicep \
+            --parameters environment="${{ inputs.environment }}" \
+            --parameters baseName="twinesandstraps" \
+            --parameters location="${{ inputs.location }}" \
+            --parameters postgresAdminLogin="${{ secrets.POSTGRES_ADMIN_LOGIN }}" \
+            --parameters postgresAdminPassword="${{ secrets.POSTGRES_ADMIN_PASSWORD }}" \
+            --parameters adminPassword="${{ secrets.ADMIN_PASSWORD }}" \
+            --parameters whatsappNumber="${{ vars.WHATSAPP_NUMBER }}" \
+            --output none
+          
+          # Get outputs
+          OUTPUTS=$(az deployment group show \
+            --name "$DEPLOYMENT_NAME" \
+            --resource-group "rg-twinesandstraps-${{ inputs.environment }}" \
+            --query "properties.outputs" \
+            -o json)
+          
+          WEB_APP_NAME=$(echo "$OUTPUTS" | jq -r '.webAppName.value')
+          WEB_APP_URL=$(echo "$OUTPUTS" | jq -r '.webAppUrl.value')
+          STORAGE_NAME=$(echo "$OUTPUTS" | jq -r '.storageAccountName.value')
+          
+          echo "webAppName=$WEB_APP_NAME" >> $GITHUB_OUTPUT
+          echo "webAppUrl=$WEB_APP_URL" >> $GITHUB_OUTPUT
+          echo "storageAccountName=$STORAGE_NAME" >> $GITHUB_OUTPUT
+          
+          echo "✓ Infrastructure deployed successfully"
+          echo "  Web App: $WEB_APP_URL"
+          echo "  Storage: $STORAGE_NAME"
+          
+      - name: Run Database Migrations
+        run: |
+          # Get database URL from Key Vault
+          DATABASE_URL=$(az keyvault secret show \
+            --vault-name "kv-twinesandstraps-${{ inputs.environment }}" \
+            --name "database-url" \
+            --query "value" \
+            -o tsv)
+          
+          # Install dependencies and run migrations
+          npm ci
+          npx prisma generate
+          DATABASE_URL="$DATABASE_URL" npx prisma migrate deploy
+          
+          echo "✓ Database migrations applied"
+
+  summary:
+    name: Deployment Summary
+    runs-on: ubuntu-latest
+    needs: deploy-infra
+    if: github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: Summary
+        run: |
+          echo "## 🚀 Infrastructure Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Resource | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | ${{ inputs.environment }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Web App | ${{ needs.deploy-infra.outputs.webAppName }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| URL | ${{ needs.deploy-infra.outputs.webAppUrl }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Storage | ${{ needs.deploy-infra.outputs.storageAccountName }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Deploy the application using the **Deploy to Azure** workflow" >> $GITHUB_STEP_SUMMARY
+          echo "2. Verify the deployment at the URL above" >> $GITHUB_STEP_SUMMARY
