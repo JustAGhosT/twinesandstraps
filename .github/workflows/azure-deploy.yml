@@ -23,6 +23,9 @@ permissions:
   contents: read
   id-token: write
 
+env:
+  PRISMA_VERSION: "6.19.0"
+
 jobs:
   lint:
     name: Lint Code
@@ -205,15 +208,25 @@ jobs:
           fi
 
           # Parse DATABASE_URL to extract host for connectivity check (mask credentials)
-          DB_HOST=$(echo "$DATABASE_URL" | sed -E 's/.*@([^:\/]+).*/\1/')
-          echo "Verifying connection to database server: $DB_HOST"
+          # Handle both formats: postgresql://user:pass@host:port/db and postgres://user:pass@host:port/db
+          if [[ "$DATABASE_URL" =~ @([^/:]+) ]]; then
+            DB_HOST="${BASH_REMATCH[1]}"
+            echo "Verifying connection to database server: $DB_HOST"
+          else
+            echo "Warning: Could not extract host from DATABASE_URL, proceeding with connection test"
+          fi
 
           # Install prisma CLI for connection verification
-          npm install prisma@6.19.0
+          npm install prisma@${{ env.PRISMA_VERSION }}
 
           # Verify database connection using prisma db pull (read-only introspection)
           echo "Testing database connection..."
-          if ! npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | head -20; then
+          set +e  # Temporarily disable exit on error to capture exit code
+          npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | tee /tmp/prisma_output.txt
+          PRISMA_EXIT_CODE=${PIPESTATUS[0]}
+          set -e  # Re-enable exit on error
+          
+          if [ $PRISMA_EXIT_CODE -ne 0 ]; then
             echo ""
             echo "::error::Database connection verification failed."
             echo ""
@@ -308,15 +321,25 @@ jobs:
           fi
 
           # Parse DATABASE_URL to extract host for connectivity check (mask credentials)
-          DB_HOST=$(echo "$DATABASE_URL" | sed -E 's/.*@([^:\/]+).*/\1/')
-          echo "Verifying connection to database server: $DB_HOST"
+          # Handle both formats: postgresql://user:pass@host:port/db and postgres://user:pass@host:port/db
+          if [[ "$DATABASE_URL" =~ @([^/:]+) ]]; then
+            DB_HOST="${BASH_REMATCH[1]}"
+            echo "Verifying connection to database server: $DB_HOST"
+          else
+            echo "Warning: Could not extract host from DATABASE_URL, proceeding with connection test"
+          fi
 
           # Install prisma CLI for connection verification
-          npm install prisma@6.19.0
+          npm install prisma@${{ env.PRISMA_VERSION }}
 
           # Verify database connection using prisma db pull (read-only introspection)
           echo "Testing database connection..."
-          if ! npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | head -20; then
+          set +e  # Temporarily disable exit on error to capture exit code
+          npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | tee /tmp/prisma_output.txt
+          PRISMA_EXIT_CODE=${PIPESTATUS[0]}
+          set -e  # Re-enable exit on error
+          
+          if [ $PRISMA_EXIT_CODE -ne 0 ]; then
             echo ""
             echo "::error::Database connection verification failed."
             echo ""
@@ -417,15 +440,25 @@ jobs:
           fi
 
           # Parse DATABASE_URL to extract host for connectivity check (mask credentials)
-          DB_HOST=$(echo "$DATABASE_URL" | sed -E 's/.*@([^:\/]+).*/\1/')
-          echo "Verifying connection to database server: $DB_HOST"
+          # Handle both formats: postgresql://user:pass@host:port/db and postgres://user:pass@host:port/db
+          if [[ "$DATABASE_URL" =~ @([^/:]+) ]]; then
+            DB_HOST="${BASH_REMATCH[1]}"
+            echo "Verifying connection to database server: $DB_HOST"
+          else
+            echo "Warning: Could not extract host from DATABASE_URL, proceeding with connection test"
+          fi
 
           # Install prisma CLI for connection verification
-          npm install prisma@6.19.0
+          npm install prisma@${{ env.PRISMA_VERSION }}
 
           # Verify database connection using prisma db pull (read-only introspection)
           echo "Testing database connection..."
-          if ! npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | head -20; then
+          set +e  # Temporarily disable exit on error to capture exit code
+          npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | tee /tmp/prisma_output.txt
+          PRISMA_EXIT_CODE=${PIPESTATUS[0]}
+          set -e  # Re-enable exit on error
+          
+          if [ $PRISMA_EXIT_CODE -ne 0 ]; then
             echo ""
             echo "::error::Database connection verification failed."
             echo ""
