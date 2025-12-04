@@ -201,7 +201,7 @@ jobs:
           # Install prisma CLI for migrations
           npm install prisma@6.19.0
           # Run migrations with error handling for common issues
-          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma 2>&1; then
+          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
             echo ""
             echo "::error::Database migration failed. Common causes:"
             echo "  1. Invalid database credentials in DATABASE_URL secret"
@@ -277,7 +277,7 @@ jobs:
           # Install prisma CLI for migrations
           npm install prisma@6.19.0
           # Run migrations with error handling for common issues
-          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma 2>&1; then
+          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
             echo ""
             echo "::error::Database migration failed. Common causes:"
             echo "  1. Invalid database credentials in DATABASE_URL secret"
@@ -359,7 +359,7 @@ jobs:
           # Install prisma CLI for migrations
           npm install prisma@6.19.0
           # Run migrations with error handling for common issues
-          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma 2>&1; then
+          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
             echo ""
             echo "::error::Database migration failed. Common causes:"
             echo "  1. Invalid database credentials in DATABASE_URL secret"
