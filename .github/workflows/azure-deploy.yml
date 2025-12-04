@@ -178,12 +178,17 @@ jobs:
             --name "dev-app-san-tassa" \
             --resource-group "dev-rg-san-tassa" \
             --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false
+          # Wait for SCM container to stabilize after settings change
+          echo "Waiting 30 seconds for SCM container to stabilize..."
+          sleep 30
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: "dev-app-san-tassa"
           package: deploy.zip
+          type: zip
+          clean: true
           startup-command: "node server.js"
 
       - name: Run database migrations
@@ -232,12 +237,17 @@ jobs:
             --name "staging-app-san-tassa" \
             --resource-group "staging-rg-san-tassa" \
             --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false
+          # Wait for SCM container to stabilize after settings change
+          echo "Waiting 30 seconds for SCM container to stabilize..."
+          sleep 30
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
           app-name: "staging-app-san-tassa"
           package: deploy.zip
+          type: zip
+          clean: true
           startup-command: "node server.js"
 
   deploy-prod:
@@ -279,6 +289,9 @@ jobs:
             --resource-group "prod-rg-san-tassa" \
             --slot "staging" \
             --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false
+          # Wait for SCM container to stabilize after settings change
+          echo "Waiting 30 seconds for SCM container to stabilize..."
+          sleep 30
 
       - name: Deploy to Azure App Service (Staging Slot)
         uses: azure/webapps-deploy@v3
@@ -286,6 +299,8 @@ jobs:
           app-name: "prod-app-san-tassa"
           slot-name: "staging"
           package: deploy.zip
+          type: zip
+          clean: true
           startup-command: "node server.js"
 
       - name: Health check on staging slot
