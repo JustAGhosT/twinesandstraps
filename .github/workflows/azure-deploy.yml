@@ -23,6 +23,9 @@ permissions:
   contents: read
   id-token: write
 
+env:
+  PRISMA_VERSION: "6.19.0"
+
 jobs:
   lint:
     name: Lint Code
@@ -191,19 +194,44 @@ jobs:
           clean: true
           startup-command: "node server.js"
 
-      - name: Run database migrations
+      - name: Verify DATABASE_URL
+        shell: bash
         run: |
           # Validate DATABASE_URL is set
           if [ -z "$DATABASE_URL" ]; then
-            echo "::error::DATABASE_URL secret is not set or empty. Please configure the DATABASE_URL secret in the 'dev' environment."
+            echo "::error::DATABASE_URL secret is not set or empty."
+            echo ""
+            echo "To fix this issue:"
+            echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → dev"
+            echo "  - Add or update the DATABASE_URL secret with valid PostgreSQL credentials"
+            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
             exit 1
           fi
-          # Install prisma CLI for migrations
-          npm install prisma@6.19.0
-          # Run migrations with error handling for common issues
-          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+
+          # Parse DATABASE_URL to extract host for connectivity check (mask credentials)
+          # Handle both formats: postgresql://user:pass@host:port/db and postgres://user:pass@host:port/db
+          if [[ "$DATABASE_URL" =~ @([^/:]+) ]]; then
+            DB_HOST="${BASH_REMATCH[1]}"
+            echo "Verifying connection to database server: $DB_HOST"
+          else
+            echo "Warning: Could not extract host from DATABASE_URL, proceeding with connection test"
+          fi
+
+          # Install prisma CLI for connection verification
+          npm install prisma@${{ env.PRISMA_VERSION }}
+
+          # Verify database connection using prisma db pull (read-only introspection)
+          echo "Testing database connection..."
+          set +e  # Temporarily disable exit on error to capture exit code
+          npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | tee /tmp/prisma_output.txt
+          PRISMA_EXIT_CODE=${PIPESTATUS[0]}
+          set -e  # Re-enable exit on error
+          
+          if [ $PRISMA_EXIT_CODE -ne 0 ]; then
             echo ""
-            echo "::error::Database migration failed. Common causes:"
+            echo "::error::Database connection verification failed."
+            echo ""
+            echo "Common causes:"
             echo "  1. Invalid database credentials in DATABASE_URL secret"
             echo "  2. Database server is not accessible (firewall/network issues)"
             echo "  3. Database does not exist"
@@ -212,11 +240,24 @@ jobs:
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → dev"
             echo "  - Update the DATABASE_URL secret with valid PostgreSQL credentials"
             echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            exit 1
+          fi
+          echo "✓ Database connection verified successfully"
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run database migrations
+        run: |
+          # Run migrations (prisma is already installed from verification step)
+          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+            echo ""
+            echo "::error::Database migration failed."
             echo ""
             echo "To verify credentials, test locally:"
             echo "  npx prisma db pull --schema=prisma/schema.prisma"
             exit 1
           fi
+          echo "✓ Database migrations completed successfully"
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
@@ -267,19 +308,44 @@ jobs:
           clean: true
           startup-command: "node server.js"
 
-      - name: Run database migrations
+      - name: Verify DATABASE_URL
+        shell: bash
         run: |
           # Validate DATABASE_URL is set
           if [ -z "$DATABASE_URL" ]; then
-            echo "::error::DATABASE_URL secret is not set or empty. Please configure the DATABASE_URL secret in the 'staging' environment."
+            echo "::error::DATABASE_URL secret is not set or empty."
+            echo ""
+            echo "To fix this issue:"
+            echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → staging"
+            echo "  - Add or update the DATABASE_URL secret with valid PostgreSQL credentials"
+            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
             exit 1
           fi
-          # Install prisma CLI for migrations
-          npm install prisma@6.19.0
-          # Run migrations with error handling for common issues
-          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+
+          # Parse DATABASE_URL to extract host for connectivity check (mask credentials)
+          # Handle both formats: postgresql://user:pass@host:port/db and postgres://user:pass@host:port/db
+          if [[ "$DATABASE_URL" =~ @([^/:]+) ]]; then
+            DB_HOST="${BASH_REMATCH[1]}"
+            echo "Verifying connection to database server: $DB_HOST"
+          else
+            echo "Warning: Could not extract host from DATABASE_URL, proceeding with connection test"
+          fi
+
+          # Install prisma CLI for connection verification
+          npm install prisma@${{ env.PRISMA_VERSION }}
+
+          # Verify database connection using prisma db pull (read-only introspection)
+          echo "Testing database connection..."
+          set +e  # Temporarily disable exit on error to capture exit code
+          npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | tee /tmp/prisma_output.txt
+          PRISMA_EXIT_CODE=${PIPESTATUS[0]}
+          set -e  # Re-enable exit on error
+          
+          if [ $PRISMA_EXIT_CODE -ne 0 ]; then
             echo ""
-            echo "::error::Database migration failed. Common causes:"
+            echo "::error::Database connection verification failed."
+            echo ""
+            echo "Common causes:"
             echo "  1. Invalid database credentials in DATABASE_URL secret"
             echo "  2. Database server is not accessible (firewall/network issues)"
             echo "  3. Database does not exist"
@@ -288,11 +354,24 @@ jobs:
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → staging"
             echo "  - Update the DATABASE_URL secret with valid PostgreSQL credentials"
             echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            exit 1
+          fi
+          echo "✓ Database connection verified successfully"
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run database migrations
+        run: |
+          # Run migrations (prisma is already installed from verification step)
+          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+            echo ""
+            echo "::error::Database migration failed."
             echo ""
             echo "To verify credentials, test locally:"
             echo "  npx prisma db pull --schema=prisma/schema.prisma"
             exit 1
           fi
+          echo "✓ Database migrations completed successfully"
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
@@ -349,19 +428,44 @@ jobs:
           clean: true
           startup-command: "node server.js"
 
-      - name: Run database migrations
+      - name: Verify DATABASE_URL
+        shell: bash
         run: |
           # Validate DATABASE_URL is set
           if [ -z "$DATABASE_URL" ]; then
-            echo "::error::DATABASE_URL secret is not set or empty. Please configure the DATABASE_URL secret in the 'prod' environment."
+            echo "::error::DATABASE_URL secret is not set or empty."
+            echo ""
+            echo "To fix this issue:"
+            echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → prod"
+            echo "  - Add or update the DATABASE_URL secret with valid PostgreSQL credentials"
+            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
             exit 1
           fi
-          # Install prisma CLI for migrations
-          npm install prisma@6.19.0
-          # Run migrations with error handling for common issues
-          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+
+          # Parse DATABASE_URL to extract host for connectivity check (mask credentials)
+          # Handle both formats: postgresql://user:pass@host:port/db and postgres://user:pass@host:port/db
+          if [[ "$DATABASE_URL" =~ @([^/:]+) ]]; then
+            DB_HOST="${BASH_REMATCH[1]}"
+            echo "Verifying connection to database server: $DB_HOST"
+          else
+            echo "Warning: Could not extract host from DATABASE_URL, proceeding with connection test"
+          fi
+
+          # Install prisma CLI for connection verification
+          npm install prisma@${{ env.PRISMA_VERSION }}
+
+          # Verify database connection using prisma db pull (read-only introspection)
+          echo "Testing database connection..."
+          set +e  # Temporarily disable exit on error to capture exit code
+          npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | tee /tmp/prisma_output.txt
+          PRISMA_EXIT_CODE=${PIPESTATUS[0]}
+          set -e  # Re-enable exit on error
+          
+          if [ $PRISMA_EXIT_CODE -ne 0 ]; then
             echo ""
-            echo "::error::Database migration failed. Common causes:"
+            echo "::error::Database connection verification failed."
+            echo ""
+            echo "Common causes:"
             echo "  1. Invalid database credentials in DATABASE_URL secret"
             echo "  2. Database server is not accessible (firewall/network issues)"
             echo "  3. Database does not exist"
@@ -370,11 +474,24 @@ jobs:
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → prod"
             echo "  - Update the DATABASE_URL secret with valid PostgreSQL credentials"
             echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            exit 1
+          fi
+          echo "✓ Database connection verified successfully"
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run database migrations
+        run: |
+          # Run migrations (prisma is already installed from verification step)
+          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+            echo ""
+            echo "::error::Database migration failed."
             echo ""
             echo "To verify credentials, test locally:"
             echo "  npx prisma db pull --schema=prisma/schema.prisma"
             exit 1
           fi
+          echo "✓ Database migrations completed successfully"
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
