@@ -134,7 +134,7 @@ If not using the setup script, manually add these secrets in GitHub:
 | `POSTGRES_ADMIN_LOGIN`    | PostgreSQL admin username            |
 | `POSTGRES_ADMIN_PASSWORD` | PostgreSQL admin password (strong!)  |
 | `ADMIN_PASSWORD`          | Application admin password           |
-| `DATABASE_URL`            | (Optional) Override database URL     |
+| `DATABASE_URL`            | PostgreSQL connection string (required for migrations) |
 
 ---
 
