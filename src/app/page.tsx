@@ -11,22 +11,32 @@ import type { Product, Category } from '@/types/database';
 export const dynamic = 'force-dynamic';
 
 async function getFeaturedProducts() {
-  const products = await prisma.product.findMany({
-    take: 3,
-    orderBy: {
-      created_at: 'desc',
-    },
-  });
-  return products;
+  try {
+    const products = await prisma.product.findMany({
+      take: 3,
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+    return products;
+  } catch (error) {
+    console.error('Failed to fetch featured products:', error);
+    return [];
+  }
 }
 
 async function getCategories() {
-  const categories = await prisma.category.findMany({
-    where: {
-      parent_id: null,
-    },
-  });
-  return categories;
+  try {
+    const categories = await prisma.category.findMany({
+      where: {
+        parent_id: null,
+      },
+    });
+    return categories;
+  } catch (error) {
+    console.error('Failed to fetch categories:', error);
+    return [];
+  }
 }
 
 export default async function Home() {
