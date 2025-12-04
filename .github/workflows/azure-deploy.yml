@@ -193,6 +193,11 @@ jobs:
 
       - name: Run database migrations
         run: |
+          # Validate DATABASE_URL is set
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL secret is not set or empty. Please configure the DATABASE_URL secret in the 'dev' environment."
+            exit 1
+          fi
           # Install prisma CLI for migrations
           npm install prisma@6.19.0
           npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma
@@ -246,6 +251,19 @@ jobs:
           clean: true
           startup-command: "node server.js"
 
+      - name: Run database migrations
+        run: |
+          # Validate DATABASE_URL is set
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL secret is not set or empty. Please configure the DATABASE_URL secret in the 'staging' environment."
+            exit 1
+          fi
+          # Install prisma CLI for migrations
+          npm install prisma@6.19.0
+          npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
   deploy-prod:
     name: Deploy to Production
     runs-on: ubuntu-latest
@@ -298,6 +316,19 @@ jobs:
           type: zip
           clean: true
           startup-command: "node server.js"
+
+      - name: Run database migrations
+        run: |
+          # Validate DATABASE_URL is set
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL secret is not set or empty. Please configure the DATABASE_URL secret in the 'prod' environment."
+            exit 1
+          fi
+          # Install prisma CLI for migrations
+          npm install prisma@6.19.0
+          npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Health check on staging slot
         run: |
