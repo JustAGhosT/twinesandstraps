@@ -90,6 +90,10 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
           value: 'false'
         }
         {
+          name: 'ENABLE_ORYX_BUILD'
+          value: 'false'
+        }
+        {
           name: 'DATABASE_URL'
           value: databaseUrl
         }
@@ -179,6 +183,10 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = if (environment ==
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+          value: 'false'
+        }
+        {
+          name: 'ENABLE_ORYX_BUILD'
           value: 'false'
         }
         {
