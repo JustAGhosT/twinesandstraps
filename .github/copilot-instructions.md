@@ -8,7 +8,7 @@ This is a Next.js 14 e-commerce platform for Twines and Straps SA, a South Afric
 - **Database**: PostgreSQL via Neon (cloud) with Prisma ORM
 - **Styling**: Tailwind CSS
 - **Language**: TypeScript
-- **Deployment**: Netlify
+- **Deployment**: Azure App Service
 
 ## Code Style Guidelines
 
@@ -119,6 +119,6 @@ Note: The build command requires a DATABASE_URL. For CI/testing purposes, use a 
 
 ## Deployment
 
-- Migrations run automatically during Netlify builds via `prisma migrate deploy`
-- Environment variables must be set in Netlify dashboard
+- Migrations run automatically during Azure deployments via `prisma migrate deploy`
+- Environment variables must be set in Azure App Service (Configuration → Application settings)
 - CI/CD pipeline runs lint, type-check, and build on every PR
