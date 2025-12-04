@@ -1,54 +1,58 @@
 -- CreateTable
 CREATE TABLE "Product" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "sku" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "material" TEXT,
-    "diameter" REAL,
-    "length" REAL,
+    "diameter" DOUBLE PRECISION,
+    "length" DOUBLE PRECISION,
     "strength_rating" TEXT,
-    "price" REAL NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
     "vat_applicable" BOOLEAN NOT NULL DEFAULT true,
     "stock_status" TEXT NOT NULL DEFAULT 'IN_STOCK',
     "image_url" TEXT,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" DATETIME NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
     "is_third_party" BOOLEAN NOT NULL DEFAULT false,
     "supplier_id" INTEGER,
     "supplier_sku" TEXT,
-    "supplier_price" REAL,
-    "markup_percentage" REAL,
-    "last_synced_at" DATETIME,
+    "supplier_price" DOUBLE PRECISION,
+    "markup_percentage" DOUBLE PRECISION,
+    "last_synced_at" TIMESTAMP(3),
     "category_id" INTEGER NOT NULL,
-    CONSTRAINT "Product_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "Category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Product_supplier_id_fkey" FOREIGN KEY ("supplier_id") REFERENCES "Supplier" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+
+    CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Category" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
-    "parent_id" INTEGER
+    "parent_id" INTEGER,
+
+    CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT,
     "password_hash" TEXT NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'CUSTOMER',
     "marketing_consent" BOOLEAN NOT NULL DEFAULT false,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "last_login" DATETIME
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "last_login" TIMESTAMP(3),
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Address" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
     "label" TEXT NOT NULL DEFAULT 'Home',
     "street_address" TEXT NOT NULL,
@@ -57,84 +61,86 @@ CREATE TABLE "Address" (
     "postal_code" TEXT NOT NULL,
     "country" TEXT NOT NULL DEFAULT 'South Africa',
     "is_default" BOOLEAN NOT NULL DEFAULT false,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" DATETIME NOT NULL,
-    CONSTRAINT "Address_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Order" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "order_number" TEXT NOT NULL,
     "user_id" INTEGER NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'PENDING',
     "payment_status" TEXT NOT NULL DEFAULT 'PENDING',
     "payment_method" TEXT,
-    "subtotal" REAL NOT NULL,
-    "vat_amount" REAL NOT NULL,
-    "shipping_cost" REAL NOT NULL DEFAULT 0,
-    "total" REAL NOT NULL,
+    "subtotal" DOUBLE PRECISION NOT NULL,
+    "vat_amount" DOUBLE PRECISION NOT NULL,
+    "shipping_cost" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "total" DOUBLE PRECISION NOT NULL,
     "notes" TEXT,
     "shipping_address_id" INTEGER,
     "billing_address_id" INTEGER,
     "tracking_number" TEXT,
-    "shipped_at" DATETIME,
-    "delivered_at" DATETIME,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" DATETIME NOT NULL,
-    CONSTRAINT "Order_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Order_shipping_address_id_fkey" FOREIGN KEY ("shipping_address_id") REFERENCES "Address" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Order_billing_address_id_fkey" FOREIGN KEY ("billing_address_id") REFERENCES "Address" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "shipped_at" TIMESTAMP(3),
+    "delivered_at" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "OrderItem" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "order_id" INTEGER NOT NULL,
     "product_id" INTEGER NOT NULL,
     "product_name" TEXT NOT NULL,
     "product_sku" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
-    "unit_price" REAL NOT NULL,
-    "total_price" REAL NOT NULL,
-    CONSTRAINT "OrderItem_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "Order" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "OrderItem_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "unit_price" DOUBLE PRECISION NOT NULL,
+    "total_price" DOUBLE PRECISION NOT NULL,
+
+    CONSTRAINT "OrderItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "OrderStatusHistory" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "order_id" INTEGER NOT NULL,
     "status" TEXT NOT NULL,
     "notes" TEXT,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "OrderStatusHistory_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "Order" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "OrderStatusHistory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ViewHistory" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
     "product_id" INTEGER NOT NULL,
-    "viewed_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "ViewHistory_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "ViewHistory_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "Product" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "viewed_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ViewHistory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "PasswordResetToken" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
     "token" TEXT NOT NULL,
-    "expires_at" DATETIME NOT NULL,
+    "expires_at" TIMESTAMP(3) NOT NULL,
     "used" BOOLEAN NOT NULL DEFAULT false,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "PasswordResetToken_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PasswordResetToken_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Review" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "product_id" INTEGER,
     "user_id" INTEGER,
     "author_name" TEXT NOT NULL,
@@ -148,23 +154,25 @@ CREATE TABLE "Review" (
     "verified_purchase" BOOLEAN NOT NULL DEFAULT false,
     "promoted_to_testimonial" BOOLEAN NOT NULL DEFAULT false,
     "admin_notes" TEXT,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" DATETIME NOT NULL,
-    CONSTRAINT "Review_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "Product" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT "Review_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User" ("id") ON DELETE SET NULL ON UPDATE CASCADE
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "AdminSession" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "token" TEXT NOT NULL,
-    "expires_at" DATETIME NOT NULL,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "expires_at" TIMESTAMP(3) NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "AdminSession_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "AdminActivityLog" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "action" TEXT NOT NULL,
     "entity_type" TEXT NOT NULL,
     "entity_id" INTEGER,
@@ -172,12 +180,14 @@ CREATE TABLE "AdminActivityLog" (
     "metadata" TEXT,
     "ip_address" TEXT,
     "user_agent" TEXT,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "AdminActivityLog_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "SiteSetting" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT DEFAULT 1,
+    "id" INTEGER NOT NULL DEFAULT 1,
     "company_name" TEXT NOT NULL DEFAULT 'Twines and Straps SA (Pty) Ltd',
     "tagline" TEXT NOT NULL DEFAULT 'Boundless Strength, Endless Solutions!',
     "email" TEXT NOT NULL DEFAULT 'admin@tassa.co.za',
@@ -192,12 +202,14 @@ CREATE TABLE "SiteSetting" (
     "social_linkedin" TEXT NOT NULL DEFAULT '',
     "social_twitter" TEXT NOT NULL DEFAULT '',
     "social_youtube" TEXT NOT NULL DEFAULT '',
-    "updated_at" DATETIME NOT NULL
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SiteSetting_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "AdminSetupTask" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "task_key" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
@@ -205,16 +217,18 @@ CREATE TABLE "AdminSetupTask" (
     "priority" INTEGER NOT NULL DEFAULT 1,
     "is_required" BOOLEAN NOT NULL DEFAULT false,
     "completed" BOOLEAN NOT NULL DEFAULT false,
-    "completed_at" DATETIME,
+    "completed_at" TIMESTAMP(3),
     "link_url" TEXT,
     "link_text" TEXT,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" DATETIME NOT NULL
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "AdminSetupTask_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Supplier" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "contact_name" TEXT,
@@ -223,18 +237,20 @@ CREATE TABLE "Supplier" (
     "website" TEXT,
     "address" TEXT,
     "notes" TEXT,
-    "default_markup" REAL NOT NULL DEFAULT 30,
+    "default_markup" DOUBLE PRECISION NOT NULL DEFAULT 30,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "payment_terms" TEXT,
     "lead_time_days" INTEGER,
-    "min_order_value" REAL,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" DATETIME NOT NULL
+    "min_order_value" DOUBLE PRECISION,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Supplier_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ProductImportBatch" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "supplier_id" INTEGER,
     "filename" TEXT,
     "source" TEXT NOT NULL,
@@ -245,8 +261,10 @@ CREATE TABLE "ProductImportBatch" (
     "skipped" INTEGER NOT NULL DEFAULT 0,
     "status" TEXT NOT NULL DEFAULT 'PENDING',
     "error_log" TEXT,
-    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "completed_at" DATETIME
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "completed_at" TIMESTAMP(3),
+
+    CONSTRAINT "ProductImportBatch_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -305,3 +323,45 @@ CREATE INDEX "ProductImportBatch_status_idx" ON "ProductImportBatch"("status");
 
 -- CreateIndex
 CREATE INDEX "ProductImportBatch_supplier_id_idx" ON "ProductImportBatch"("supplier_id");
+
+-- AddForeignKey
+ALTER TABLE "Product" ADD CONSTRAINT "Product_category_id_fkey" FOREIGN KEY ("category_id") REFERENCES "Category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Product" ADD CONSTRAINT "Product_supplier_id_fkey" FOREIGN KEY ("supplier_id") REFERENCES "Supplier"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Address" ADD CONSTRAINT "Address_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_shipping_address_id_fkey" FOREIGN KEY ("shipping_address_id") REFERENCES "Address"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_billing_address_id_fkey" FOREIGN KEY ("billing_address_id") REFERENCES "Address"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "Order"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderStatusHistory" ADD CONSTRAINT "OrderStatusHistory_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "Order"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ViewHistory" ADD CONSTRAINT "ViewHistory_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ViewHistory" ADD CONSTRAINT "ViewHistory_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PasswordResetToken" ADD CONSTRAINT "PasswordResetToken_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Review" ADD CONSTRAINT "Review_product_id_fkey" FOREIGN KEY ("product_id") REFERENCES "Product"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Review" ADD CONSTRAINT "Review_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
