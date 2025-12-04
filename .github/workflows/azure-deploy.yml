@@ -178,12 +178,17 @@ jobs:
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
 
-      - name: Configure App Service to skip Oryx build
+      - name: Configure App Service settings
         run: |
+          # Configure build settings and DATABASE_URL for the application
           az webapp config appsettings set \
             --name "dev-app-san-tassa" \
             --resource-group "dev-rg-san-tassa" \
-            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false
+            --settings \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
+              ENABLE_ORYX_BUILD=false \
+              NODE_ENV=production \
+              DATABASE_URL="${{ secrets.DATABASE_URL }}"
           # Wait for SCM container to stabilize after settings change
           echo "Waiting 30 seconds for SCM container to stabilize..."
           sleep 30
@@ -311,12 +316,17 @@ jobs:
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
 
-      - name: Configure App Service to skip Oryx build
+      - name: Configure App Service settings
         run: |
+          # Configure build settings and DATABASE_URL for the application
           az webapp config appsettings set \
             --name "staging-app-san-tassa" \
             --resource-group "staging-rg-san-tassa" \
-            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false
+            --settings \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
+              ENABLE_ORYX_BUILD=false \
+              NODE_ENV=production \
+              DATABASE_URL="${{ secrets.DATABASE_URL }}"
           # Wait for SCM container to stabilize after settings change
           echo "Waiting 30 seconds for SCM container to stabilize..."
           sleep 30
@@ -444,17 +454,27 @@ jobs:
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
 
-      - name: Configure App Service to skip Oryx build
+      - name: Configure App Service settings
         run: |
+          # Configure build settings and DATABASE_URL for the production slot
           az webapp config appsettings set \
             --name "prod-app-san-tassa" \
             --resource-group "prod-rg-san-tassa" \
-            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false
+            --settings \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
+              ENABLE_ORYX_BUILD=false \
+              NODE_ENV=production \
+              DATABASE_URL="${{ secrets.DATABASE_URL }}"
+          # Configure settings for staging slot (used for blue/green deployment)
           az webapp config appsettings set \
             --name "prod-app-san-tassa" \
             --resource-group "prod-rg-san-tassa" \
             --slot "staging" \
-            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false
+            --settings \
+              SCM_DO_BUILD_DURING_DEPLOYMENT=false \
+              ENABLE_ORYX_BUILD=false \
+              NODE_ENV=production \
+              DATABASE_URL="${{ secrets.DATABASE_URL }}"
           # Wait for SCM container to stabilize after settings change
           echo "Waiting 30 seconds for SCM container to stabilize..."
           sleep 30
