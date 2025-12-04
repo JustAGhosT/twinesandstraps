@@ -136,6 +136,9 @@ jobs:
           cp -r public deploy-package/
           # Copy prisma schema and migrations for runtime migrations
           cp -r prisma deploy-package/
+          # Copy migration script for production deployments
+          mkdir -p deploy-package/scripts
+          cp scripts/migrate-production.js deploy-package/scripts/
           # Copy deployment config to skip Oryx build
           cp .deployment deploy-package/
 
@@ -264,8 +267,11 @@ jobs:
 
       - name: Run database migrations
         run: |
-          # Run migrations (prisma is already installed from verification step)
-          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+          # Generate Prisma Client for migration script
+          npx prisma generate --schema=deploy-package/prisma/schema.prisma
+          
+          # Run migration script that handles baselining for existing databases
+          if ! node deploy-package/scripts/migrate-production.js --schema=deploy-package/prisma/schema.prisma; then
             echo ""
             echo "::error::Database migration failed."
             echo ""
@@ -394,8 +400,11 @@ jobs:
 
       - name: Run database migrations
         run: |
-          # Run migrations (prisma is already installed from verification step)
-          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+          # Generate Prisma Client for migration script
+          npx prisma generate --schema=deploy-package/prisma/schema.prisma
+          
+          # Run migration script that handles baselining for existing databases
+          if ! node deploy-package/scripts/migrate-production.js --schema=deploy-package/prisma/schema.prisma; then
             echo ""
             echo "::error::Database migration failed."
             echo ""
@@ -530,8 +539,11 @@ jobs:
 
       - name: Run database migrations
         run: |
-          # Run migrations (prisma is already installed from verification step)
-          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+          # Generate Prisma Client for migration script
+          npx prisma generate --schema=deploy-package/prisma/schema.prisma
+          
+          # Run migration script that handles baselining for existing databases
+          if ! node deploy-package/scripts/migrate-production.js --schema=deploy-package/prisma/schema.prisma; then
             echo ""
             echo "::error::Database migration failed."
             echo ""

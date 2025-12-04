@@ -9,19 +9,27 @@
  * - If init migration is not recorded but tables exist: baselines it as applied
  * - If any migration is marked as failed: marks it as rolled back for retry
  * 
- * Usage: tsx scripts/migrate-production.ts
+ * Usage: tsx scripts/migrate-production.ts [--schema=path/to/schema.prisma]
  */
 
 import { execSync } from 'child_process';
 import { PrismaClient } from '@prisma/client';
 
 // The init migration that creates the base tables (Product, Category, User)
-const INIT_MIGRATION_NAME = '20251117010205_init';
+const INIT_MIGRATION_NAME = '20251203031247_init';
+
+// Parse command line arguments for schema path
+const schemaArg = process.argv.find(arg => arg.startsWith('--schema='));
+const schemaPath = schemaArg ? schemaArg.split('=')[1] : null;
+const schemaOption = schemaPath ? ` --schema=${schemaPath}` : '';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Starting production migration...');
+  if (schemaPath) {
+    console.log(`Using schema: ${schemaPath}`);
+  }
 
   try {
     // First, check if we need to baseline the init migration
@@ -36,7 +44,7 @@ async function main() {
         console.log('Tables already exist. Baselining init migration...');
         
         // Mark the init migration as already applied
-        execSync(`npx prisma migrate resolve --applied ${INIT_MIGRATION_NAME}`, {
+        execSync(`npx prisma migrate resolve --applied ${INIT_MIGRATION_NAME}${schemaOption}`, {
           stdio: 'inherit',
         });
         
@@ -51,7 +59,7 @@ async function main() {
         console.log('Tables exist despite failed status. Marking init migration as applied...');
         
         // Mark the failed init migration as applied since the tables exist
-        execSync(`npx prisma migrate resolve --applied ${INIT_MIGRATION_NAME}`, {
+        execSync(`npx prisma migrate resolve --applied ${INIT_MIGRATION_NAME}${schemaOption}`, {
           stdio: 'inherit',
         });
         
@@ -60,7 +68,7 @@ async function main() {
         console.log('Tables do not exist. Marking init migration as rolled back for retry...');
         
         // Mark the failed init migration as rolled back so it can be retried
-        execSync(`npx prisma migrate resolve --rolled-back ${INIT_MIGRATION_NAME}`, {
+        execSync(`npx prisma migrate resolve --rolled-back ${INIT_MIGRATION_NAME}${schemaOption}`, {
           stdio: 'inherit',
         });
         
@@ -77,7 +85,7 @@ async function main() {
       
       for (const migrationName of failedMigrations) {
         console.log(`  Marking migration as rolled back: ${migrationName}`);
-        execSync(`npx prisma migrate resolve --rolled-back ${migrationName}`, {
+        execSync(`npx prisma migrate resolve --rolled-back ${migrationName}${schemaOption}`, {
           stdio: 'inherit',
         });
       }
@@ -87,7 +95,7 @@ async function main() {
 
     // Now run the normal migrate deploy
     console.log('Running prisma migrate deploy...');
-    execSync('npx prisma migrate deploy', {
+    execSync(`npx prisma migrate deploy${schemaOption}`, {
       stdio: 'inherit',
     });
 
