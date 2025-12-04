@@ -193,15 +193,11 @@ jobs:
 
       - name: Run database migrations
         run: |
-          DATABASE_URL=$(az keyvault secret show \
-            --vault-name "dev-kv-san-tassa" \
-            --name "database-url" \
-            -o tsv --query "value")
-          export DATABASE_URL
-
           # Install prisma CLI for migrations
           npm install prisma@6.19.0
           npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
   deploy-staging:
     name: Deploy to Staging
