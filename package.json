@@ -13,9 +13,6 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "next": "14.2.32",
