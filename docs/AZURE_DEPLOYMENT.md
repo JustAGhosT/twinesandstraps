@@ -324,6 +324,42 @@ The `azure-health-check.yml` workflow runs every 15 minutes to verify:
 
 ### Common Issues
 
+#### "P1000: Authentication failed against database server"
+
+This error occurs when the `DATABASE_URL` secret contains invalid credentials. The error message will include the username that failed to authenticate (e.g., `credentials for 'Martyn' are not valid`).
+
+**Causes:**
+1. Incorrect username or password in the `DATABASE_URL` secret
+2. The database user doesn't exist
+3. The password was changed in Azure PostgreSQL but not updated in GitHub secrets
+
+**Solution:**
+
+1. **Get the correct credentials** from Azure PostgreSQL:
+   ```bash
+   # View the PostgreSQL server admin login
+   az postgres flexible-server show \
+     --name dev-psql-san-tassa \
+     --resource-group dev-rg-san-tassa \
+     --query administratorLogin
+   ```
+
+2. **Update the GitHub secret**:
+   - Go to **Settings → Secrets and variables → Actions → Environments**
+   - Select the environment (dev, staging, or prod)
+   - Update `DATABASE_URL` with the correct credentials
+   - Format: `postgresql://USERNAME:PASSWORD@dev-psql-san-tassa.postgres.database.azure.com:5432/postgres?sslmode=require`
+
+3. **Re-run the deployment** workflow
+
+**Note:** If you've forgotten the admin password, you can reset it:
+```bash
+az postgres flexible-server update \
+  --name dev-psql-san-tassa \
+  --resource-group dev-rg-san-tassa \
+  --admin-password "NewSecurePassword123!"
+```
+
 #### "Could not connect to database"
 
 1. Check if the PostgreSQL server firewall allows Azure services

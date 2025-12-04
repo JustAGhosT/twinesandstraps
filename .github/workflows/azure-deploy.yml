@@ -200,7 +200,23 @@ jobs:
           fi
           # Install prisma CLI for migrations
           npm install prisma@6.19.0
-          npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma
+          # Run migrations with error handling for common issues
+          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+            echo ""
+            echo "::error::Database migration failed. Common causes:"
+            echo "  1. Invalid database credentials in DATABASE_URL secret"
+            echo "  2. Database server is not accessible (firewall/network issues)"
+            echo "  3. Database does not exist"
+            echo ""
+            echo "To fix credential issues:"
+            echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → dev"
+            echo "  - Update the DATABASE_URL secret with valid PostgreSQL credentials"
+            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            echo ""
+            echo "To verify credentials, test locally:"
+            echo "  npx prisma db pull --schema=prisma/schema.prisma"
+            exit 1
+          fi
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
@@ -260,7 +276,23 @@ jobs:
           fi
           # Install prisma CLI for migrations
           npm install prisma@6.19.0
-          npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma
+          # Run migrations with error handling for common issues
+          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+            echo ""
+            echo "::error::Database migration failed. Common causes:"
+            echo "  1. Invalid database credentials in DATABASE_URL secret"
+            echo "  2. Database server is not accessible (firewall/network issues)"
+            echo "  3. Database does not exist"
+            echo ""
+            echo "To fix credential issues:"
+            echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → staging"
+            echo "  - Update the DATABASE_URL secret with valid PostgreSQL credentials"
+            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            echo ""
+            echo "To verify credentials, test locally:"
+            echo "  npx prisma db pull --schema=prisma/schema.prisma"
+            exit 1
+          fi
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
@@ -326,7 +358,23 @@ jobs:
           fi
           # Install prisma CLI for migrations
           npm install prisma@6.19.0
-          npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma
+          # Run migrations with error handling for common issues
+          if ! npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma; then
+            echo ""
+            echo "::error::Database migration failed. Common causes:"
+            echo "  1. Invalid database credentials in DATABASE_URL secret"
+            echo "  2. Database server is not accessible (firewall/network issues)"
+            echo "  3. Database does not exist"
+            echo ""
+            echo "To fix credential issues:"
+            echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → prod"
+            echo "  - Update the DATABASE_URL secret with valid PostgreSQL credentials"
+            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            echo ""
+            echo "To verify credentials, test locally:"
+            echo "  npx prisma db pull --schema=prisma/schema.prisma"
+            exit 1
+          fi
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
