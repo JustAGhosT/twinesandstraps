@@ -74,7 +74,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
     clientAffinityEnabled: false
     siteConfig: {
       linuxFxVersion: 'NODE|18-lts'
-      appCommandLine: 'npm run start'
+      appCommandLine: 'node server.js'
       alwaysOn: environment == 'prod'
       http20Enabled: true
       minTlsVersion: '1.2'
@@ -87,11 +87,7 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'true'
-        }
-        {
-          name: 'ENABLE_ORYX_BUILD'
-          value: 'true'
+          value: 'false'
         }
         {
           name: 'DATABASE_URL'
@@ -170,12 +166,78 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = if (environment ==
     clientAffinityEnabled: false
     siteConfig: {
       linuxFxVersion: 'NODE|18-lts'
-      appCommandLine: 'npm run start'
+      appCommandLine: 'node server.js'
       alwaysOn: true
       http20Enabled: true
       minTlsVersion: '1.2'
       ftpsState: 'Disabled'
       healthCheckPath: '/api/health'
+      appSettings: [
+        {
+          name: 'WEBSITE_NODE_DEFAULT_VERSION'
+          value: '~18'
+        }
+        {
+          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+          value: 'false'
+        }
+        {
+          name: 'DATABASE_URL'
+          value: databaseUrl
+        }
+        {
+          name: 'AZURE_STORAGE_ACCOUNT_NAME'
+          value: storageAccountName
+        }
+        {
+          name: 'AZURE_STORAGE_ACCOUNT_KEY'
+          value: storageAccountKey
+        }
+        {
+          name: 'AZURE_STORAGE_CONTAINER_NAME'
+          value: storageContainerName
+        }
+        {
+          name: 'ADMIN_PASSWORD'
+          value: adminPassword
+        }
+        {
+          name: 'NEXT_PUBLIC_WHATSAPP_NUMBER'
+          value: whatsappNumber
+        }
+        {
+          name: 'NEXT_PUBLIC_SITE_URL'
+          value: 'https://${name}-staging.azurewebsites.net'
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: appInsightsConnectionString
+        }
+        {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: appInsightsInstrumentationKey
+        }
+        {
+          name: 'AZURE_AI_ENDPOINT'
+          value: azureAiEndpoint
+        }
+        {
+          name: 'AZURE_AI_API_KEY'
+          value: azureAiApiKey
+        }
+        {
+          name: 'AZURE_AI_DEPLOYMENT_NAME'
+          value: azureAiDeploymentName
+        }
+        {
+          name: 'NODE_ENV'
+          value: 'production'
+        }
+        {
+          name: 'APP_VERSION'
+          value: appVersion
+        }
+      ]
     }
   }
 }
