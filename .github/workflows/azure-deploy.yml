@@ -172,6 +172,13 @@ jobs:
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
 
+      - name: Configure App Service to skip Oryx build
+        run: |
+          az webapp config appsettings set \
+            --name "dev-app-san-tassa" \
+            --resource-group "dev-rg-san-tassa" \
+            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false
+
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
@@ -219,6 +226,13 @@ jobs:
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
 
+      - name: Configure App Service to skip Oryx build
+        run: |
+          az webapp config appsettings set \
+            --name "staging-app-san-tassa" \
+            --resource-group "staging-rg-san-tassa" \
+            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false
+
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
         with:
@@ -253,6 +267,18 @@ jobs:
       - name: Create deployment zip
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
+
+      - name: Configure App Service to skip Oryx build
+        run: |
+          az webapp config appsettings set \
+            --name "prod-app-san-tassa" \
+            --resource-group "prod-rg-san-tassa" \
+            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false
+          az webapp config appsettings set \
+            --name "prod-app-san-tassa" \
+            --resource-group "prod-rg-san-tassa" \
+            --slot "staging" \
+            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false
 
       - name: Deploy to Azure App Service (Staging Slot)
         uses: azure/webapps-deploy@v3
