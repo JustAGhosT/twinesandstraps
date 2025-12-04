@@ -139,7 +139,11 @@ html:not(.dark):not(.light) * {
   animation: fade-in 0.2s ease-out forwards;
 }
 
-.animate-scale-.dark ::-webkit-scrollbar {
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out forwards;
+}
+
+.dark ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }

@@ -76,7 +76,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} flex flex-col min-h-screen bg-white dark:bg-secondary-900 text-secondary-900 dark:text-gray-100`}>
+      <body className={`${inter.className} flex flex-col min-h-screen`}>
         <SkipLink />
         <Providers>
           <Header />
