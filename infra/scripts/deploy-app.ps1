@@ -142,6 +142,7 @@ Copy-Item -Path "prisma" -Destination $deployDir -Recurse -Force
 Copy-Item -Path "package.json" -Destination $deployDir -Force
 Copy-Item -Path "package-lock.json" -Destination $deployDir -Force
 Copy-Item -Path "next.config.js" -Destination $deployDir -Force
+if (Test-Path ".deployment") { Copy-Item -Path ".deployment" -Destination $deployDir -Force }
 
 # Create zip for deployment
 Write-Info "Creating deployment zip..."

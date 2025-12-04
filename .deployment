@@ -1,0 +1,4 @@
+# Azure App Service deployment configuration
+# Skip Oryx build - we deploy pre-built Next.js application
+[config]
+SCM_DO_BUILD_DURING_DEPLOYMENT=false

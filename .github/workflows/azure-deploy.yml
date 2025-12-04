@@ -130,6 +130,7 @@ jobs:
           cp package.json deploy-package/
           cp package-lock.json deploy-package/
           cp next.config.js deploy-package/
+          cp .deployment deploy-package/
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
