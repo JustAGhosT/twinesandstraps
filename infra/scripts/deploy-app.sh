@@ -168,6 +168,7 @@ cp -r prisma "$DEPLOY_DIR/"
 cp package.json "$DEPLOY_DIR/"
 cp package-lock.json "$DEPLOY_DIR/"
 cp next.config.js "$DEPLOY_DIR/"
+cp .deployment "$DEPLOY_DIR/" 2>/dev/null || true
 
 # Create zip for deployment
 log_info "Creating deployment zip..."
