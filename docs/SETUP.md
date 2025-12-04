@@ -90,6 +90,27 @@ DATABASE_URL="postgresql://user:password@host.neon.tech/dbname?sslmode=require"
 DATABASE_URL="postgresql://user:password@host.supabase.co:5432/postgres"
 ```
 
+**Azure PostgreSQL Flexible Server**
+1. Create an Azure Database for PostgreSQL Flexible Server in the [Azure Portal](https://portal.azure.com/)
+2. Note your server name, admin username, and password
+3. Construct your connection string with credentials in the authority section
+
+```env
+DATABASE_URL="postgresql://USERNAME:PASSWORD@SERVER.postgres.database.azure.com:5432/DATABASE?sslmode=require"
+```
+
+> ⚠️ **Important**: Azure PostgreSQL URL format must have username and password **before** the `@` symbol.
+>
+> ✅ **Correct format:**
+> ```
+> postgresql://myuser:mypassword@myserver.postgres.database.azure.com:5432/postgres?sslmode=require
+> ```
+>
+> ❌ **Incorrect format (will fail):**
+> ```
+> postgresql://myserver.postgres.database.azure.com:5432/postgres?user=myuser&password=mypassword&sslmode=require
+> ```
+
 ### Option B: Local PostgreSQL
 
 For local-only development, install PostgreSQL on your machine:

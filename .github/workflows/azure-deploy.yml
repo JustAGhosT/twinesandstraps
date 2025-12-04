@@ -208,6 +208,21 @@ jobs:
             exit 1
           fi
 
+          # Validate URL format - credentials must be in authority section, not query params
+          if [[ "$DATABASE_URL" =~ \?.*user= ]] || [[ "$DATABASE_URL" =~ \?.*password= ]]; then
+            echo "::error::DATABASE_URL has incorrect format. Credentials should be in the authority section, not as query parameters."
+            echo ""
+            echo "❌ Your format (incorrect):"
+            echo "   postgresql://host:5432/db?user=USERNAME&password=PASSWORD&sslmode=require"
+            echo ""
+            echo "✅ Correct format:"
+            echo "   postgresql://USERNAME:PASSWORD@host:5432/db?sslmode=require"
+            echo ""
+            echo "For Azure PostgreSQL, use:"
+            echo "   postgresql://USERNAME:PASSWORD@SERVER.postgres.database.azure.com:5432/DATABASE?sslmode=require"
+            exit 1
+          fi
+
           # Parse DATABASE_URL to extract host for connectivity check (mask credentials)
           # Handle both formats: postgresql://user:pass@host:port/db and postgres://user:pass@host:port/db
           if [[ "$DATABASE_URL" =~ @([^/:]+) ]]; then
@@ -235,6 +250,7 @@ jobs:
             echo "  1. Invalid database credentials in DATABASE_URL secret"
             echo "  2. Database server is not accessible (firewall/network issues)"
             echo "  3. Database does not exist"
+            echo "  4. Incorrect URL format (credentials should be before @, not as query params)"
             echo ""
             echo "To fix credential issues:"
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → dev"
@@ -322,6 +338,21 @@ jobs:
             exit 1
           fi
 
+          # Validate URL format - credentials must be in authority section, not query params
+          if [[ "$DATABASE_URL" =~ \?.*user= ]] || [[ "$DATABASE_URL" =~ \?.*password= ]]; then
+            echo "::error::DATABASE_URL has incorrect format. Credentials should be in the authority section, not as query parameters."
+            echo ""
+            echo "❌ Your format (incorrect):"
+            echo "   postgresql://host:5432/db?user=USERNAME&password=PASSWORD&sslmode=require"
+            echo ""
+            echo "✅ Correct format:"
+            echo "   postgresql://USERNAME:PASSWORD@host:5432/db?sslmode=require"
+            echo ""
+            echo "For Azure PostgreSQL, use:"
+            echo "   postgresql://USERNAME:PASSWORD@SERVER.postgres.database.azure.com:5432/DATABASE?sslmode=require"
+            exit 1
+          fi
+
           # Parse DATABASE_URL to extract host for connectivity check (mask credentials)
           # Handle both formats: postgresql://user:pass@host:port/db and postgres://user:pass@host:port/db
           if [[ "$DATABASE_URL" =~ @([^/:]+) ]]; then
@@ -349,6 +380,7 @@ jobs:
             echo "  1. Invalid database credentials in DATABASE_URL secret"
             echo "  2. Database server is not accessible (firewall/network issues)"
             echo "  3. Database does not exist"
+            echo "  4. Incorrect URL format (credentials should be before @, not as query params)"
             echo ""
             echo "To fix credential issues:"
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → staging"
@@ -442,6 +474,21 @@ jobs:
             exit 1
           fi
 
+          # Validate URL format - credentials must be in authority section, not query params
+          if [[ "$DATABASE_URL" =~ \?.*user= ]] || [[ "$DATABASE_URL" =~ \?.*password= ]]; then
+            echo "::error::DATABASE_URL has incorrect format. Credentials should be in the authority section, not as query parameters."
+            echo ""
+            echo "❌ Your format (incorrect):"
+            echo "   postgresql://host:5432/db?user=USERNAME&password=PASSWORD&sslmode=require"
+            echo ""
+            echo "✅ Correct format:"
+            echo "   postgresql://USERNAME:PASSWORD@host:5432/db?sslmode=require"
+            echo ""
+            echo "For Azure PostgreSQL, use:"
+            echo "   postgresql://USERNAME:PASSWORD@SERVER.postgres.database.azure.com:5432/DATABASE?sslmode=require"
+            exit 1
+          fi
+
           # Parse DATABASE_URL to extract host for connectivity check (mask credentials)
           # Handle both formats: postgresql://user:pass@host:port/db and postgres://user:pass@host:port/db
           if [[ "$DATABASE_URL" =~ @([^/:]+) ]]; then
@@ -469,6 +516,7 @@ jobs:
             echo "  1. Invalid database credentials in DATABASE_URL secret"
             echo "  2. Database server is not accessible (firewall/network issues)"
             echo "  3. Database does not exist"
+            echo "  4. Incorrect URL format (credentials should be before @, not as query params)"
             echo ""
             echo "To fix credential issues:"
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → prod"
