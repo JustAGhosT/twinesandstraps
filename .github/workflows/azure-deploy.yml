@@ -204,7 +204,7 @@ jobs:
             echo "To fix this issue:"
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → dev"
             echo "  - Add or update the DATABASE_URL secret with valid PostgreSQL credentials"
-            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            echo "  - Format: postgresql://{username}:{password}@{host}:5432/{database}?sslmode=require"
             exit 1
           fi
 
@@ -213,13 +213,13 @@ jobs:
             echo "::error::DATABASE_URL has incorrect format. Credentials should be in the authority section, not as query parameters."
             echo ""
             echo "❌ Your format (incorrect):"
-            echo "   postgresql://host:5432/db?user=USERNAME&password=PASSWORD&sslmode=require"
+            echo "   postgresql://{host}:5432/{database}?user={username}&password={password}&sslmode=require"
             echo ""
             echo "✅ Correct format:"
-            echo "   postgresql://USERNAME:PASSWORD@host:5432/db?sslmode=require"
+            echo "   postgresql://{username}:{password}@{host}:5432/{database}?sslmode=require"
             echo ""
             echo "For Azure PostgreSQL, use:"
-            echo "   postgresql://USERNAME:PASSWORD@SERVER.postgres.database.azure.com:5432/DATABASE?sslmode=require"
+            echo "   postgresql://{username}:{password}@{server}.postgres.database.azure.com:5432/{database}?sslmode=require"
             exit 1
           fi
 
@@ -255,7 +255,7 @@ jobs:
             echo "To fix credential issues:"
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → dev"
             echo "  - Update the DATABASE_URL secret with valid PostgreSQL credentials"
-            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            echo "  - Format: postgresql://{username}:{password}@{host}:5432/{database}?sslmode=require"
             exit 1
           fi
           echo "✓ Database connection verified successfully"
@@ -334,7 +334,7 @@ jobs:
             echo "To fix this issue:"
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → staging"
             echo "  - Add or update the DATABASE_URL secret with valid PostgreSQL credentials"
-            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            echo "  - Format: postgresql://{username}:{password}@{host}:5432/{database}?sslmode=require"
             exit 1
           fi
 
@@ -343,13 +343,13 @@ jobs:
             echo "::error::DATABASE_URL has incorrect format. Credentials should be in the authority section, not as query parameters."
             echo ""
             echo "❌ Your format (incorrect):"
-            echo "   postgresql://host:5432/db?user=USERNAME&password=PASSWORD&sslmode=require"
+            echo "   postgresql://{host}:5432/{database}?user={username}&password={password}&sslmode=require"
             echo ""
             echo "✅ Correct format:"
-            echo "   postgresql://USERNAME:PASSWORD@host:5432/db?sslmode=require"
+            echo "   postgresql://{username}:{password}@{host}:5432/{database}?sslmode=require"
             echo ""
             echo "For Azure PostgreSQL, use:"
-            echo "   postgresql://USERNAME:PASSWORD@SERVER.postgres.database.azure.com:5432/DATABASE?sslmode=require"
+            echo "   postgresql://{username}:{password}@{server}.postgres.database.azure.com:5432/{database}?sslmode=require"
             exit 1
           fi
 
@@ -385,7 +385,7 @@ jobs:
             echo "To fix credential issues:"
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → staging"
             echo "  - Update the DATABASE_URL secret with valid PostgreSQL credentials"
-            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            echo "  - Format: postgresql://{username}:{password}@{host}:5432/{database}?sslmode=require"
             exit 1
           fi
           echo "✓ Database connection verified successfully"
@@ -470,7 +470,7 @@ jobs:
             echo "To fix this issue:"
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → prod"
             echo "  - Add or update the DATABASE_URL secret with valid PostgreSQL credentials"
-            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            echo "  - Format: postgresql://{username}:{password}@{host}:5432/{database}?sslmode=require"
             exit 1
           fi
 
@@ -479,13 +479,13 @@ jobs:
             echo "::error::DATABASE_URL has incorrect format. Credentials should be in the authority section, not as query parameters."
             echo ""
             echo "❌ Your format (incorrect):"
-            echo "   postgresql://host:5432/db?user=USERNAME&password=PASSWORD&sslmode=require"
+            echo "   postgresql://{host}:5432/{database}?user={username}&password={password}&sslmode=require"
             echo ""
             echo "✅ Correct format:"
-            echo "   postgresql://USERNAME:PASSWORD@host:5432/db?sslmode=require"
+            echo "   postgresql://{username}:{password}@{host}:5432/{database}?sslmode=require"
             echo ""
             echo "For Azure PostgreSQL, use:"
-            echo "   postgresql://USERNAME:PASSWORD@SERVER.postgres.database.azure.com:5432/DATABASE?sslmode=require"
+            echo "   postgresql://{username}:{password}@{server}.postgres.database.azure.com:5432/{database}?sslmode=require"
             exit 1
           fi
 
@@ -521,7 +521,7 @@ jobs:
             echo "To fix credential issues:"
             echo "  - Go to GitHub Settings → Secrets and variables → Actions → Environments → prod"
             echo "  - Update the DATABASE_URL secret with valid PostgreSQL credentials"
-            echo "  - Format: postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE?sslmode=require"
+            echo "  - Format: postgresql://{username}:{password}@{host}:5432/{database}?sslmode=require"
             exit 1
           fi
           echo "✓ Database connection verified successfully"

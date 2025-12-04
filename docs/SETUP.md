@@ -96,19 +96,19 @@ DATABASE_URL="postgresql://user:password@host.supabase.co:5432/postgres"
 3. Construct your connection string with credentials in the authority section
 
 ```env
-DATABASE_URL="postgresql://USERNAME:PASSWORD@SERVER.postgres.database.azure.com:5432/DATABASE?sslmode=require"
+DATABASE_URL="postgresql://{username}:{password}@{server}.postgres.database.azure.com:5432/{database}?sslmode=require"
 ```
 
 > ⚠️ **Important**: Azure PostgreSQL URL format must have username and password **before** the `@` symbol.
 >
 > ✅ **Correct format:**
 > ```
-> postgresql://myuser:mypassword@myserver.postgres.database.azure.com:5432/postgres?sslmode=require
+> postgresql://{username}:{password}@{server}.postgres.database.azure.com:5432/{database}?sslmode=require
 > ```
 >
 > ❌ **Incorrect format (will fail):**
 > ```
-> postgresql://myserver.postgres.database.azure.com:5432/postgres?user=myuser&password=mypassword&sslmode=require
+> postgresql://{server}.postgres.database.azure.com:5432/{database}?user={username}&password={password}&sslmode=require
 > ```
 
 ### Option B: Local PostgreSQL
