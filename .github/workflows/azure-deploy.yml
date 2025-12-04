@@ -124,12 +124,16 @@ jobs:
       - name: Create deployment package
         run: |
           mkdir -p deploy-package
-          cp -r .next deploy-package/
+          # Copy standalone server (includes bundled dependencies)
+          cp -r .next/standalone/. deploy-package/
+          # Copy static files to the correct location
+          mkdir -p deploy-package/.next/static
+          cp -r .next/static/. deploy-package/.next/static/
+          # Copy public files
           cp -r public deploy-package/
+          # Copy prisma schema and migrations for runtime migrations
           cp -r prisma deploy-package/
-          cp package.json deploy-package/
-          cp package-lock.json deploy-package/
-          cp next.config.js deploy-package/
+          # Copy deployment config to skip Oryx build
           cp .deployment deploy-package/
 
       - name: Upload build artifact
@@ -164,10 +168,6 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install production dependencies
-        working-directory: deploy-package
-        run: npm ci --production
-
       - name: Create deployment zip
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
@@ -177,19 +177,19 @@ jobs:
         with:
           app-name: "dev-app-san-tassa"
           package: deploy.zip
+          startup-command: "node server.js"
 
       - name: Run database migrations
         run: |
           DATABASE_URL=$(az keyvault secret show \
             --vault-name "dev-kv-san-tassa" \
             --name "database-url" \
-            --query "value" \
-            -o tsv)
+            -o tsv --query "value")
+          export DATABASE_URL
 
-          cd deploy-package
-          npx prisma migrate deploy
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Install prisma CLI for migrations
+          npm install prisma@6.19.0
+          npx prisma migrate deploy --schema=deploy-package/prisma/schema.prisma
 
   deploy-staging:
     name: Deploy to Staging
@@ -215,10 +215,6 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install production dependencies
-        working-directory: deploy-package
-        run: npm ci --production
-
       - name: Create deployment zip
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
@@ -228,6 +224,7 @@ jobs:
         with:
           app-name: "staging-app-san-tassa"
           package: deploy.zip
+          startup-command: "node server.js"
 
   deploy-prod:
     name: Deploy to Production
@@ -253,10 +250,6 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install production dependencies
-        working-directory: deploy-package
-        run: npm ci --production
-
       - name: Create deployment zip
         working-directory: deploy-package
         run: zip -r ../deploy.zip . -x "*.git*"
@@ -267,6 +260,7 @@ jobs:
           app-name: "prod-app-san-tassa"
           slot-name: "staging"
           package: deploy.zip
+          startup-command: "node server.js"
 
       - name: Health check on staging slot
         run: |
