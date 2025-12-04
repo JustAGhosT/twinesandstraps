@@ -195,6 +195,7 @@ jobs:
           startup-command: "node server.js"
 
       - name: Verify DATABASE_URL
+        shell: bash
         run: |
           # Validate DATABASE_URL is set
           if [ -z "$DATABASE_URL" ]; then
@@ -308,6 +309,7 @@ jobs:
           startup-command: "node server.js"
 
       - name: Verify DATABASE_URL
+        shell: bash
         run: |
           # Validate DATABASE_URL is set
           if [ -z "$DATABASE_URL" ]; then
@@ -427,6 +429,7 @@ jobs:
           startup-command: "node server.js"
 
       - name: Verify DATABASE_URL
+        shell: bash
         run: |
           # Validate DATABASE_URL is set
           if [ -z "$DATABASE_URL" ]; then
