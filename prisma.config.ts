@@ -11,6 +11,6 @@ export default defineConfig({
   schema: path.join('prisma', 'schema.prisma'),
   migrations: {
     path: path.join('prisma', 'migrations'),
-    seed: 'npx tsx prisma/seed.ts',
+    seed: 'tsx prisma/seed.ts',
   },
 })
