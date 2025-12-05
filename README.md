@@ -1,8 +1,24 @@
 # Twines and Straps SA
 
+[![CI/CD Pipeline](https://github.com/JustAGhosT/twinesandstraps/actions/workflows/ci.yml/badge.svg)](https://github.com/JustAGhosT/twinesandstraps/actions/workflows/ci.yml)
+[![Deploy to Azure](https://github.com/JustAGhosT/twinesandstraps/actions/workflows/azure-deploy.yml/badge.svg)](https://github.com/JustAGhosT/twinesandstraps/actions/workflows/azure-deploy.yml)
+[![Azure Health Check](https://github.com/JustAGhosT/twinesandstraps/actions/workflows/azure-health-check.yml/badge.svg)](https://github.com/JustAGhosT/twinesandstraps/actions/workflows/azure-health-check.yml)
+
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-6.19-2D3748?logo=prisma)](https://www.prisma.io/)
+[![Azure](https://img.shields.io/badge/Azure-App_Service-0078D4?logo=microsoft-azure)](https://azure.microsoft.com/)
+
 **An e-commerce platform for South Africa's premier industrial twines and ropes manufacturer.**
 
-🌐 **Live Site:** Deployed on Azure App Service
+🌐 **Live Sites:**
+
+| Environment | URL | Status |
+|-------------|-----|--------|
+| **Production** | [prod-app-san-tassa.azurewebsites.net](https://prod-app-san-tassa.azurewebsites.net) | 🟢 Live |
+| **Staging** | [staging-app-san-tassa.azurewebsites.net](https://staging-app-san-tassa.azurewebsites.net) | 🟡 Pre-release |
+| **Development** | [dev-app-san-tassa.azurewebsites.net](https://dev-app-san-tassa.azurewebsites.net) | 🔵 Development |
 
 ---
 
