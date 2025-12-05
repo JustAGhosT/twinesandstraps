@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/Button';
@@ -143,7 +143,15 @@ export default function CheckoutPage() {
 
   const subtotal = getTotalPrice();
   const vat = subtotal * 0.15; // 15% VAT
-  const total = subtotal + vat;
+  const [shippingCost, setShippingCost] = useState(0);
+  const [shippingQuote, setShippingQuote] = useState<{
+    serviceType: string;
+    estimatedDays: number;
+    cost: number;
+  } | null>(null);
+  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
+  const [selectedShippingMethod, setSelectedShippingMethod] = useState<'standard' | 'express'>('standard');
+  const total = subtotal + vat + shippingCost;
 
   // Payment methods available via PayFast
   const paymentMethods = [
@@ -183,12 +191,64 @@ export default function CheckoutPage() {
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(paymentMethods[0].id);
 
-  // Shipping information
-  const shippingInfo = {
-    standard: '3-5 business days',
-    express: '1-2 business days (select areas)',
-    freeShippingThreshold: 5000, // R5000 for free shipping
-  };
+  // Calculate shipping when address is complete
+  useEffect(() => {
+    const calculateShipping = async () => {
+      if (!formData.city || !formData.province || !formData.postalCode || items.length === 0) {
+        setShippingCost(0);
+        setShippingQuote(null);
+        return;
+      }
+
+      setIsCalculatingShipping(true);
+      try {
+        // Estimate weight (simplified - in production, use actual product weights)
+        const estimatedWeight = Math.max(1, items.length * 0.5); // 0.5kg per item, minimum 1kg
+
+        const response = await fetch('/api/shipping/quote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            origin: {
+              city: 'Johannesburg', // Your warehouse location
+              province: 'Gauteng',
+              postalCode: '2000',
+            },
+            destination: {
+              city: formData.city,
+              province: formData.province,
+              postalCode: formData.postalCode,
+            },
+            weight: estimatedWeight,
+            serviceType: selectedShippingMethod,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.quote) {
+            setShippingQuote(data.quote);
+            // Free shipping for orders over R5000
+            setShippingCost(subtotal >= 5000 ? 0 : data.quote.cost);
+          }
+        }
+      } catch (error) {
+        console.error('Error calculating shipping:', error);
+        // Fallback to free shipping for orders over R5000
+        if (subtotal >= 5000) {
+          setShippingCost(0);
+        } else {
+          setShippingCost(50); // Default R50
+        }
+      } finally {
+        setIsCalculatingShipping(false);
+      }
+    };
+
+    // Debounce shipping calculation
+    const timeoutId = setTimeout(calculateShipping, 500);
+    return () => clearTimeout(timeoutId);
+  }, [formData.city, formData.province, formData.postalCode, items.length, selectedShippingMethod, subtotal]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -435,24 +495,68 @@ export default function CheckoutPage() {
                 <span>VAT (15%)</span>
                 <span>R{vat.toFixed(2)}</span>
               </div>
+              <div className="flex justify-between text-sm">
+                <span>Shipping</span>
+                <span>
+                  {isCalculatingShipping ? (
+                    <span className="text-muted-foreground">Calculating...</span>
+                  ) : shippingCost === 0 && subtotal >= 5000 ? (
+                    <span className="text-green-600 dark:text-green-400 font-semibold">FREE</span>
+                  ) : (
+                    `R${shippingCost.toFixed(2)}`
+                  )}
+                </span>
+              </div>
               <div className="flex justify-between font-bold text-lg border-t dark:border-secondary-700 pt-2">
                 <span>Total</span>
                 <span>R{total.toFixed(2)}</span>
               </div>
             </div>
 
-            {/* Shipping Information */}
+            {/* Shipping Method Selection */}
             <div className="mt-6 pt-6 border-t dark:border-secondary-700">
-              <h3 className="font-semibold text-sm mb-2">Shipping Information</h3>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>• Standard delivery: 3-5 business days</p>
-                <p>• Express delivery: 1-2 business days (select areas)</p>
-                {subtotal >= 5000 ? (
-                  <p className="text-green-600 dark:text-green-400 font-semibold">✓ Free shipping on this order!</p>
-                ) : (
-                  <p>• Free shipping on orders over R5,000</p>
-                )}
+              <h3 className="font-semibold text-sm mb-3">Shipping Method</h3>
+              <div className="space-y-2 mb-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="shippingMethod"
+                    value="standard"
+                    checked={selectedShippingMethod === 'standard'}
+                    onChange={(e) => setSelectedShippingMethod(e.target.value as 'standard' | 'express')}
+                    className="w-4 h-4 text-primary-600"
+                  />
+                  <div className="flex-1">
+                    <span className="font-medium text-sm">Standard Delivery</span>
+                    <p className="text-xs text-muted-foreground">
+                      {shippingQuote && selectedShippingMethod === 'standard' 
+                        ? `${shippingQuote.estimatedDays} business days - R${shippingQuote.cost.toFixed(2)}`
+                        : '3-5 business days'}
+                    </p>
+                  </div>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="shippingMethod"
+                    value="express"
+                    checked={selectedShippingMethod === 'express'}
+                    onChange={(e) => setSelectedShippingMethod(e.target.value as 'standard' | 'express')}
+                    className="w-4 h-4 text-primary-600"
+                  />
+                  <div className="flex-1">
+                    <span className="font-medium text-sm">Express Delivery</span>
+                    <p className="text-xs text-muted-foreground">
+                      {shippingQuote && selectedShippingMethod === 'express'
+                        ? `${shippingQuote.estimatedDays} business days - R${shippingQuote.cost.toFixed(2)}`
+                        : '1-2 business days (select areas)'}
+                    </p>
+                  </div>
+                </label>
               </div>
+              {subtotal >= 5000 && (
+                <p className="text-xs text-green-600 dark:text-green-400 font-semibold">✓ Free shipping on orders over R5,000!</p>
+              )}
             </div>
           </div>
         </div>
