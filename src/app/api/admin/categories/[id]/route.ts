@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { updateCategorySchema, validateBody, formatZodErrors } from '@/lib/validations';
+import { invalidateCategoryCache, invalidateProductCache } from '@/lib/cache';
 
 export async function PUT(
   request: NextRequest,
@@ -92,6 +93,11 @@ export async function PUT(
       },
     });
 
+    // Invalidate cache
+    await invalidateCategoryCache();
+    // Also invalidate products since category changes affect product listings
+    await invalidateProductCache();
+
     return NextResponse.json(category);
   } catch (error) {
     console.error('Error updating category:', error);
@@ -167,6 +173,10 @@ export async function DELETE(
     await prisma.category.delete({
       where: { id: categoryId },
     });
+
+    // Invalidate cache
+    await invalidateCategoryCache();
+    await invalidateProductCache();
 
     return NextResponse.json({ success: true, message: 'Category deleted successfully' });
   } catch (error) {

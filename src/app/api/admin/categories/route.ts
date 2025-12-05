@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { invalidateCategoryCache } from '@/lib/cache';
 import { createCategorySchema, validateBody, formatZodErrors } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
@@ -55,6 +56,9 @@ export async function POST(request: NextRequest) {
         parent_id: data.parent_id ?? null,
       },
     });
+
+    // Invalidate cache
+    await invalidateCategoryCache();
 
     return NextResponse.json(category, { status: 201 });
   } catch (error) {

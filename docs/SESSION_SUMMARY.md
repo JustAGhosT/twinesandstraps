@@ -84,6 +84,12 @@
 - `src/app/api/admin/inventory/low-stock/route.ts`
 - `src/app/api/cron/low-stock-alert/route.ts`
 - `src/components/admin/LowStockWidget.tsx`
+- `src/lib/cache/redis.ts`
+- `src/lib/cache/redis-cache.ts`
+- `src/lib/cache/warm-cache.ts`
+- `src/app/api/admin/cache/stats/route.ts`
+- `src/app/api/admin/cache/warm/route.ts`
+- `src/app/api/cron/warm-cache/route.ts`
 - `azure-functions/low-stock-alert/function.json`
 - `azure-functions/low-stock-alert/index.ts`
 - `azure-functions/low-stock-alert/package.json`
@@ -93,13 +99,20 @@
 - `docs/testing/IMPLEMENTATION_STATUS.md`
 - `docs/testing/MANUAL_STEPS.md`
 - `docs/deployment/AZURE_CRON_SETUP.md`
+- `docs/deployment/REDIS_SETUP.md`
 - `docs/optimization/DATABASE_QUERY_OPTIMIZATION.md`
 
 ### Modified Files
 - `src/app/quote/page.tsx` - Updated to use API
 - `src/lib/data.ts` - Optimized queries
+- `src/lib/cache.ts` - Added Redis support with fallback
 - `src/app/api/user/orders/[id]/route.ts` - Optimized order lookup
 - `src/app/admin/page.tsx` - Added LowStockWidget
+- `src/app/api/admin/products/route.ts` - Added cache invalidation
+- `src/app/api/admin/products/[id]/route.ts` - Added cache invalidation
+- `src/app/api/admin/categories/route.ts` - Added cache invalidation
+- `src/app/api/admin/categories/[id]/route.ts` - Added cache invalidation
+- `package.json` - Added ioredis dependency
 - `docs/planning/NEXT_STEPS.md` - Updated status
 - `docs/planning/phased-improvement-plan.md` - Updated status
 
@@ -109,11 +122,11 @@
 
 ### What Can Be Done Next (Automated)
 
-1. **Redis Caching Layer** (12h)
-   - Set up Redis client
-   - Replace in-memory cache
-   - Implement cache invalidation
-   - **Note:** Requires Azure Cache for Redis setup (manual)
+1. **Inventory Movement Tracking** (12h)
+   - Create inventory event model
+   - Track stock changes
+   - Create audit trail
+   - Admin interface
 
 2. **Inventory Movement Tracking** (12h)
    - Create inventory event model
@@ -154,6 +167,7 @@ Before going live, ensure:
 
 - [ ] `CRON_SECRET` set in Azure Function App
 - [ ] `API_URL` set in Azure Function App
+- [ ] `REDIS_URL` set (optional, falls back to memory cache)
 - [ ] PayFast webhook configured
 - [ ] The Courier Guy webhook configured
 - [ ] Brevo email API key configured

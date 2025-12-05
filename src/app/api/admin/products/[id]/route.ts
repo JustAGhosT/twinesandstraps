@@ -4,6 +4,7 @@ import { requireAdminAuth } from '@/lib/admin-auth';
 import { updateProductSchema, validateBody, formatZodErrors } from '@/lib/validations';
 import type { ProductWithCategory } from '@/types/database';
 import { successResponse, errorResponse } from '@/types/api';
+import { invalidateProductCache, invalidateCategoryCache } from '@/lib/cache';
 
 export async function PUT(
   request: NextRequest,
@@ -97,6 +98,12 @@ export async function PUT(
       include: { category: true },
     });
 
+    // Invalidate cache
+    await invalidateProductCache(productId);
+    if (data.category_id) {
+      await invalidateCategoryCache();
+    }
+
     return NextResponse.json(
       successResponse(product as ProductWithCategory, 'Product updated successfully')
     );
@@ -144,6 +151,9 @@ export async function DELETE(
     await prisma.product.delete({
       where: { id: productId },
     });
+
+    // Invalidate cache
+    await invalidateProductCache(productId);
 
     return NextResponse.json(
       successResponse(null, 'Product deleted successfully')

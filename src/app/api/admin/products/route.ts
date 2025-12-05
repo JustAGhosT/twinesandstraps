@@ -4,6 +4,7 @@ import { requireAdminAuth } from '@/lib/admin-auth';
 import { createProductSchema, validateBody, formatZodErrors } from '@/lib/validations';
 import type { ProductWithCategory } from '@/types/database';
 import { successResponse, errorResponse } from '@/types/api';
+import { invalidateProductCache, invalidateCategoryCache } from '@/lib/cache';
 
 export async function POST(request: NextRequest) {
   // Verify admin authentication
@@ -65,6 +66,10 @@ export async function POST(request: NextRequest) {
       },
       include: { category: true },
     });
+
+    // Invalidate cache
+    await invalidateProductCache();
+    await invalidateCategoryCache();
 
     return NextResponse.json(
       successResponse(product as ProductWithCategory, 'Product created successfully'),

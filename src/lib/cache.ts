@@ -1,7 +1,10 @@
 /**
  * Caching utilities for API responses and database queries
- * Uses in-memory cache (can be upgraded to Redis for production)
+ * Uses Redis if available, falls back to in-memory cache
  */
+
+import { initRedis, isRedisConnected } from './cache/redis';
+import { redisCache } from './cache/redis-cache';
 
 interface CacheEntry<T> {
   data: T;
@@ -94,18 +97,34 @@ class MemoryCache {
   }
 }
 
-// Singleton instance
-const cache = new MemoryCache();
+// Singleton instances
+const memoryCache = new MemoryCache();
 
-// Clean up expired entries every 5 minutes
+// Initialize Redis on module load
+if (typeof window === 'undefined') {
+  // Only initialize on server-side
+  initRedis();
+}
+
+// Clean up expired entries every 5 minutes (memory cache only)
 setInterval(() => {
   const now = Date.now();
-  for (const [key, entry] of cache['cache'].entries()) {
+  for (const [key, entry] of memoryCache['cache'].entries()) {
     if (now > entry.expiresAt) {
-      cache.delete(key);
+      memoryCache.delete(key);
     }
   }
 }, 5 * 60 * 1000);
+
+/**
+ * Get the active cache instance (Redis if available, otherwise memory)
+ */
+async function getCache() {
+  if (isRedisConnected()) {
+    return redisCache;
+  }
+  return memoryCache;
+}
 
 /**
  * Cache key generators
@@ -128,17 +147,30 @@ export async function getOrSetCache<T>(
   fetcher: () => Promise<T>,
   ttlMs?: number
 ): Promise<T> {
+  const cache = await getCache();
+  
   // Try to get from cache
-  const cached = cache.get<T>(key);
-  if (cached !== null) {
-    return cached;
+  if (cache === redisCache) {
+    const cached = await cache.get<T>(key);
+    if (cached !== null) {
+      return cached;
+    }
+  } else {
+    const cached = cache.get<T>(key);
+    if (cached !== null) {
+      return cached;
+    }
   }
 
   // Fetch fresh data
   const data = await fetcher();
   
   // Cache it
-  cache.set(key, data, ttlMs);
+  if (cache === redisCache) {
+    await cache.set(key, data, ttlMs);
+  } else {
+    cache.set(key, data, ttlMs);
+  }
   
   return data;
 }
@@ -146,37 +178,89 @@ export async function getOrSetCache<T>(
 /**
  * Invalidate cache by key or pattern
  */
-export function invalidateCache(keyOrPattern: string): void {
+export async function invalidateCache(keyOrPattern: string): Promise<void> {
+  const cache = await getCache();
+  
   if (keyOrPattern.includes('*') || keyOrPattern.includes('^')) {
-    cache.deletePattern(keyOrPattern);
+    if (cache === redisCache) {
+      await cache.deletePattern(keyOrPattern);
+    } else {
+      cache.deletePattern(keyOrPattern);
+    }
   } else {
-    cache.delete(keyOrPattern);
+    if (cache === redisCache) {
+      await cache.delete(keyOrPattern);
+    } else {
+      cache.delete(keyOrPattern);
+    }
   }
 }
 
 /**
  * Invalidate all product-related cache
  */
-export function invalidateProductCache(productId?: number): void {
+export async function invalidateProductCache(productId?: number): Promise<void> {
+  const cache = await getCache();
+  
   if (productId) {
-    cache.delete(CacheKeys.product(productId));
-    cache.delete(CacheKeys.relatedProducts(productId));
+    if (cache === redisCache) {
+      await cache.delete(CacheKeys.product(productId));
+      await cache.delete(CacheKeys.relatedProducts(productId));
+    } else {
+      cache.delete(CacheKeys.product(productId));
+      cache.delete(CacheKeys.relatedProducts(productId));
+    }
   }
-  cache.deletePattern('^products:');
+  
+  if (cache === redisCache) {
+    await cache.deletePattern('^products:');
+  } else {
+    cache.deletePattern('^products:');
+  }
 }
 
 /**
  * Invalidate all category-related cache
  */
-export function invalidateCategoryCache(): void {
-  cache.deletePattern('^category');
-  cache.delete(CacheKeys.categories());
+export async function invalidateCategoryCache(): Promise<void> {
+  const cache = await getCache();
+  
+  if (cache === redisCache) {
+    await cache.deletePattern('^category');
+    await cache.delete(CacheKeys.categories());
+  } else {
+    cache.deletePattern('^category');
+    cache.delete(CacheKeys.categories());
+  }
 }
 
 /**
  * Get cache instance (for advanced usage)
+ * Returns the active cache (Redis if available, otherwise memory)
  */
-export function getCache() {
-  return cache;
+export async function getCacheInstance() {
+  return await getCache();
+}
+
+/**
+ * Get cache statistics
+ */
+export async function getCacheStats() {
+  const cache = await getCache();
+  
+  if (cache === redisCache) {
+    const stats = cache.getStats();
+    return {
+      ...stats,
+      type: 'redis',
+    };
+  } else {
+    const stats = cache.getStats();
+    return {
+      ...stats,
+      type: 'memory',
+      hitRate: 0, // Memory cache doesn't track hit rate
+    };
+  }
 }
 
