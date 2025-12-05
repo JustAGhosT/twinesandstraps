@@ -272,7 +272,7 @@ export default function FeaturesPage() {
         <p className="text-sm text-amber-700 dark:text-amber-400">
           Changes made here are saved to browser storage for preview purposes.
           For permanent changes that affect all visitors, you need to update the environment variables
-          in your deployment settings. See the <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">docs/FEATURE_FLAGS.md</code> file for details.
+          in your deployment settings. See the <code className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">docs/guides/administration/feature-flags.md</code> file for details.
         </p>
       </div>
     </div>

@@ -360,6 +360,125 @@ az postgres flexible-server update \
   --admin-password "NewSecurePassword123!"
 ```
 
+#### "403 Forbidden" - Deployment Failed
+
+This error occurs when the GitHub Actions workflow cannot deploy to Azure App Service due to permission issues.
+
+**Error Message:**
+```
+Error: Failed to deploy web package to App Service.
+Error: Deployment Failed, Error: Failed to deploy web package using OneDeploy to App Service.
+Forbidden (CODE: 403)
+```
+
+**Common Causes:**
+
+1. **Service Principal Permissions**
+   - The service principal used by GitHub Actions lacks necessary permissions
+   - Missing `Contributor` or `Website Contributor` role on the resource group or App Service
+
+2. **Invalid or Expired AZURE_CREDENTIALS**
+   - The `AZURE_CREDENTIALS` secret is malformed, expired, or invalid
+   - Service principal credentials have been rotated but not updated in GitHub
+
+3. **App Service Deployment Restrictions**
+   - Deployment is disabled in App Service settings
+   - SCM (Kudu) site is stopped
+   - IP restrictions blocking GitHub Actions IPs
+
+4. **Resource Group Access**
+   - Service principal doesn't have access to the subscription or resource group
+   - Subscription-level permissions are missing
+
+**Solutions:**
+
+1. **Verify Service Principal Permissions:**
+   ```bash
+   # Get your subscription ID
+   SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+   
+   # Check role assignments on resource group
+   az role assignment list \
+     --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/dev-rg-san-tassa" \
+     --query "[?principalType=='ServicePrincipal']" \
+     -o table
+   ```
+
+2. **Assign Required Permissions:**
+   ```bash
+   # Get service principal object ID from AZURE_CREDENTIALS secret
+   # (The clientId in the JSON)
+   
+   # Assign Contributor role to resource group
+   az role assignment create \
+     --role "Contributor" \
+     --assignee <service-principal-client-id> \
+     --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/dev-rg-san-tassa"
+   ```
+
+   Or via Azure Portal:
+   - Go to **Resource Groups** → `dev-rg-san-tassa` (or your environment)
+   - Click **Access control (IAM)**
+   - Click **Add** → **Add role assignment**
+   - Select **Contributor** or **Website Contributor**
+   - Search for your service principal name and assign
+
+3. **Regenerate Service Principal (if credentials are invalid):**
+   ```bash
+   # Create new service principal
+   az ad sp create-for-rbac \
+     --name "github-actions-twinesandstraps" \
+     --role contributor \
+     --scopes "/subscriptions/$SUBSCRIPTION_ID" \
+     --sdk-auth
+   ```
+   
+   Copy the JSON output and update the `AZURE_CREDENTIALS` secret in GitHub:
+   - Go to **Settings → Secrets and variables → Actions**
+   - Update `AZURE_CREDENTIALS` with the new JSON
+
+4. **Check App Service Deployment Settings:**
+   ```bash
+   # Verify deployment is enabled
+   az webapp config show \
+     --name dev-app-san-tassa \
+     --resource-group dev-rg-san-tassa \
+     --query "scmType"
+   
+   # Check if SCM site is stopped
+   az webapp show \
+     --name dev-app-san-tassa \
+     --resource-group dev-rg-san-tassa \
+     --query "state"
+   ```
+
+5. **Verify App Service Access:**
+   ```bash
+   # Test if you can read App Service configuration
+   az webapp config show \
+     --name dev-app-san-tassa \
+     --resource-group dev-rg-san-tassa
+   
+   # If this fails, the service principal lacks permissions
+   ```
+
+6. **Check IP Restrictions:**
+   - Go to **App Service** → **Networking** → **Access restriction**
+   - Ensure GitHub Actions IPs are allowed (or allow all Azure services)
+
+**Prevention:**
+
+The deployment workflow now includes automatic verification steps that will:
+- Verify Azure authentication before deployment
+- Check App Service access and permissions
+- Display role assignments for troubleshooting
+- Provide detailed error messages with solutions
+
+If the verification steps pass but deployment still fails, check:
+- App Service logs: `az webapp log tail --name dev-app-san-tassa --resource-group dev-rg-san-tassa`
+- Deployment logs in GitHub Actions workflow run
+- Azure Activity Log for permission denials
+
 #### "Could not connect to database"
 
 1. Check if the PostgreSQL server firewall allows Azure services
@@ -478,6 +597,6 @@ az webapp update \
 
 ## Related Documentation
 
-- [Setup Guide](./SETUP.md) — Local development setup
-- [Deployment Pipeline](./DEPLOYMENT_PIPELINE.md) — CI/CD overview
-- [Feature Flags](./FEATURE_FLAGS.md) — Toggle features without code changes
+- [Setup Guide](../getting-started/setup.md) — Local development setup
+- [Deployment Pipeline](./deployment-pipeline.md) — CI/CD overview
+- [Feature Flags](../administration/feature-flags.md) — Toggle features without code changes

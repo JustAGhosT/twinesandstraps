@@ -169,6 +169,82 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Verify Azure Authentication
+        run: |
+          echo "Verifying Azure authentication..."
+          if ! az account show &> /dev/null; then
+            echo "::error::Failed to authenticate with Azure"
+            exit 1
+          fi
+          SUBSCRIPTION=$(az account show --query "name" -o tsv)
+          SUBSCRIPTION_ID=$(az account show --query "id" -o tsv)
+          echo "✓ Authenticated to subscription: $SUBSCRIPTION ($SUBSCRIPTION_ID)"
+
+          # Get current user/service principal info
+          CURRENT_USER=$(az account show --query "user.name" -o tsv 2>/dev/null || echo "Service Principal")
+          echo "Current identity: $CURRENT_USER"
+
+      - name: Verify App Service Access
+        run: |
+          APP_NAME="dev-app-san-tassa"
+          RESOURCE_GROUP="dev-rg-san-tassa"
+
+          echo "Verifying access to App Service: $APP_NAME"
+
+          # Check if resource group exists
+          if ! az group show --name "$RESOURCE_GROUP" &> /dev/null; then
+            echo "::error::Resource group '$RESOURCE_GROUP' not found"
+            echo ""
+            echo "Troubleshooting steps:"
+            echo "  1. Verify the resource group exists in your Azure subscription"
+            echo "  2. Ensure the service principal has access to the subscription"
+            echo "  3. Run the infrastructure deployment workflow first"
+            exit 1
+          fi
+          echo "✓ Resource group found: $RESOURCE_GROUP"
+
+          # Check if app service exists
+          if ! az webapp show --name "$APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
+            echo "::error::App Service '$APP_NAME' not found in resource group '$RESOURCE_GROUP'"
+            echo ""
+            echo "Troubleshooting steps:"
+            echo "  1. Verify the App Service exists in Azure Portal"
+            echo "  2. Run the infrastructure deployment workflow to create it"
+            exit 1
+          fi
+          echo "✓ App Service found: $APP_NAME"
+
+          # Check service principal permissions
+          echo "Checking service principal permissions..."
+          ASSIGNMENTS=$(az role assignment list \
+            --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/$RESOURCE_GROUP" \
+            --query "[?principalType=='ServicePrincipal'].{Role:roleDefinitionName,Principal:principalName}" \
+            -o table 2>/dev/null || echo "")
+
+          if [ -z "$ASSIGNMENTS" ]; then
+            echo "::warning::Could not verify role assignments. This may indicate permission issues."
+          else
+            echo "Role assignments on resource group:"
+            echo "$ASSIGNMENTS"
+          fi
+
+          # Verify we can read app service configuration (tests basic permissions)
+          if ! az webapp config show --name "$APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
+            echo "::error::Cannot access App Service configuration. Service principal may lack permissions."
+            echo ""
+            echo "Required permissions:"
+            echo "  - Contributor role on the resource group, OR"
+            echo "  - Website Contributor role on the App Service"
+            echo ""
+            echo "To fix:"
+            echo "  1. Go to Azure Portal → Resource Groups → $RESOURCE_GROUP"
+            echo "  2. Access control (IAM) → Add → Add role assignment"
+            echo "  3. Select 'Contributor' or 'Website Contributor'"
+            echo "  4. Assign to your service principal"
+            exit 1
+          fi
+          echo "✓ App Service access verified"
+
       - name: Setup Node.js for deployment
         uses: actions/setup-node@v4
         with:
@@ -196,7 +272,34 @@ jobs:
           echo "Waiting 30 seconds for SCM container to stabilize..."
           sleep 30
 
+      - name: Check Deployment Restrictions
+        run: |
+          APP_NAME="dev-app-san-tassa"
+          RESOURCE_GROUP="dev-rg-san-tassa"
+
+          echo "Checking for deployment restrictions..."
+
+          # Check if deployment is enabled
+          DEPLOYMENT_ENABLED=$(az webapp config show \
+            --name "$APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "scmType" -o tsv 2>/dev/null || echo "None")
+
+          echo "SCM Type: $DEPLOYMENT_ENABLED"
+
+          # Check if there are any IP restrictions that might block deployment
+          IP_RESTRICTIONS=$(az webapp config access-restriction show \
+            --name "$APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "scmSiteAlsoStopped" -o tsv 2>/dev/null || echo "false")
+
+          if [ "$IP_RESTRICTIONS" = "true" ]; then
+            echo "::warning::IP restrictions may be enabled. Ensure GitHub Actions IPs are allowed."
+          fi
+
       - name: Deploy to Azure App Service
+        id: deploy
+        continue-on-error: false
         uses: azure/webapps-deploy@v3
         with:
           app-name: "dev-app-san-tassa"
@@ -204,6 +307,42 @@ jobs:
           type: zip
           clean: true
           startup-command: "node server.js"
+        env:
+          AZURE_HTTP_USER_AGENT: "GITHUBACTIONS"
+
+      - name: Handle Deployment Failure
+        if: failure() && steps.deploy.outcome == 'failure'
+        run: |
+          APP_NAME="dev-app-san-tassa"
+          RESOURCE_GROUP="dev-rg-san-tassa"
+
+          echo "::error::Deployment failed with 403 Forbidden error"
+          echo ""
+          echo "Common causes and solutions:"
+          echo ""
+          echo "1. Service Principal Permissions:"
+          echo "   - Ensure the service principal has 'Contributor' or 'Website Contributor' role"
+          echo "   - Check role assignments:"
+          echo "     az role assignment list --scope /subscriptions/$(az account show --query id -o tsv)/resourceGroups/$RESOURCE_GROUP"
+          echo ""
+          echo "2. Invalid AZURE_CREDENTIALS Secret:"
+          echo "   - Verify the secret is valid JSON with: clientId, clientSecret, subscriptionId, tenantId"
+          echo "   - Regenerate if expired: az ad sp create-for-rbac --name <sp-name> --role contributor --scopes /subscriptions/<sub-id>"
+          echo ""
+          echo "3. App Service Deployment Restrictions:"
+          echo "   - Check if deployment is disabled in App Service settings"
+          echo "   - Verify SCM site is not stopped"
+          echo ""
+          echo "4. Resource Group Permissions:"
+          echo "   - Ensure service principal has access to the resource group"
+          echo "   - Check subscription-level permissions"
+          echo ""
+          echo "To verify permissions, run:"
+          echo "  az webapp show --name $APP_NAME --resource-group $RESOURCE_GROUP"
+          echo "  az webapp config show --name $APP_NAME --resource-group $RESOURCE_GROUP"
+          echo ""
+          echo "If these commands fail, the service principal lacks necessary permissions."
+          exit 1
 
       - name: Verify DATABASE_URL
         shell: bash
@@ -252,7 +391,7 @@ jobs:
           npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | tee /tmp/prisma_output.txt
           PRISMA_EXIT_CODE=${PIPESTATUS[0]}
           set -e  # Re-enable exit on error
-          
+
           if [ $PRISMA_EXIT_CODE -ne 0 ]; then
             echo ""
             echo "::error::Database connection verification failed."
@@ -277,7 +416,7 @@ jobs:
         run: |
           # Generate Prisma Client for migration script
           npx prisma generate --schema=deploy-package/prisma/schema.prisma
-          
+
           # Run migration script that handles baselining for existing databases
           if ! node deploy-package/scripts/migrate-production.js --schema=deploy-package/prisma/schema.prisma; then
             echo ""
@@ -310,6 +449,82 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Verify Azure Authentication
+        run: |
+          echo "Verifying Azure authentication..."
+          if ! az account show &> /dev/null; then
+            echo "::error::Failed to authenticate with Azure"
+            exit 1
+          fi
+          SUBSCRIPTION=$(az account show --query "name" -o tsv)
+          SUBSCRIPTION_ID=$(az account show --query "id" -o tsv)
+          echo "✓ Authenticated to subscription: $SUBSCRIPTION ($SUBSCRIPTION_ID)"
+
+          # Get current user/service principal info
+          CURRENT_USER=$(az account show --query "user.name" -o tsv 2>/dev/null || echo "Service Principal")
+          echo "Current identity: $CURRENT_USER"
+
+      - name: Verify App Service Access
+        run: |
+          APP_NAME="staging-app-san-tassa"
+          RESOURCE_GROUP="staging-rg-san-tassa"
+
+          echo "Verifying access to App Service: $APP_NAME"
+
+          # Check if resource group exists
+          if ! az group show --name "$RESOURCE_GROUP" &> /dev/null; then
+            echo "::error::Resource group '$RESOURCE_GROUP' not found"
+            echo ""
+            echo "Troubleshooting steps:"
+            echo "  1. Verify the resource group exists in your Azure subscription"
+            echo "  2. Ensure the service principal has access to the subscription"
+            echo "  3. Run the infrastructure deployment workflow first"
+            exit 1
+          fi
+          echo "✓ Resource group found: $RESOURCE_GROUP"
+
+          # Check if app service exists
+          if ! az webapp show --name "$APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
+            echo "::error::App Service '$APP_NAME' not found in resource group '$RESOURCE_GROUP'"
+            echo ""
+            echo "Troubleshooting steps:"
+            echo "  1. Verify the App Service exists in Azure Portal"
+            echo "  2. Run the infrastructure deployment workflow to create it"
+            exit 1
+          fi
+          echo "✓ App Service found: $APP_NAME"
+
+          # Check service principal permissions
+          echo "Checking service principal permissions..."
+          ASSIGNMENTS=$(az role assignment list \
+            --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/$RESOURCE_GROUP" \
+            --query "[?principalType=='ServicePrincipal'].{Role:roleDefinitionName,Principal:principalName}" \
+            -o table 2>/dev/null || echo "")
+
+          if [ -z "$ASSIGNMENTS" ]; then
+            echo "::warning::Could not verify role assignments. This may indicate permission issues."
+          else
+            echo "Role assignments on resource group:"
+            echo "$ASSIGNMENTS"
+          fi
+
+          # Verify we can read app service configuration (tests basic permissions)
+          if ! az webapp config show --name "$APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
+            echo "::error::Cannot access App Service configuration. Service principal may lack permissions."
+            echo ""
+            echo "Required permissions:"
+            echo "  - Contributor role on the resource group, OR"
+            echo "  - Website Contributor role on the App Service"
+            echo ""
+            echo "To fix:"
+            echo "  1. Go to Azure Portal → Resource Groups → $RESOURCE_GROUP"
+            echo "  2. Access control (IAM) → Add → Add role assignment"
+            echo "  3. Select 'Contributor' or 'Website Contributor'"
+            echo "  4. Assign to your service principal"
+            exit 1
+          fi
+          echo "✓ App Service access verified"
+
       - name: Setup Node.js for deployment
         uses: actions/setup-node@v4
         with:
@@ -337,7 +552,34 @@ jobs:
           echo "Waiting 30 seconds for SCM container to stabilize..."
           sleep 30
 
+      - name: Check Deployment Restrictions
+        run: |
+          APP_NAME="staging-app-san-tassa"
+          RESOURCE_GROUP="staging-rg-san-tassa"
+
+          echo "Checking for deployment restrictions..."
+
+          # Check if deployment is enabled
+          DEPLOYMENT_ENABLED=$(az webapp config show \
+            --name "$APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "scmType" -o tsv 2>/dev/null || echo "None")
+
+          echo "SCM Type: $DEPLOYMENT_ENABLED"
+
+          # Check if there are any IP restrictions that might block deployment
+          IP_RESTRICTIONS=$(az webapp config access-restriction show \
+            --name "$APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "scmSiteAlsoStopped" -o tsv 2>/dev/null || echo "false")
+
+          if [ "$IP_RESTRICTIONS" = "true" ]; then
+            echo "::warning::IP restrictions may be enabled. Ensure GitHub Actions IPs are allowed."
+          fi
+
       - name: Deploy to Azure App Service
+        id: deploy
+        continue-on-error: false
         uses: azure/webapps-deploy@v3
         with:
           app-name: "staging-app-san-tassa"
@@ -345,6 +587,42 @@ jobs:
           type: zip
           clean: true
           startup-command: "node server.js"
+        env:
+          AZURE_HTTP_USER_AGENT: "GITHUBACTIONS"
+
+      - name: Handle Deployment Failure
+        if: failure() && steps.deploy.outcome == 'failure'
+        run: |
+          APP_NAME="staging-app-san-tassa"
+          RESOURCE_GROUP="staging-rg-san-tassa"
+
+          echo "::error::Deployment failed with 403 Forbidden error"
+          echo ""
+          echo "Common causes and solutions:"
+          echo ""
+          echo "1. Service Principal Permissions:"
+          echo "   - Ensure the service principal has 'Contributor' or 'Website Contributor' role"
+          echo "   - Check role assignments:"
+          echo "     az role assignment list --scope /subscriptions/$(az account show --query id -o tsv)/resourceGroups/$RESOURCE_GROUP"
+          echo ""
+          echo "2. Invalid AZURE_CREDENTIALS Secret:"
+          echo "   - Verify the secret is valid JSON with: clientId, clientSecret, subscriptionId, tenantId"
+          echo "   - Regenerate if expired: az ad sp create-for-rbac --name <sp-name> --role contributor --scopes /subscriptions/<sub-id>"
+          echo ""
+          echo "3. App Service Deployment Restrictions:"
+          echo "   - Check if deployment is disabled in App Service settings"
+          echo "   - Verify SCM site is not stopped"
+          echo ""
+          echo "4. Resource Group Permissions:"
+          echo "   - Ensure service principal has access to the resource group"
+          echo "   - Check subscription-level permissions"
+          echo ""
+          echo "To verify permissions, run:"
+          echo "  az webapp show --name $APP_NAME --resource-group $RESOURCE_GROUP"
+          echo "  az webapp config show --name $APP_NAME --resource-group $RESOURCE_GROUP"
+          echo ""
+          echo "If these commands fail, the service principal lacks necessary permissions."
+          exit 1
 
       - name: Verify DATABASE_URL
         shell: bash
@@ -393,7 +671,7 @@ jobs:
           npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | tee /tmp/prisma_output.txt
           PRISMA_EXIT_CODE=${PIPESTATUS[0]}
           set -e  # Re-enable exit on error
-          
+
           if [ $PRISMA_EXIT_CODE -ne 0 ]; then
             echo ""
             echo "::error::Database connection verification failed."
@@ -418,7 +696,7 @@ jobs:
         run: |
           # Generate Prisma Client for migration script
           npx prisma generate --schema=deploy-package/prisma/schema.prisma
-          
+
           # Run migration script that handles baselining for existing databases
           if ! node deploy-package/scripts/migrate-production.js --schema=deploy-package/prisma/schema.prisma; then
             echo ""
@@ -450,6 +728,90 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Verify Azure Authentication
+        run: |
+          echo "Verifying Azure authentication..."
+          if ! az account show &> /dev/null; then
+            echo "::error::Failed to authenticate with Azure"
+            exit 1
+          fi
+          SUBSCRIPTION=$(az account show --query "name" -o tsv)
+          SUBSCRIPTION_ID=$(az account show --query "id" -o tsv)
+          echo "✓ Authenticated to subscription: $SUBSCRIPTION ($SUBSCRIPTION_ID)"
+
+          # Get current user/service principal info
+          CURRENT_USER=$(az account show --query "user.name" -o tsv 2>/dev/null || echo "Service Principal")
+          echo "Current identity: $CURRENT_USER"
+
+      - name: Verify App Service Access
+        run: |
+          APP_NAME="prod-app-san-tassa"
+          RESOURCE_GROUP="prod-rg-san-tassa"
+
+          echo "Verifying access to App Service: $APP_NAME"
+
+          # Check if resource group exists
+          if ! az group show --name "$RESOURCE_GROUP" &> /dev/null; then
+            echo "::error::Resource group '$RESOURCE_GROUP' not found"
+            echo ""
+            echo "Troubleshooting steps:"
+            echo "  1. Verify the resource group exists in your Azure subscription"
+            echo "  2. Ensure the service principal has access to the subscription"
+            echo "  3. Run the infrastructure deployment workflow first"
+            exit 1
+          fi
+          echo "✓ Resource group found: $RESOURCE_GROUP"
+
+          # Check if app service exists
+          if ! az webapp show --name "$APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
+            echo "::error::App Service '$APP_NAME' not found in resource group '$RESOURCE_GROUP'"
+            echo ""
+            echo "Troubleshooting steps:"
+            echo "  1. Verify the App Service exists in Azure Portal"
+            echo "  2. Run the infrastructure deployment workflow to create it"
+            exit 1
+          fi
+          echo "✓ App Service found: $APP_NAME"
+
+          # Check if staging slot exists (required for prod)
+          if ! az webapp deployment slot show --name "$APP_NAME" --resource-group "$RESOURCE_GROUP" --slot "staging" &> /dev/null; then
+            echo "::warning::Staging slot not found. Production deployment uses slot swap."
+            echo "The deployment will proceed, but slot swap will be skipped."
+          else
+            echo "✓ Staging slot found"
+          fi
+
+          # Check service principal permissions
+          echo "Checking service principal permissions..."
+          ASSIGNMENTS=$(az role assignment list \
+            --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/$RESOURCE_GROUP" \
+            --query "[?principalType=='ServicePrincipal'].{Role:roleDefinitionName,Principal:principalName}" \
+            -o table 2>/dev/null || echo "")
+
+          if [ -z "$ASSIGNMENTS" ]; then
+            echo "::warning::Could not verify role assignments. This may indicate permission issues."
+          else
+            echo "Role assignments on resource group:"
+            echo "$ASSIGNMENTS"
+          fi
+
+          # Verify we can read app service configuration (tests basic permissions)
+          if ! az webapp config show --name "$APP_NAME" --resource-group "$RESOURCE_GROUP" &> /dev/null; then
+            echo "::error::Cannot access App Service configuration. Service principal may lack permissions."
+            echo ""
+            echo "Required permissions:"
+            echo "  - Contributor role on the resource group, OR"
+            echo "  - Website Contributor role on the App Service"
+            echo ""
+            echo "To fix:"
+            echo "  1. Go to Azure Portal → Resource Groups → $RESOURCE_GROUP"
+            echo "  2. Access control (IAM) → Add → Add role assignment"
+            echo "  3. Select 'Contributor' or 'Website Contributor'"
+            echo "  4. Assign to your service principal"
+            exit 1
+          fi
+          echo "✓ App Service access verified"
 
       - name: Setup Node.js for deployment
         uses: actions/setup-node@v4
@@ -491,7 +853,34 @@ jobs:
           echo "Waiting 30 seconds for SCM container to stabilize..."
           sleep 30
 
+      - name: Check Deployment Restrictions
+        run: |
+          APP_NAME="prod-app-san-tassa"
+          RESOURCE_GROUP="prod-rg-san-tassa"
+
+          echo "Checking for deployment restrictions..."
+
+          # Check if deployment is enabled
+          DEPLOYMENT_ENABLED=$(az webapp config show \
+            --name "$APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "scmType" -o tsv 2>/dev/null || echo "None")
+
+          echo "SCM Type: $DEPLOYMENT_ENABLED"
+
+          # Check if there are any IP restrictions that might block deployment
+          IP_RESTRICTIONS=$(az webapp config access-restriction show \
+            --name "$APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "scmSiteAlsoStopped" -o tsv 2>/dev/null || echo "false")
+
+          if [ "$IP_RESTRICTIONS" = "true" ]; then
+            echo "::warning::IP restrictions may be enabled. Ensure GitHub Actions IPs are allowed."
+          fi
+
       - name: Deploy to Azure App Service (Staging Slot)
+        id: deploy
+        continue-on-error: false
         uses: azure/webapps-deploy@v3
         with:
           app-name: "prod-app-san-tassa"
@@ -500,6 +889,46 @@ jobs:
           type: zip
           clean: true
           startup-command: "node server.js"
+        env:
+          AZURE_HTTP_USER_AGENT: "GITHUBACTIONS"
+
+      - name: Handle Deployment Failure
+        if: failure() && steps.deploy.outcome == 'failure'
+        run: |
+          APP_NAME="prod-app-san-tassa"
+          RESOURCE_GROUP="prod-rg-san-tassa"
+
+          echo "::error::Deployment failed with 403 Forbidden error"
+          echo ""
+          echo "Common causes and solutions:"
+          echo ""
+          echo "1. Service Principal Permissions:"
+          echo "   - Ensure the service principal has 'Contributor' or 'Website Contributor' role"
+          echo "   - Check role assignments:"
+          echo "     az role assignment list --scope /subscriptions/$(az account show --query id -o tsv)/resourceGroups/$RESOURCE_GROUP"
+          echo ""
+          echo "2. Invalid AZURE_CREDENTIALS Secret:"
+          echo "   - Verify the secret is valid JSON with: clientId, clientSecret, subscriptionId, tenantId"
+          echo "   - Regenerate if expired: az ad sp create-for-rbac --name <sp-name> --role contributor --scopes /subscriptions/<sub-id>"
+          echo ""
+          echo "3. App Service Deployment Restrictions:"
+          echo "   - Check if deployment is disabled in App Service settings"
+          echo "   - Verify SCM site is not stopped"
+          echo ""
+          echo "4. Resource Group Permissions:"
+          echo "   - Ensure service principal has access to the resource group"
+          echo "   - Check subscription-level permissions"
+          echo ""
+          echo "5. Staging Slot Permissions:"
+          echo "   - Ensure service principal can deploy to staging slot"
+          echo "   - Verify slot exists: az webapp deployment slot list --name $APP_NAME --resource-group $RESOURCE_GROUP"
+          echo ""
+          echo "To verify permissions, run:"
+          echo "  az webapp show --name $APP_NAME --resource-group $RESOURCE_GROUP"
+          echo "  az webapp config show --name $APP_NAME --resource-group $RESOURCE_GROUP"
+          echo ""
+          echo "If these commands fail, the service principal lacks necessary permissions."
+          exit 1
 
       - name: Verify DATABASE_URL
         shell: bash
@@ -548,7 +977,7 @@ jobs:
           npx prisma db pull --schema=deploy-package/prisma/schema.prisma 2>&1 | tee /tmp/prisma_output.txt
           PRISMA_EXIT_CODE=${PIPESTATUS[0]}
           set -e  # Re-enable exit on error
-          
+
           if [ $PRISMA_EXIT_CODE -ne 0 ]; then
             echo ""
             echo "::error::Database connection verification failed."
@@ -573,7 +1002,7 @@ jobs:
         run: |
           # Generate Prisma Client for migration script
           npx prisma generate --schema=deploy-package/prisma/schema.prisma
-          
+
           # Run migration script that handles baselining for existing databases
           if ! node deploy-package/scripts/migrate-production.js --schema=deploy-package/prisma/schema.prisma; then
             echo ""
@@ -635,11 +1064,11 @@ jobs:
         run: |
           URL="${{ steps.env.outputs.url }}"
           echo "Checking health at: $URL"
-          
+
           # Retry logic with backoff for cold start scenarios
           MAX_RETRIES=5
           RETRY_DELAY=30
-          
+
           for i in $(seq 1 $MAX_RETRIES); do
             echo ""
             echo "Attempt $i of $MAX_RETRIES..."
@@ -670,7 +1099,7 @@ jobs:
               RETRY_DELAY=$((RETRY_DELAY + 15))
             fi
           done
-          
+
           echo ""
           echo "✗ Application health check failed after $MAX_RETRIES attempts"
           echo "Last homepage status: $STATUS"

@@ -2,7 +2,7 @@
 
 Step-by-step guide for presenting the platform to clients and stakeholders.
 
-> **Looking for setup instructions?** See the [Setup Guide](./SETUP.md) for environment configuration.
+> **Looking for setup instructions?** See the [Setup Guide](./setup.md) for environment configuration.
 
 ---
 
@@ -268,7 +268,7 @@ Be prepared to discuss:
    - Integration with existing systems
 
 5. **Costs**
-   - Reference `docs/COST_ANALYSIS.md`
+   - Reference [Cost Analysis](../analysis/cost-analysis.md)
    - Free tier available for testing
    - Production costs R665-R1,615/month
 

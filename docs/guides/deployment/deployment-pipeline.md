@@ -2,7 +2,7 @@
 
 Technical documentation for the CI/CD pipeline and deployment infrastructure.
 
-> **Looking for setup instructions?** See the [Setup Guide](./SETUP.md) for environment configuration and deployment steps.
+> **Looking for setup instructions?** See the [Setup Guide](../../getting-started/setup.md) for environment configuration and deployment steps.
 
 ---
 
@@ -44,7 +44,7 @@ Configure in **Settings → Secrets and variables → Actions**:
 
 | Secret | Where to Find |
 |--------|---------------|
-| `AZURE_CREDENTIALS` | Service principal credentials (JSON) - see [Azure Setup](./AZURE_DEPLOYMENT.md#setup) |
+| `AZURE_CREDENTIALS` | Service principal credentials (JSON) - see [Azure Setup](./azure-deployment.md#initial-setup) |
 | `AZURE_SUBSCRIPTION_ID` | Azure subscription ID |
 | `AZURE_RG_DEV` | Resource group name (e.g., `dev-rg-san-tassa`) |
 | `AZURE_WEBAPP_NAME_DEV` | Web app name (e.g., `dev-app-san-tassa`) |
@@ -53,7 +53,7 @@ Configure in **Settings → Secrets and variables → Actions**:
 
 ## Azure Configuration
 
-The infrastructure is configured using Bicep templates in `infra/bicep/`. See [Azure Deployment Guide](./AZURE_DEPLOYMENT.md) for details.
+The infrastructure is configured using Bicep templates in `infra/bicep/`. See [Azure Deployment Guide](./azure-deployment.md) for details.
 
 ### Build Pipeline
 

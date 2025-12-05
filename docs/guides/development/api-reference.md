@@ -2,7 +2,7 @@
 
 REST API reference for the Twines and Straps SA platform.
 
-> **Looking for setup instructions?** See the [Setup Guide](./SETUP.md) for environment configuration.
+> **Looking for setup instructions?** See the [Setup Guide](../../getting-started/setup.md) for environment configuration.
 
 ---
 

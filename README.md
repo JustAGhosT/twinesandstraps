@@ -86,7 +86,7 @@ As part of a comprehensive analysis, several improvements have been implemented 
 
 ## Design System
 
-The project's design system has been reverse-engineered from the existing UI. For a detailed overview of the color palette, typography, and component styles, please see the [Design System Documentation](./docs/DESIGN.md).
+The project's design system has been reverse-engineered from the existing UI. For a detailed overview of the color palette, typography, and component styles, please see the [Design System Documentation](./docs/guides/development/design-system.md).
 
 ## Theming
 
@@ -122,13 +122,13 @@ Open [http://localhost:3000](http://localhost:3000) to view the site.
 
 | Document                                       | Description                                               |
 | ---------------------------------------------- | --------------------------------------------------------- |
-| [Setup Guide](./docs/SETUP.md)                 | Environment setup, database configuration, and deployment |
-| [Azure Deployment](./docs/AZURE_DEPLOYMENT.md) | Deploy to Azure with Bicep infrastructure and CI/CD       |
-| [Design System](./docs/DESIGN.md)              | Color palette, typography, and component styles           |
-| [Best Practices](./docs/BEST_PRACTICES.md)     | Industry standards for the project's tech stack           |
-| [Product Requirements](./docs/PRD.md)          | Full product vision and business requirements             |
-| [Feature Flags](./docs/FEATURE_FLAGS.md)       | Toggle features on/off without code changes               |
-| [API Reference](./docs/API.md)                 | REST API documentation for developers                     |
+| [Setup Guide](./docs/getting-started/setup.md) | Environment setup, database configuration, and deployment |
+| [Azure Deployment](./docs/guides/deployment/azure-deployment.md) | Deploy to Azure with Bicep infrastructure and CI/CD       |
+| [Design System](./docs/guides/development/design-system.md) | Color palette, typography, and component styles           |
+| [Best Practices](./docs/guides/development/best-practices.md) | Industry standards for the project's tech stack           |
+| [Product Requirements](./docs/planning/product-requirements.md) | Full product vision and business requirements             |
+| [Feature Flags](./docs/guides/administration/feature-flags.md) | Toggle features on/off without code changes               |
+| [API Reference](./docs/guides/development/api-reference.md) | REST API documentation for developers                     |
 | [All Documentation](./docs/README.md)          | Complete documentation index                              |
 
 ## Future Development Guidance

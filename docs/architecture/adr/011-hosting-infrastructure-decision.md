@@ -9,7 +9,7 @@
 
 Twines and Straps SA has selected Azure as the hosting infrastructure to balance cost, performance, reliability, and operational complexity. The application is now deployed on Azure App Service with Azure PostgreSQL and Azure Blob Storage, providing a unified Azure stack.
 
-> **Note:** If you're seeing a 503 error on `/api/admin/upload`, this is a configuration issue, not a hosting issue. Azure Blob Storage environment variables need to be configured in Azure App Service. See [docs/SETUP.md](../SETUP.md#azure-blob-storage-required-for-production) for setup instructions.
+> **Note:** If you're seeing a 503 error on `/api/admin/upload`, this is a configuration issue, not a hosting issue. Azure Blob Storage environment variables need to be configured in Azure App Service. See [Setup Guide](../../getting-started/setup.md#azure-blob-storage-required-for-production) for setup instructions.
 
 ### Current Architecture
 

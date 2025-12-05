@@ -2,7 +2,7 @@
 
 Overview of the quote-based purchasing system using WhatsApp integration.
 
-> **Looking for setup instructions?** See the [Setup Guide](./SETUP.md) for environment configuration.
+> **Looking for setup instructions?** See the [Setup Guide](../../getting-started/setup.md) for environment configuration.
 
 ---
 
@@ -72,8 +72,8 @@ This document summarizes the WhatsApp-based quote system implemented for Twines 
 6. **.env.example**
    - Added `NEXT_PUBLIC_WHATSAPP_NUMBER` configuration
 
-7. **docs/CHANGELOG.md**
-   - Created to document all changes
+7. **Changelog**
+   - Created to document all changes (see [Changelog](../../reference/changelog.md))
 
 ### Configuration Required
 

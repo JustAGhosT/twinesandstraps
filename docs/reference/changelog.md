@@ -22,12 +22,12 @@ Notable changes to the Twines and Straps SA platform.
      - Azure AI Foundry credentials
      - Azure deployment credentials
    - Updated README.md with environment variables table and setup guides
-   - Updated DEPLOYMENT_PIPELINE.md with complete credentials documentation
+   - Updated deployment pipeline documentation with complete credentials documentation
 
 3. **Documentation Updates**
    - README.md: Updated AI features section and environment variables
    - .env.example: Comprehensive configuration file with detailed comments
-   - docs/DEPLOYMENT_PIPELINE.md: Added all environment variables and credentials guide
+   - Deployment pipeline docs: Added all environment variables and credentials guide
 
 #### Configuration Required:
 See `.env.example` for complete list of environment variables and instructions.
@@ -65,7 +65,7 @@ Set the following environment variable in Azure App Service:
 - `NEXT_PUBLIC_WHATSAPP_NUMBER`: Your WhatsApp business number (format: 27XXXXXXXXX without + or spaces)
 
 #### Notes:
-- Original PRD (docs/PRD.md) describes the full e-commerce vision with cart, checkout, and PayFast integration
+- Original PRD (see [Product Requirements](../planning/product-requirements.md)) describes the full e-commerce vision with cart, checkout, and PayFast integration
 - Current implementation focuses on product catalog and quote requests via WhatsApp
 - Product specifications are fully displayed on product detail pages as requested
 - The quote-based approach allows the business to maintain control over pricing and negotiations

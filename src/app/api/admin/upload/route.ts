@@ -93,8 +93,8 @@ export async function POST(request: NextRequest) {
           { 
             configuration: errorMessage,
             missing: status.missingVariables.join(', '),
-            help: 'Please configure Azure Blob Storage environment variables in Azure App Service. See docs/SETUP.md for detailed setup instructions.',
-            setupGuide: 'docs/SETUP.md#azure-blob-storage-required-for-production'
+            help: 'Please configure Azure Blob Storage environment variables in Azure App Service. See docs/getting-started/setup.md for detailed setup instructions.',
+            setupGuide: 'docs/getting-started/setup.md#azure-blob-storage-required-for-production'
           }
         ),
         { status: 503 }

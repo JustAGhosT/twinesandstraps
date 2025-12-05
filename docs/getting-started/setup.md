@@ -163,13 +163,13 @@ DATABASE_URL="postgresql://localhost:5432/twinesandstraps"
 
 ### Feature Flags
 
-See [Feature Flags](./FEATURE_FLAGS.md) for a complete list of toggleable features.
+See [Feature Flags](../guides/administration/feature-flags.md) for a complete list of toggleable features.
 
 ---
 
 ## Deployment to Azure
 
-The application is deployed to Azure App Service. For detailed deployment instructions, see [Azure Deployment Guide](./AZURE_DEPLOYMENT.md).
+The application is deployed to Azure App Service. For detailed deployment instructions, see [Azure Deployment Guide](../guides/deployment/azure-deployment.md).
 
 ### Quick Deployment Steps
 
@@ -199,7 +199,7 @@ Environment variables are configured in Azure App Service:
 - **Azure Portal** → Your App Service → Configuration → Application settings
 - Or via Azure CLI / Bicep templates during infrastructure deployment
 
-See [Azure Deployment Guide](./AZURE_DEPLOYMENT.md) for complete setup instructions.
+See [Azure Deployment Guide](../guides/deployment/azure-deployment.md) for complete setup instructions.
 
 ### GitHub Actions CI/CD
 
@@ -377,6 +377,6 @@ npm run build
 
 ## Next Steps
 
-- [Feature Flags](./FEATURE_FLAGS.md) — Toggle features without code changes
-- [API Documentation](./API.md) — REST API reference
-- [Deployment Pipeline](./DEPLOYMENT_PIPELINE.md) — CI/CD details
+- [Feature Flags](../guides/administration/feature-flags.md) — Toggle features without code changes
+- [API Documentation](../guides/development/api-reference.md) — REST API reference
+- [Deployment Pipeline](../guides/deployment/deployment-pipeline.md) — CI/CD details
