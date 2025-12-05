@@ -149,6 +149,10 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
           name: 'APP_VERSION'
           value: appVersion
         }
+        {
+          name: 'HOSTNAME'
+          value: '0.0.0.0'
+        }
       ]
     }
   }
@@ -244,6 +248,10 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = if (environment ==
         {
           name: 'APP_VERSION'
           value: appVersion
+        }
+        {
+          name: 'HOSTNAME'
+          value: '0.0.0.0'
         }
       ]
     }

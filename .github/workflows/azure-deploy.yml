@@ -188,6 +188,7 @@ jobs:
               SCM_DO_BUILD_DURING_DEPLOYMENT=false \
               ENABLE_ORYX_BUILD=false \
               NODE_ENV=production \
+              HOSTNAME=0.0.0.0 \
               DATABASE_URL="${{ secrets.DATABASE_URL }}"
           # Wait for SCM container to stabilize after settings change
           echo "Waiting 30 seconds for SCM container to stabilize..."
@@ -326,6 +327,7 @@ jobs:
               SCM_DO_BUILD_DURING_DEPLOYMENT=false \
               ENABLE_ORYX_BUILD=false \
               NODE_ENV=production \
+              HOSTNAME=0.0.0.0 \
               DATABASE_URL="${{ secrets.DATABASE_URL }}"
           # Wait for SCM container to stabilize after settings change
           echo "Waiting 30 seconds for SCM container to stabilize..."
@@ -464,6 +466,7 @@ jobs:
               SCM_DO_BUILD_DURING_DEPLOYMENT=false \
               ENABLE_ORYX_BUILD=false \
               NODE_ENV=production \
+              HOSTNAME=0.0.0.0 \
               DATABASE_URL="${{ secrets.DATABASE_URL }}"
           # Configure settings for staging slot (used for blue/green deployment)
           az webapp config appsettings set \
@@ -474,6 +477,7 @@ jobs:
               SCM_DO_BUILD_DURING_DEPLOYMENT=false \
               ENABLE_ORYX_BUILD=false \
               NODE_ENV=production \
+              HOSTNAME=0.0.0.0 \
               DATABASE_URL="${{ secrets.DATABASE_URL }}"
           # Wait for SCM container to stabilize after settings change
           echo "Waiting 30 seconds for SCM container to stabilize..."
