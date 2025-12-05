@@ -53,10 +53,11 @@ model Product {
   category     Category      @relation(fields: [category_id], references: [id])
   category_id  Int
   supplier     Supplier?     @relation(fields: [supplier_id], references: [id], onDelete: SetNull)
-  order_items  OrderItem[]
-  view_history ViewHistory[]
-  reviews      Review[]
-  quote_items  QuoteItem[]
+  order_items      OrderItem[]
+  view_history     ViewHistory[]
+  reviews          Review[]
+  quote_items      QuoteItem[]
+  inventory_events InventoryEvent[]
 
   @@index([category_id])
   @@index([stock_status])
@@ -396,3 +397,27 @@ model QuoteAttachment {
 
   quote Quote @relation(fields: [quote_id], references: [id], onDelete: Cascade)
 }
+
+// Inventory Movement Tracking - Audit trail for all stock changes
+model InventoryEvent {
+  id              Int      @id @default(autoincrement())
+  product_id      Int
+  event_type      String // STOCK_ADDED, STOCK_REMOVED, STOCK_ADJUSTED, SUPPLIER_DELIVERY, ORDER_FULFILLMENT, MANUAL_ADJUSTMENT
+  quantity_change Int // Positive for additions, negative for removals
+  quantity_before Int? // Stock level before change
+  quantity_after  Int? // Stock level after change
+  reference_type  String? // ORDER, SUPPLIER_DELIVERY, MANUAL, etc.
+  reference_id    Int? // ID of related order, supplier delivery, etc.
+  notes           String? // Additional context
+  created_by_user_id Int? // User who made the change (if manual)
+  created_at      DateTime @default(now())
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@index([product_id])
+  @@index([event_type])
+  @@index([reference_type, reference_id])
+  @@index([created_at])
+}
+
+// Add relation to Product model

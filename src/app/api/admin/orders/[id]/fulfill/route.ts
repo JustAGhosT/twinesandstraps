@@ -3,11 +3,12 @@
  * Marks order as processing and creates waybill
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { createWaybillForOrder } from '@/lib/shipping/waybill-creation';
 import { sendEmail } from '@/lib/email/brevo';
 import { getSiteUrl } from '@/lib/env';
+import { trackOrderFulfillment } from '@/lib/inventory/tracking';
+import prisma from '@/lib/prisma';
+import { createWaybillForOrder } from '@/lib/shipping/waybill-creation';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(
   request: NextRequest,
@@ -63,6 +64,15 @@ export async function POST(
         },
       },
     });
+
+    // Track inventory movement for order fulfillment
+    await trackOrderFulfillment(
+      orderId,
+      order.items.map(item => ({
+        product_id: item.product_id,
+        quantity: item.quantity,
+      }))
+    );
 
     // Create waybill
     const waybillResult = await createWaybillForOrder({

@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
-import { updateProductSchema, validateBody, formatZodErrors } from '@/lib/validations';
+import { invalidateCategoryCache, invalidateProductCache } from '@/lib/cache';
+import { trackStockStatusChange } from '@/lib/inventory/tracking';
+import prisma from '@/lib/prisma';
+import { formatZodErrors, updateProductSchema, validateBody } from '@/lib/validations';
+import { errorResponse, successResponse } from '@/types/api';
 import type { ProductWithCategory } from '@/types/database';
-import { successResponse, errorResponse } from '@/types/api';
-import { invalidateProductCache, invalidateCategoryCache } from '@/lib/cache';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function PUT(
   request: NextRequest,
@@ -77,6 +78,15 @@ export async function PUT(
           { status: 409 }
         );
       }
+    }
+
+    // Track stock status change if it's being updated
+    if (data.stock_status && data.stock_status !== existingProduct.stock_status) {
+      await trackStockStatusChange(
+        productId,
+        existingProduct.stock_status,
+        data.stock_status
+      );
     }
 
     const product = await prisma.product.update({

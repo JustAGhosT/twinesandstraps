@@ -90,6 +90,12 @@
 - `src/app/api/admin/cache/stats/route.ts`
 - `src/app/api/admin/cache/warm/route.ts`
 - `src/app/api/cron/warm-cache/route.ts`
+- `src/lib/inventory/tracking.ts`
+- `src/app/api/admin/inventory/history/route.ts`
+- `src/app/api/admin/inventory/supplier-delivery/route.ts`
+- `src/app/admin/inventory/page.tsx`
+- `docs/features/INVENTORY_TRACKING.md`
+- `docs/planning/CONSOLIDATED_ROADMAP.md`
 - `azure-functions/low-stock-alert/function.json`
 - `azure-functions/low-stock-alert/index.ts`
 - `azure-functions/low-stock-alert/package.json`
@@ -112,6 +118,9 @@
 - `src/app/api/admin/products/[id]/route.ts` - Added cache invalidation
 - `src/app/api/admin/categories/route.ts` - Added cache invalidation
 - `src/app/api/admin/categories/[id]/route.ts` - Added cache invalidation
+- `src/app/api/admin/orders/[id]/fulfill/route.ts` - Added inventory tracking
+- `src/app/api/admin/products/[id]/route.ts` - Added inventory tracking for stock status changes
+- `prisma/schema.prisma` - Added InventoryEvent model
 - `package.json` - Added ioredis dependency
 - `docs/planning/NEXT_STEPS.md` - Updated status
 - `docs/planning/phased-improvement-plan.md` - Updated status
