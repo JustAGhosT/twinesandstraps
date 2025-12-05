@@ -2,22 +2,25 @@ import { STOCK_STATUS } from '@/constants';
 import prisma from './prisma';
 import { getOrSetCache, CacheKeys } from './cache';
 
-export async function getProduct(id: string) {
-  const productId = parseInt(id, 10);
-
-  // Validate that the ID is a valid positive number
-  if (isNaN(productId) || productId <= 0 || !Number.isFinite(productId)) {
-    return null;
-  }
+export async function getProduct(idOrSlug: string) {
+  // Try to parse as ID first (for backward compatibility)
+  const productId = parseInt(idOrSlug, 10);
+  const isNumericId = !isNaN(productId) && productId > 0 && Number.isFinite(productId);
 
   try {
     return await getOrSetCache(
-      CacheKeys.product(productId),
+      CacheKeys.product(idOrSlug),
       async () => {
-        const product = await prisma.product.findUnique({
-          where: {
-            id: productId,
-          },
+        // Try to find by slug first (SEO-friendly), then fall back to ID
+        const product = await prisma.product.findFirst({
+          where: isNumericId
+            ? {
+                OR: [
+                  { id: productId },
+                  { slug: idOrSlug },
+                ],
+              }
+            : { slug: idOrSlug },
           include: {
             category: true,
           },

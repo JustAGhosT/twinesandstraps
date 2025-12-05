@@ -7,7 +7,7 @@
 export const ROUTES = {
   HOME: '/',
   PRODUCTS: '/products',
-  PRODUCT_DETAIL: (id: string | number) => `/products/${id}`,
+  PRODUCT_DETAIL: (idOrSlug: string | number) => `/products/${idOrSlug}`,
   CART: '/cart',
   WISHLIST: '/wishlist',
   COMPARE: '/compare',

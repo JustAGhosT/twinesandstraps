@@ -30,18 +30,8 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
     };
   }
 
-  const productId = parseInt(params.id, 10);
-  if (isNaN(productId) || productId <= 0 || !Number.isFinite(productId)) {
-    return {
-      title: 'Product Not Found',
-    };
-  }
-
   try {
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
-      include: { category: true },
-    });
+    const product = await getProduct(params.id);
 
     if (!product) {
       return {
@@ -50,19 +40,19 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
     }
 
     const siteUrl = getSiteUrl();
-
+    const productUrl = product.slug ? `${siteUrl}/products/${product.slug}` : `${siteUrl}/products/${product.id}`;
     const description = `${product.description.slice(0, 150)}${product.description.length > 150 ? '...' : ''} - R${product.price.toFixed(2)}`;
 
     return {
       title: product.name,
       description,
       alternates: {
-        canonical: `${siteUrl}/products/${product.id}`,
+        canonical: productUrl,
       },
       openGraph: {
         title: `${product.name} | TASSA`,
         description,
-        url: `${siteUrl}/products/${product.id}`,
+        url: productUrl,
         siteName: 'TASSA - Twines and Straps SA',
         images: product.image_url ? [
           {
@@ -107,26 +97,23 @@ const JsonLd = ({ data }: { data: object }) => {
 };
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
-  const productId = parseInt(params.id, 10);
-
-  if (isNaN(productId) || productId <= 0) {
-    return (
-      <NotFound
-        title="Invalid Product ID"
-        message="The product ID is not valid."
-      />
-    );
-  }
-
   const siteUrl = getSiteUrl();
   
   // Parallelize data fetching with error handling
-  const [product, relatedProducts] = await Promise.all([
-    getProduct(params.id),
-    getRelatedProducts(productId, undefined), // Fetch related products in parallel
-  ]);
+  const product = await getProduct(params.id);
 
   if (!product) {
+    // Try to redirect if it's an old ID-based URL and product has a slug
+    const productId = parseInt(params.id, 10);
+    if (!isNaN(productId) && productId > 0) {
+      // This might be an old ID URL - redirect will be handled by middleware
+      return (
+        <NotFound
+          title="Product Not Found"
+          message="The product you are looking for does not exist."
+        />
+      );
+    }
     return (
       <NotFound
         title="Product Not Found"
@@ -134,6 +121,24 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       />
     );
   }
+
+  // Redirect to slug URL if accessed via ID (for SEO)
+  if (params.id !== product.slug && !isNaN(parseInt(params.id, 10))) {
+    return (
+      <div>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.location.replace('/products/${product.slug}');`,
+          }}
+        />
+        <p>Redirecting...</p>
+      </div>
+    );
+  }
+
+  const [relatedProducts] = await Promise.all([
+    getRelatedProducts(product.id, product.category_id), // Fetch related products in parallel
+  ]);
 
   // JSON-LD structured data for product
   const jsonLdData = {
@@ -154,7 +159,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     },
     offers: {
       '@type': 'Offer',
-      url: `${siteUrl}/products/${product.id}`,
+      url: `${siteUrl}/products/${product.slug || product.id}`,
       priceCurrency: 'ZAR',
       price: product.price,
       availability: product.stock_status === STOCK_STATUS.OUT_OF_STOCK

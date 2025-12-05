@@ -309,7 +309,7 @@ export default async function Home() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {featuredProducts.map((product: Product) => (
-              <Link href={`/products/${product.id}`} key={product.id}>
+              <Link href={`/products/${(product as any).slug || product.id}`} key={product.id}>
                 <ProductCard product={product} />
               </Link>
             ))}

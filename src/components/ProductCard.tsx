@@ -7,6 +7,9 @@ import { useCart } from '@/contexts/CartContext';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { STOCK_STATUS, STOCK_STATUS_LABELS, ROUTES, TIMEOUTS } from '@/constants';
 import { Button } from './Button';
+import { getProductImageBlur } from '@/lib/utils/image-blur';
+import { getProductUrl } from '@/lib/utils/product-url';
+import Link from 'next/link';
 
 interface ProductCardProps {
   product: ProductWithCategory;
@@ -85,8 +88,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
         {getStockBadge()}
       </div>
 
-      {/* Image Container */}
-      <div className="aspect-[4/3] relative bg-gray-100 dark:bg-secondary-700">
+      {/* Image Container - Clickable Link */}
+      <Link href={getProductUrl(product)} className="block aspect-[4/3] relative bg-gray-100 dark:bg-secondary-700 overflow-hidden">
         {product.image_url ? (
           <Image
             src={product.image_url}
@@ -94,19 +97,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            placeholder="blur"
+            blurDataURL={getProductImageBlur()}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-secondary-700">
             <span className="text-sm">No Image</span>
           </div>
         )}
-      </div>
+      </Link>
 
       {/* Content */}
       <div className="p-3 flex-grow flex flex-col">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1 line-clamp-1">
-          {product.name}
-        </h3>
+        <Link href={getProductUrl(product)}>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1 line-clamp-1 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+            {product.name}
+          </h3>
+        </Link>
         <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 line-clamp-2 flex-grow">{product.description}</p>
 
         {/* Specs Badges */}

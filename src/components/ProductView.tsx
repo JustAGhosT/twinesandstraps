@@ -9,6 +9,7 @@ import CompareButton from '@/components/CompareButton';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { STOCK_STATUS, STOCK_STATUS_LABELS, ROUTES, TIMEOUTS, SUCCESS_MESSAGES } from '@/constants';
 import { trackViewItem } from '@/lib/analytics';
+import { getProductImageBlur } from '@/lib/utils/image-blur';
 
 interface ProductViewProps {
   product: ProductWithCategory;
@@ -136,6 +137,8 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
               className="object-contain"
               sizes="100vw"
               priority
+              placeholder="blur"
+              blurDataURL={getProductImageBlur()}
             />
           </div>
         </div>
@@ -156,6 +159,8 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                   sizes="(max-width: 768px) 100vw, 50vw"
                   priority
+                  placeholder="blur"
+                  blurDataURL={getProductImageBlur()}
                 />
                 <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

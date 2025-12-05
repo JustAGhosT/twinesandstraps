@@ -43,7 +43,7 @@ export async function getFeedProducts(): Promise<FeedProduct[]> {
     id: product.id.toString(),
     title: product.name,
     description: product.description.substring(0, 5000), // Limit description length
-    link: `${siteUrl}/products/${product.id}`,
+    link: `${siteUrl}/products/${product.slug || product.id}`,
     image_link: product.image_url || `${siteUrl}/images/placeholder.jpg`,
     price: `${product.price.toFixed(2)} ZAR`,
     availability: product.stock_status === STOCK_STATUS.OUT_OF_STOCK

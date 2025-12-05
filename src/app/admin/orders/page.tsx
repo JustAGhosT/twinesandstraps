@@ -39,6 +39,9 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedOrders, setSelectedOrders] = useState<number[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [processingBulk, setProcessingBulk] = useState(false);
 
   const fetchOrders = useCallback(async (page = 1) => {
     setLoading(true);
@@ -103,8 +106,41 @@ export default function AdminOrdersPage() {
     <div>
       <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Orders</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage customer orders</p>
+          <h1 className="text-3xl font-bold text-secondary-900 dark:text-white">Order Fulfillment</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage orders, shipping, and fulfillment</p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              // Print shipping labels for selected orders
+              if (selectedOrders.length === 0) return;
+              setProcessingBulk(true);
+              try {
+                const res = await fetch('/api/admin/orders/bulk/labels', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ orderIds: selectedOrders }),
+                });
+                if (res.ok) {
+                  const blob = await res.blob();
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `shipping-labels-${Date.now()}.pdf`;
+                  a.click();
+                  setSelectedOrders([]);
+                }
+              } catch (error) {
+                console.error('Error printing labels:', error);
+              } finally {
+                setProcessingBulk(false);
+              }
+            }}
+            disabled={selectedOrders.length === 0 || processingBulk}
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+          >
+            {processingBulk ? 'Processing...' : `Print Labels (${selectedOrders.length})`}
+          </button>
         </div>
       </div>
 
@@ -163,6 +199,20 @@ export default function AdminOrdersPage() {
               <thead className="bg-gray-50 dark:bg-secondary-700">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <input
+                      type="checkbox"
+                      checked={selectedOrders.length === orders.length && orders.length > 0}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedOrders(orders.map(o => o.id));
+                        } else {
+                          setSelectedOrders([]);
+                        }
+                      }}
+                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    />
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Order
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -188,6 +238,20 @@ export default function AdminOrdersPage() {
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-secondary-700">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={selectedOrders.includes(order.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedOrders([...selectedOrders, order.id]);
+                          } else {
+                            setSelectedOrders(selectedOrders.filter(id => id !== order.id));
+                          }
+                        }}
+                        className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      />
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Link
                         href={`/admin/orders/${order.id}`}
@@ -224,12 +288,33 @@ export default function AdminOrdersPage() {
                       })}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                        className="text-primary-600 hover:text-primary-700 font-medium text-sm"
-                      >
-                        View
-                      </Link>
+                      <div className="flex items-center justify-end gap-2">
+                        {order.status === ORDER_STATUS.CONFIRMED && (
+                          <button
+                            onClick={async () => {
+                              try {
+                                const res = await fetch(`/api/admin/orders/${order.id}/fulfill`, {
+                                  method: 'POST',
+                                });
+                                if (res.ok) {
+                                  fetchOrders();
+                                }
+                              } catch (error) {
+                                console.error('Error fulfilling order:', error);
+                              }
+                            }}
+                            className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                          >
+                            Fulfill
+                          </button>
+                        )}
+                        <Link
+                          href={`/admin/orders/${order.id}`}
+                          className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+                        >
+                          View
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

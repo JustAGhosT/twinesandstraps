@@ -125,7 +125,7 @@ export default function CartPage() {
                     </div>
 
                     <div className="flex-grow">
-                      <Link href={`/products/${item.product.id}`} className="text-lg font-semibold text-secondary-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
+                      <Link href={`/products/${item.product.slug || item.product.id}`} className="text-lg font-semibold text-secondary-900 dark:text-white hover:text-primary-600 dark:hover:text-primary-400">
                         {item.product.name}
                       </Link>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">SKU: {item.product.sku}</p>
