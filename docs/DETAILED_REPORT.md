@@ -15,7 +15,7 @@ The project's design system has been reverse-engineered from the existing UI. Th
 | Primary     | `#E31E24` | Brand color, CTAs, links, highlights|
 | Secondary   | `#1A1A1A` | Backgrounds, text                   |
 | Accent      | `#6B6B6B` | Borders, secondary text             |
-| Warm        | `#C4B8A5` | backgrounds, decorative elements      |
+| Warm        | `#C4B8A5` | Backgrounds, decorative elements      |
 
 ### Typography
 
