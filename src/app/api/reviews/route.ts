@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { z } from 'zod';
 import { successResponse, errorResponse } from '@/types/api';
 
@@ -58,7 +60,11 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/reviews - Submit a new review (requires moderation)
  */
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   try {
     const body = await request.json();
     

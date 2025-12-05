@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import { getCurrentUser } from '@/lib/user-auth';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { z } from 'zod';
 
 const updateAddressSchema = z.object({
@@ -15,10 +17,14 @@ const updateAddressSchema = z.object({
 });
 
 // Update address
-export async function PUT(
+async function handlePUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   const user = getCurrentUser(request);
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -77,10 +83,14 @@ export async function PUT(
 }
 
 // Delete address
-export async function DELETE(
+async function handleDELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   const user = getCurrentUser(request);
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -129,3 +139,6 @@ export async function DELETE(
     return NextResponse.json({ error: 'Failed to delete address' }, { status: 500 });
   }
 }
+
+export const PUT = withRateLimit(handlePUT, getRateLimitConfig('public'));
+export const DELETE = withRateLimit(handleDELETE, getRateLimitConfig('public'));

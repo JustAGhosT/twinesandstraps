@@ -4,6 +4,8 @@
 
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { trackSupplierDelivery } from '@/lib/inventory/tracking';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { getRateLimitConfig, withRateLimit } from '@/lib/security/rate-limit-wrapper';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -14,7 +16,11 @@ const supplierDeliverySchema = z.object({
   notes: z.string().optional(),
 });
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
@@ -48,4 +54,6 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withRateLimit(handlePOST, getRateLimitConfig('admin'));
 

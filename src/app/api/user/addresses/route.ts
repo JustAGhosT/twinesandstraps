@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/user-auth';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { z } from 'zod';
 
 const addressSchema = z.object({
@@ -35,7 +37,11 @@ export async function GET(request: NextRequest) {
 }
 
 // Create new address
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   const user = getCurrentUser(request);
 
   if (!user) {
@@ -82,3 +88,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create address' }, { status: 500 });
   }
 }
+
+export const POST = withRateLimit(handlePOST, getRateLimitConfig('public'));

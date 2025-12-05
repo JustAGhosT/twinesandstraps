@@ -8,11 +8,13 @@
 ## Immediate Priorities (Next 2-4 Weeks)
 
 ### 🔴 Critical - Payment Testing
+
 **Status:** ⏳ Pending  
 **Effort:** 8 hours  
 **Impact:** Very High
 
 **Tasks:**
+
 - [ ] Test all PayFast payment methods in sandbox environment
   - Credit/Debit cards (Visa, Mastercard, Amex)
   - EFT (Electronic Funds Transfer)
@@ -33,10 +35,12 @@
 ### 🟠 High Priority - Remaining Phase 2-4 Items
 
 #### 1. Database Query Optimization ✅
+
 **Status:** Complete  
 **Effort:** 8 hours
 
 **Tasks Completed:**
+
 - [x] Optimize related products queries (reduced queries)
 - [x] Optimize order lookup queries
 - [x] Review N+1 query patterns (customer list already optimized)
@@ -46,10 +50,12 @@
 **Documentation:** `docs/optimization/DATABASE_QUERY_OPTIMIZATION.md`
 
 #### 2. Redis Caching Layer (Phase 8) ✅
+
 **Status:** Complete  
 **Effort:** 12 hours
 
 **Tasks Completed:**
+
 - [x] Redis client implementation with automatic fallback
 - [x] Replace in-memory cache with Redis (when available)
 - [x] Implement cache invalidation strategies
@@ -58,6 +64,7 @@
 - [x] Product and category cache invalidation on updates
 
 **Manual Steps Required:**
+
 - [ ] Set up Redis instance (Azure Cache for Redis or similar)
 - [ ] Configure `REDIS_URL` environment variable
 - [ ] Test Redis connection
@@ -66,10 +73,12 @@
 **Documentation:** `docs/deployment/REDIS_SETUP.md`
 
 #### 3. Quote Request Confirmation Page ✅
+
 **Status:** Complete  
 **Effort:** 4 hours
 
 **Tasks Completed:**
+
 - [x] Create `/quote/confirmation` page
 - [x] Display quote request details
 - [x] Show estimated response time
@@ -84,7 +93,7 @@
 **Timeline:** 4 weeks  
 **Business Impact:** High - Reduces manual work
 
-### Priority Order:
+### Phase 7 Priority Order
 
 1. **Low Stock Alerts** (6h) - ✅ Complete
    - ✅ Automated alerts when stock falls below threshold
@@ -116,7 +125,7 @@
 **Timeline:** 4 weeks  
 **Business Impact:** Medium-High
 
-### Priority Order:
+### Phase 8 Priority Order
 
 1. **Security & Compliance** (High Priority)
    - [ ] Security audit (16h)
@@ -139,7 +148,7 @@
 
 ## Phase 10: Testing & Documentation (Ongoing)
 
-### Immediate Testing Tasks:
+### Immediate Testing Tasks
 
 1. **Unit Tests** (40h)
    - [ ] Test critical components (ProductCard, Cart, Checkout)
@@ -166,6 +175,7 @@
 ## Recommended Action Plan
 
 ### Week 1-2: Critical Testing & Optimization
+
 1. **Payment Testing** (Critical - 8h)
    - Test all payment methods
    - Verify webhook handling
@@ -179,6 +189,7 @@
    - Quick win, improves UX
 
 ### Week 3-4: Infrastructure & Security
+
 1. **Redis Caching** (High - 12h)
    - Set up Redis
    - Migrate from in-memory cache
@@ -192,11 +203,13 @@
    - Quick win for operations
 
 ### Week 5-8: Phase 7 - Accounting Integration
+
 1. Inventory movement tracking
 2. Xero integration setup
 3. Automated invoice syncing
 
 ### Week 9-12: Phase 8 - Advanced Features
+
 1. User authentication
 2. Performance monitoring
 3. POPIA compliance
@@ -238,4 +251,3 @@ Before proceeding, consider:
 ---
 
 *This document should be reviewed weekly and updated as priorities change.*
-

@@ -35,7 +35,7 @@ export function checkRateLimit(
   identifier: string,
   maxRequests: number,
   windowMs: number
-): { allowed: boolean; remaining: number; resetAt: number } {
+): { allowed: boolean; remaining: number; resetAt: number; used: number } {
   const now = Date.now();
   const key = identifier;
   
@@ -49,6 +49,7 @@ export function checkRateLimit(
       allowed: true,
       remaining: maxRequests - 1,
       resetAt: store[key].resetAt,
+      used: 1,
     };
   }
   
@@ -60,6 +61,7 @@ export function checkRateLimit(
       allowed: false,
       remaining: 0,
       resetAt: store[key].resetAt,
+      used: store[key].count,
     };
   }
   
@@ -67,6 +69,7 @@ export function checkRateLimit(
     allowed: true,
     remaining: maxRequests - store[key].count,
     resetAt: store[key].resetAt,
+    used: store[key].count,
   };
 }
 

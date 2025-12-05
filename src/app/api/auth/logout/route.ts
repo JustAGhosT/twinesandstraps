@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserSessionToken, invalidateUserSession } from '@/lib/user-auth';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
   const token = getUserSessionToken(request);
 
   if (token) {
@@ -21,3 +26,5 @@ export async function POST(request: NextRequest) {
 
   return response;
 }
+
+export const POST = withRateLimit(handlePOST, getRateLimitConfig('auth'));

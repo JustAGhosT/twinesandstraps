@@ -8,12 +8,18 @@ import { getSiteUrl } from '@/lib/env';
 import { trackOrderFulfillment } from '@/lib/inventory/tracking';
 import prisma from '@/lib/prisma';
 import { createWaybillForOrder } from '@/lib/shipping/waybill-creation';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(
+async function handlePOST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   try {
     // TODO: Add admin authentication check
 

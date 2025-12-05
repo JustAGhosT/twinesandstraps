@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { ToastProvider } from '@/components/Toast';
 import { ConfirmProvider } from '@/components/ConfirmModal';
 import { Analytics } from '@/components/Analytics';
+import { CsrfProvider } from '@/components/CsrfProvider';
 import { ReactNode } from 'react';
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -21,8 +22,10 @@ export function Providers({ children }: { children: ReactNode }) {
               <CompareProvider>
                 <ToastProvider>
                   <ConfirmProvider>
-                    <Analytics />
-                    {children}
+                    <CsrfProvider>
+                      <Analytics />
+                      {children}
+                    </CsrfProvider>
                   </ConfirmProvider>
                 </ToastProvider>
               </CompareProvider>

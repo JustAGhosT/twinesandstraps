@@ -5,6 +5,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createQuote } from '@/lib/quotes/quote-management';
 import { sendQuoteRequestConfirmation } from '@/lib/quotes/quote-email';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { z } from 'zod';
 
 const quoteRequestSchema = z.object({
@@ -25,7 +27,11 @@ const quoteRequestSchema = z.object({
   notes: z.string().optional(),
 });
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   try {
     const body = await request.json();
     const validation = quoteRequestSchema.safeParse(body);
@@ -85,4 +91,6 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withRateLimit(handlePOST, getRateLimitConfig('public'));
 

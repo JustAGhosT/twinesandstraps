@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { updateSupplierSchema, validateBody, formatZodErrors } from '@/lib/validations';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
 interface RouteParams {
   params: { id: string };
@@ -54,7 +56,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 // PUT - Update supplier
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+async function handlePUT(request: NextRequest, { params }: RouteParams) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
@@ -124,7 +130,11 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 }
 
 // DELETE - Delete supplier (soft delete by deactivating, or hard delete if no products)
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+async function handleDELETE(request: NextRequest, { params }: RouteParams) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
 
@@ -168,3 +178,6 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     );
   }
 }
+
+export const PUT = withRateLimit(handlePUT, getRateLimitConfig('admin'));
+export const DELETE = withRateLimit(handleDELETE, getRateLimitConfig('admin'));

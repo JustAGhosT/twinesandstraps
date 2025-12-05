@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { uploadFile, isBlobStorageConfigured, getStorageStatus } from '@/lib/blob-storage';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import type { UploadData } from '@/types/api';
 import { successResponse, errorResponse } from '@/types/api';
 
@@ -19,7 +21,11 @@ const ALLOWED_MIME_TYPES: Record<string, string> = {
 const MAX_FILE_SIZE_BLOB = 5 * 1024 * 1024; // 5MB
 const MAX_FILE_SIZE_BASE64 = 2 * 1024 * 1024; // 2MB
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   // Verify admin authentication
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
@@ -109,3 +115,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withRateLimit(handlePOST, getRateLimitConfig('admin'));

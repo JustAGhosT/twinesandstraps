@@ -185,7 +185,11 @@ function getChangedFields(
   return changedFields;
 }
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   // Verify admin authentication
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
@@ -245,3 +249,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export const POST = withRateLimit(handlePOST, getRateLimitConfig('admin'));

@@ -5,8 +5,14 @@ import { createProductSchema, validateBody, formatZodErrors } from '@/lib/valida
 import type { ProductWithCategory } from '@/types/database';
 import { successResponse, errorResponse } from '@/types/api';
 import { invalidateProductCache, invalidateCategoryCache } from '@/lib/cache';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   // Verify admin authentication
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
@@ -83,3 +89,6 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// Export with rate limiting
+export const POST = withRateLimit(handlePOST, getRateLimitConfig('admin'));

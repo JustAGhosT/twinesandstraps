@@ -6,11 +6,17 @@ import { formatZodErrors, updateProductSchema, validateBody } from '@/lib/valida
 import { errorResponse, successResponse } from '@/types/api';
 import type { ProductWithCategory } from '@/types/database';
 import { NextRequest, NextResponse } from 'next/server';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
-export async function PUT(
+async function handlePUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   // Verify admin authentication
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
@@ -126,10 +132,14 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
+async function handleDELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   // Verify admin authentication
   const authError = await requireAdminAuth(request);
   if (authError) return authError;

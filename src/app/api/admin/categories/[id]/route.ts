@@ -3,11 +3,17 @@ import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { updateCategorySchema, validateBody, formatZodErrors } from '@/lib/validations';
 import { invalidateCategoryCache, invalidateProductCache } from '@/lib/cache';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
-export async function PUT(
+async function handlePUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   // Verify admin authentication
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
@@ -108,10 +114,14 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
+async function handleDELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verify CSRF token
+  const csrfError = requireCsrfToken(request);
+  if (csrfError) return csrfError;
+
   // Verify admin authentication
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
