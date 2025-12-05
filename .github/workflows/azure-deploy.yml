@@ -621,25 +621,51 @@ jobs:
           fi
 
       - name: Wait for deployment to stabilize
-        run: sleep 60
+        run: sleep 30
 
       - name: Check application health
         run: |
           URL="${{ steps.env.outputs.url }}"
           echo "Checking health at: $URL"
-
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
-          echo "Homepage status: $STATUS"
-
-          HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL/api/health")
-          echo "Health endpoint status: $HEALTH_STATUS"
-
-          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
-            echo "✓ Application is responding"
-          else
-            echo "✗ Application returned unexpected status"
-            exit 1
-          fi
+          
+          # Retry logic with exponential backoff for cold start scenarios
+          MAX_RETRIES=5
+          RETRY_DELAY=30
+          
+          for i in $(seq 1 $MAX_RETRIES); do
+            echo ""
+            echo "Attempt $i of $MAX_RETRIES..."
+            
+            # Use longer timeout for cold start scenarios
+            STATUS=$(curl -s -o /tmp/response.txt -w "%{http_code}" --max-time 60 "$URL")
+            echo "Homepage status: $STATUS"
+            
+            HEALTH_STATUS=$(curl -s -o /tmp/health_response.txt -w "%{http_code}" --max-time 60 "$URL/api/health")
+            echo "Health endpoint status: $HEALTH_STATUS"
+            
+            # Show health response body for debugging
+            if [ -f /tmp/health_response.txt ]; then
+              echo "Health response: $(cat /tmp/health_response.txt)"
+            fi
+            
+            if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+              echo "✓ Application is responding"
+              exit 0
+            fi
+            
+            if [ $i -lt $MAX_RETRIES ]; then
+              echo "Waiting ${RETRY_DELAY}s before retry..."
+              sleep $RETRY_DELAY
+              # Increase delay for next retry (exponential backoff)
+              RETRY_DELAY=$((RETRY_DELAY + 15))
+            fi
+          done
+          
+          echo ""
+          echo "✗ Application health check failed after $MAX_RETRIES attempts"
+          echo "Last homepage status: $STATUS"
+          echo "Last health endpoint status: $HEALTH_STATUS"
+          exit 1
 
       - name: Create summary
         run: |
