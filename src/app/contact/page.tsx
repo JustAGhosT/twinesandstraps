@@ -1,6 +1,41 @@
 import Link from 'next/link';
+import FAQ from '@/components/FAQ';
 
 export default function ContactPage() {
+  const faqItems = [
+    {
+      question: 'What is your minimum order quantity?',
+      answer: 'We offer flexible ordering options. For standard products, there is no minimum order quantity. However, bulk orders may qualify for volume discounts. Please contact us for specific requirements.',
+    },
+    {
+      question: 'Do you offer delivery services?',
+      answer: 'Yes, we provide delivery services across South Africa. Delivery costs and timeframes depend on your location and order size. We work with trusted courier partners to ensure safe and timely delivery.',
+    },
+    {
+      question: 'What payment methods do you accept?',
+      answer: 'We accept various payment methods including credit/debit cards via PayFast, EFT transfers, and bank deposits. For large B2B orders, we can arrange payment terms upon approval.',
+    },
+    {
+      question: 'Can I return or exchange products?',
+      answer: 'Yes, we have a return and exchange policy. Products must be returned in original condition within 14 days of purchase. Custom orders may have different terms. Please see our Returns & Warranty page for full details.',
+    },
+    {
+      question: 'Do you offer custom product specifications?',
+      answer: 'Absolutely! We specialize in custom orders and can manufacture products to your specific requirements including diameter, length, material, and strength ratings. Contact us with your specifications for a quote.',
+    },
+    {
+      question: 'What is your warranty policy?',
+      answer: 'All our products come with a quality guarantee. We stand behind the durability and performance of our twines and straps. Specific warranty terms vary by product type. Please refer to our Returns & Warranty page for detailed information.',
+    },
+    {
+      question: 'How long does it take to process an order?',
+      answer: 'Standard orders are typically processed within 1-2 business days. Custom orders may take 5-10 business days depending on specifications. We\'ll provide an estimated delivery date when you place your order.',
+    },
+    {
+      question: 'Do you serve both retail and B2B customers?',
+      answer: 'Yes! We serve both individual customers and businesses. B2B customers may qualify for volume pricing, custom terms, and dedicated account management. Contact us to discuss your business needs.',
+    },
+  ];
   const contacts = [
     { name: 'Annemarie', phone: '074 187 4975' },
     { name: 'Andre', phone: '082 577 8039' },
@@ -130,29 +165,11 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* FAQ or Additional Info */}
-      <section className="py-16 bg-white dark:bg-secondary-900">
+      {/* FAQ Section */}
+      <section className="py-16 bg-gray-50 dark:bg-secondary-900">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-secondary-900 dark:text-white text-center mb-12">Frequently Asked Questions</h2>
-            <div className="space-y-6">
-              <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
-                <h3 className="font-bold text-secondary-900 dark:text-white mb-2">Do you offer bulk pricing?</h3>
-                <p className="text-accent-600 dark:text-gray-300">Yes! We offer competitive bulk pricing for business customers. Contact us for a personalized quote based on your requirements.</p>
-              </div>
-              <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
-                <h3 className="font-bold text-secondary-900 dark:text-white mb-2">What is the lead time for orders?</h3>
-                <p className="text-accent-600 dark:text-gray-300">Standard orders are typically fulfilled within 3-5 business days. Large or custom orders may require additional time.</p>
-              </div>
-              <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
-                <h3 className="font-bold text-secondary-900 dark:text-white mb-2">Do you offer custom products?</h3>
-                <p className="text-accent-600 dark:text-gray-300">Yes, we offer customization options to meet specific customer needs. Contact our team to discuss your requirements.</p>
-              </div>
-              <div className="bg-gray-50 dark:bg-secondary-800 p-6 rounded-xl">
-                <h3 className="font-bold text-secondary-900 dark:text-white mb-2">What payment methods do you accept?</h3>
-                <p className="text-accent-600 dark:text-gray-300">We accept EFT, credit card, and other payment methods. For business accounts, we offer 30-day terms upon approval.</p>
-              </div>
-            </div>
+            <FAQ items={faqItems} />
           </div>
         </div>
       </section>

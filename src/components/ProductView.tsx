@@ -86,7 +86,14 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
       case STOCK_STATUS.IN_STOCK:
         return <span className="inline-block px-3 py-1 text-sm font-semibold text-green-800 bg-green-100 rounded dark:bg-green-900/30 dark:text-green-300">{STOCK_STATUS_LABELS.IN_STOCK}</span>;
       case STOCK_STATUS.LOW_STOCK:
-        return <span className="inline-block px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100 rounded dark:bg-yellow-900/30 dark:text-yellow-300">{STOCK_STATUS_LABELS.LOW_STOCK}</span>;
+        return (
+          <div className="flex items-center gap-2">
+            <span className="inline-block px-3 py-1 text-sm font-semibold text-yellow-800 bg-yellow-100 rounded dark:bg-yellow-900/30 dark:text-yellow-300">{STOCK_STATUS_LABELS.LOW_STOCK}</span>
+            <span className="inline-block px-3 py-1 text-sm font-semibold text-red-800 bg-red-100 rounded dark:bg-red-900/30 dark:text-red-300 animate-pulse">
+              ⚠️ Only a few left!
+            </span>
+          </div>
+        );
       case STOCK_STATUS.OUT_OF_STOCK:
         return <span className="inline-block px-3 py-1 text-sm font-semibold text-red-800 bg-red-100 rounded dark:bg-red-900/30 dark:text-red-300">{STOCK_STATUS_LABELS.OUT_OF_STOCK}</span>;
       default:

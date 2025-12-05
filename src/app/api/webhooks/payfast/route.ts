@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPayFastConfig, isPayFastConfigured } from '@/lib/payfast/config';
 import { validateSignature, parseITNData } from '@/lib/payfast/signature';
+import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
+import { sendOrderConfirmation } from '@/lib/email/brevo';
 import prisma from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
@@ -14,6 +16,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'PayFast not configured' },
         { status: 500 }
+      );
+    }
+
+    // Rate limiting - prevent abuse
+    const clientId = getClientIdentifier(request);
+    const rateLimit = checkRateLimit(
+      `payfast:${clientId}`,
+      RATE_LIMITS.paymentWebhook.maxRequests,
+      RATE_LIMITS.paymentWebhook.windowMs
+    );
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': Math.ceil((rateLimit.resetAt - Date.now()) / 1000).toString(),
+            'X-RateLimit-Limit': RATE_LIMITS.paymentWebhook.maxRequests.toString(),
+            'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+            'X-RateLimit-Reset': new Date(rateLimit.resetAt).toISOString(),
+          },
+        }
       );
     }
 
@@ -70,6 +95,9 @@ export async function POST(request: NextRequest) {
       status: 200,
       headers: {
         'Content-Type': 'text/plain',
+        'X-RateLimit-Limit': RATE_LIMITS.paymentWebhook.maxRequests.toString(),
+        'X-RateLimit-Remaining': rateLimit.remaining.toString(),
+        'X-RateLimit-Reset': new Date(rateLimit.resetAt).toISOString(),
       },
     });
   } catch (error) {
@@ -96,7 +124,7 @@ async function handlePaymentSuccess(
     // For now, this is a placeholder implementation
     
     // TODO: Update order status in database
-    // await prisma.order.update({
+    // const order = await prisma.order.update({
     //   where: { payment_id: paymentId },
     //   data: {
     //     status: 'PAID',
@@ -104,10 +132,26 @@ async function handlePaymentSuccess(
     //     payment_id: pfPaymentId,
     //     paid_at: new Date(),
     //   },
+    //   include: {
+    //     items: {
+    //       include: {
+    //         product: true,
+    //       },
+    //     },
+    //   },
     // });
 
     // Send confirmation email
-    // TODO: Implement email sending via Brevo
+    const customerEmail = itnData.email_address || '';
+    if (customerEmail) {
+      // TODO: Replace with actual order data when Order model is implemented
+      await sendOrderConfirmation(customerEmail, {
+        orderId: paymentId,
+        items: [], // order.items.map(item => ({ ... }))
+        total: amount,
+        shippingAddress: '', // order.shipping_address
+      });
+    }
 
     console.log('Payment successful:', { paymentId, pfPaymentId, amount });
   } catch (error) {

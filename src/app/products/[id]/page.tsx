@@ -189,7 +189,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       <div className="bg-background min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <nav className="mb-6 text-sm" aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-2 text-muted-foreground">
+          <ol className="flex items-center space-x-2 text-muted-foreground" itemScope itemType="https://schema.org/BreadcrumbList">
             {breadcrumbs.map((crumb, index) => (
               <React.Fragment key={`breadcrumb-${index}-${crumb.name}`}>
                 <li>

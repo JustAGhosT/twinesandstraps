@@ -7,6 +7,7 @@ import { Button } from '@/components/Button';
 import { generateCheckoutUrl } from '@/lib/payfast/checkout';
 import { isPayFastConfigured } from '@/lib/payfast/config';
 import { useToast } from '@/components/Toast';
+import { addressSchema, SA_PROVINCES, validateAddress, formatPhoneNumber, type AddressFormData } from '@/lib/validations/address';
 
 export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart } = useCart();
@@ -22,14 +23,54 @@ export default function CheckoutPage() {
     address: '',
     city: '',
     postalCode: '',
-    province: '',
+    province: '' as typeof SA_PROVINCES[number] | '',
   });
+  
+  const [errors, setErrors] = useState<Partial<Record<keyof AddressFormData, string>>>({});
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    // Clear error when user starts typing
+    if (errors[name as keyof AddressFormData]) {
+      setErrors({
+        ...errors,
+        [name]: undefined,
+      });
+    }
+  };
+  
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only digits, spaces, +, and -
+    const cleaned = value.replace(/[^\d\s+-]/g, '');
+    setFormData({
+      ...formData,
+      phone: cleaned,
+    });
+    if (errors.phone) {
+      setErrors({
+        ...errors,
+        phone: undefined,
+      });
+    }
+  };
+  
+  const handlePostalCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+    setFormData({
+      ...formData,
+      postalCode: value,
+    });
+    if (errors.postalCode) {
+      setErrors({
+        ...errors,
+        postalCode: undefined,
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,6 +83,14 @@ export default function CheckoutPage() {
 
     if (items.length === 0) {
       showError('Your cart is empty');
+      return;
+    }
+
+    // Validate address
+    const validation = validateAddress(formData);
+    if (!validation.isValid) {
+      setErrors(validation.errors);
+      showError('Please correct the errors in the form');
       return;
     }
 
@@ -95,6 +144,13 @@ export default function CheckoutPage() {
   const subtotal = getTotalPrice();
   const vat = subtotal * 0.15; // 15% VAT
   const total = subtotal + vat;
+
+  // Shipping information
+  const shippingInfo = {
+    standard: '3-5 business days',
+    express: '1-2 business days (select areas)',
+    freeShippingThreshold: 5000, // R5000 for free shipping
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -163,10 +219,15 @@ export default function CheckoutPage() {
                   name="phone"
                   required
                   value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-secondary-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="082 123 4567"
+                  onChange={handlePhoneChange}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
+                    errors.phone ? 'border-red-500' : 'border-gray-300 dark:border-secondary-600'
+                  }`}
+                  placeholder="082 123 4567 or +27821234567"
                 />
+                {errors.phone && (
+                  <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
+                )}
               </div>
 
               <div>
@@ -180,8 +241,13 @@ export default function CheckoutPage() {
                   required
                   value={formData.address}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-secondary-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
+                    errors.address ? 'border-red-500' : 'border-gray-300 dark:border-secondary-600'
+                  }`}
                 />
+                {errors.address && (
+                  <p className="mt-1 text-sm text-red-500">{errors.address}</p>
+                )}
               </div>
 
               <div className="grid md:grid-cols-3 gap-4">
@@ -196,22 +262,38 @@ export default function CheckoutPage() {
                     required
                     value={formData.city}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-secondary-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
+                      errors.city ? 'border-red-500' : 'border-gray-300 dark:border-secondary-600'
+                    }`}
                   />
+                  {errors.city && (
+                    <p className="mt-1 text-sm text-red-500">{errors.city}</p>
+                  )}
                 </div>
                 <div>
                   <label htmlFor="province" className="block text-sm font-medium mb-1">
                     Province <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
+                  <select
                     id="province"
                     name="province"
                     required
                     value={formData.province}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-secondary-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  />
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-700 ${
+                      errors.province ? 'border-red-500' : 'border-gray-300 dark:border-secondary-600'
+                    }`}
+                  >
+                    <option value="">Select Province</option>
+                    {SA_PROVINCES.map((province) => (
+                      <option key={province} value={province}>
+                        {province}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.province && (
+                    <p className="mt-1 text-sm text-red-500">{errors.province}</p>
+                  )}
                 </div>
                 <div>
                   <label htmlFor="postalCode" className="block text-sm font-medium mb-1">
@@ -222,10 +304,17 @@ export default function CheckoutPage() {
                     id="postalCode"
                     name="postalCode"
                     required
+                    maxLength={4}
                     value={formData.postalCode}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-secondary-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    onChange={handlePostalCodeChange}
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
+                      errors.postalCode ? 'border-red-500' : 'border-gray-300 dark:border-secondary-600'
+                    }`}
+                    placeholder="1234"
                   />
+                  {errors.postalCode && (
+                    <p className="mt-1 text-sm text-red-500">{errors.postalCode}</p>
+                  )}
                 </div>
               </div>
 
@@ -268,6 +357,20 @@ export default function CheckoutPage() {
               <div className="flex justify-between font-bold text-lg border-t dark:border-secondary-700 pt-2">
                 <span>Total</span>
                 <span>R{total.toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Shipping Information */}
+            <div className="mt-6 pt-6 border-t dark:border-secondary-700">
+              <h3 className="font-semibold text-sm mb-2">Shipping Information</h3>
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p>• Standard delivery: 3-5 business days</p>
+                <p>• Express delivery: 1-2 business days (select areas)</p>
+                {subtotal >= 5000 ? (
+                  <p className="text-green-600 dark:text-green-400 font-semibold">✓ Free shipping on this order!</p>
+                ) : (
+                  <p>• Free shipping on orders over R5,000</p>
+                )}
               </div>
             </div>
           </div>

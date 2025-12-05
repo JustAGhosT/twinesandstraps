@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { sendEmail, isBrevoConfigured } from '@/lib/email/brevo';
 
 interface NewsletterSignupProps {
   variant?: 'footer' | 'inline';
@@ -22,15 +23,63 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ variant = 'footer' 
 
     setStatus('loading');
 
-    // Simulate API call - in production, connect to your email service
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Try to use Brevo if configured, otherwise fall back to localStorage
+      if (isBrevoConfigured()) {
+        // Send welcome email via Brevo
+        const result = await sendEmail({
+          to: email,
+          subject: 'Welcome to TASSA Newsletter!',
+          htmlContent: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+              <meta charset="utf-8">
+              <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background-color: #E31E24; color: white; padding: 20px; text-align: center; }
+                .content { background-color: #f9f9f9; padding: 20px; }
+                .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1>Welcome to TASSA!</h1>
+                </div>
+                <div class="content">
+                  <p>Thank you for subscribing to our newsletter!</p>
+                  <p>You'll now receive:</p>
+                  <ul>
+                    <li>Product updates and new arrivals</li>
+                    <li>Special offers and promotions</li>
+                    <li>Industry news and insights</li>
+                    <li>Tips and best practices</li>
+                  </ul>
+                  <p>We're excited to have you on board!</p>
+                </div>
+                <div class="footer">
+                  <p>TASSA - Twines and Straps SA</p>
+                  <p>If you no longer wish to receive these emails, you can unsubscribe at any time.</p>
+                </div>
+              </div>
+            </body>
+            </html>
+          `,
+          tags: ['newsletter-signup'],
+        });
 
-      // Store in localStorage for demo purposes
-      const subscribers = JSON.parse(localStorage.getItem('newsletter_subscribers') || '[]');
-      if (!subscribers.includes(email)) {
-        subscribers.push(email);
-        localStorage.setItem('newsletter_subscribers', JSON.stringify(subscribers));
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to subscribe');
+        }
+      } else {
+        // Fallback to localStorage if Brevo not configured
+        const subscribers = JSON.parse(localStorage.getItem('newsletter_subscribers') || '[]');
+        if (!subscribers.includes(email)) {
+          subscribers.push(email);
+          localStorage.setItem('newsletter_subscribers', JSON.stringify(subscribers));
+        }
       }
 
       setStatus('success');
@@ -42,7 +91,8 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ variant = 'footer' 
         setStatus('idle');
         setMessage('');
       }, 3000);
-    } catch {
+    } catch (error) {
+      console.error('Newsletter signup error:', error);
       setStatus('error');
       setMessage('Something went wrong. Please try again.');
     }

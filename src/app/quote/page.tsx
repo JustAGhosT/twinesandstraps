@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import { useToast } from '@/components/Toast';
+import { event } from '@/lib/analytics';
 
 export default function QuotePage() {
   const { items, getTotalItems, getTotalPrice } = useCart();
@@ -24,6 +25,14 @@ export default function QuotePage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  // Track quote page view
+  useEffect(() => {
+    event('page_view', {
+      page_title: 'Quote Request',
+      page_location: window.location.href,
+    });
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

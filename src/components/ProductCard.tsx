@@ -55,7 +55,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = true
       case STOCK_STATUS.IN_STOCK:
         return <span className="px-2 py-0.5 text-xs font-medium text-green-700 bg-green-100 rounded">{STOCK_STATUS_LABELS.IN_STOCK}</span>;
       case STOCK_STATUS.LOW_STOCK:
-        return <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-amber-100 rounded">{STOCK_STATUS_LABELS.LOW_STOCK}</span>;
+        return (
+          <div className="flex flex-col gap-1">
+            <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-amber-100 rounded">{STOCK_STATUS_LABELS.LOW_STOCK}</span>
+            <span className="px-2 py-0.5 text-xs font-bold text-red-700 bg-red-100 rounded animate-pulse">Only a few left!</span>
+          </div>
+        );
       case STOCK_STATUS.OUT_OF_STOCK:
         return <span className="px-2 py-0.5 text-xs font-medium text-red-700 bg-red-100 rounded">{STOCK_STATUS_LABELS.OUT_OF_STOCK}</span>;
       default:
