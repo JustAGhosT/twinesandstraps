@@ -637,10 +637,11 @@ jobs:
             echo "Attempt $i of $MAX_RETRIES..."
             
             # Use longer timeout for cold start scenarios
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 "$URL")
+            # Add fallback for curl failures (exit code 28 = timeout)
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 "$URL" || echo "000")
             echo "Homepage status: $STATUS"
             
-            HEALTH_STATUS=$(curl -s -o /tmp/health_response.txt -w "%{http_code}" --max-time 60 "$URL/api/health")
+            HEALTH_STATUS=$(curl -s -o /tmp/health_response.txt -w "%{http_code}" --max-time 60 "$URL/api/health" || echo "000")
             echo "Health endpoint status: $HEALTH_STATUS"
             
             # Show health response body for debugging
