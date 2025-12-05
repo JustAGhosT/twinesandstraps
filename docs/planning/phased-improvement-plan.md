@@ -630,6 +630,8 @@ Some tasks depend on others being completed first:
 
 ## Next Steps & Priority Queue
 
+> **📋 See [NEXT_STEPS.md](./NEXT_STEPS.md) for detailed action plan and recommendations**
+
 ### Immediate Next Steps (High Priority)
 
 Based on current completion status, here are the recommended next tasks to tackle:
