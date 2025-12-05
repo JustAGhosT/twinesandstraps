@@ -145,6 +145,44 @@ export default function CheckoutPage() {
   const vat = subtotal * 0.15; // 15% VAT
   const total = subtotal + vat;
 
+  // Payment methods available via PayFast
+  const paymentMethods = [
+    {
+      id: 'credit_card',
+      name: 'Credit/Debit Card',
+      icon: '💳',
+      description: 'Visa, Mastercard, American Express',
+      processingTime: 'Instant',
+      fees: 'No additional fees',
+    },
+    {
+      id: 'eft',
+      name: 'EFT / Bank Transfer',
+      icon: '🏦',
+      description: 'Direct bank transfer',
+      processingTime: '2-3 business days',
+      fees: 'No additional fees',
+    },
+    {
+      id: 'instant_eft',
+      name: 'Instant EFT',
+      icon: '⚡',
+      description: 'Immediate bank transfer',
+      processingTime: 'Instant',
+      fees: 'No additional fees',
+    },
+    {
+      id: 'payfast_wallet',
+      name: 'PayFast Wallet',
+      icon: '👛',
+      description: 'PayFast account balance',
+      processingTime: 'Instant',
+      fees: 'No additional fees',
+    },
+  ];
+
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(paymentMethods[0].id);
+
   // Shipping information
   const shippingInfo = {
     standard: '3-5 business days',
@@ -315,6 +353,49 @@ export default function CheckoutPage() {
                   {errors.postalCode && (
                     <p className="mt-1 text-sm text-red-500">{errors.postalCode}</p>
                   )}
+                </div>
+              </div>
+
+              {/* Payment Method Selection */}
+              <div className="pt-4">
+                <label className="block text-sm font-medium mb-3">
+                  Payment Method <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                  {paymentMethods.map((method) => (
+                    <button
+                      key={method.id}
+                      type="button"
+                      onClick={() => setSelectedPaymentMethod(method.id)}
+                      className={`p-4 border-2 rounded-lg text-left transition-all ${
+                        selectedPaymentMethod === method.id
+                          ? 'border-primary-600 bg-primary-50 dark:bg-primary-900/20'
+                          : 'border-gray-300 dark:border-secondary-600 hover:border-primary-400'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="text-2xl">{method.icon}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              value={method.id}
+                              checked={selectedPaymentMethod === method.id}
+                              onChange={() => setSelectedPaymentMethod(method.id)}
+                              className="w-4 h-4 text-primary-600"
+                            />
+                            <span className="font-semibold">{method.name}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mb-1">{method.description}</p>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span>⏱️ {method.processingTime}</span>
+                            <span>💰 {method.fees}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               </div>
 

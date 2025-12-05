@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { sendEmail, isBrevoConfigured } from '@/lib/email/brevo';
+import { addToWelcomeSeries } from '@/lib/email/welcome-series';
 
 interface NewsletterSignupProps {
   variant?: 'footer' | 'inline';
@@ -73,6 +74,9 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ variant = 'footer' 
         if (!result.success) {
           throw new Error(result.error || 'Failed to subscribe');
         }
+
+        // Add to welcome email series
+        addToWelcomeSeries(email);
       } else {
         // Fallback to localStorage if Brevo not configured
         const subscribers = JSON.parse(localStorage.getItem('newsletter_subscribers') || '[]');

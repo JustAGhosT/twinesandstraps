@@ -54,6 +54,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('cart', JSON.stringify(items));
+      
+      // Track abandoned cart if user has items but hasn't checked out
+      // This is a simplified version - in production, you'd track this server-side
+      if (items.length > 0) {
+        // Store timestamp of last cart update
+        localStorage.setItem('cart_last_updated', Date.now().toString());
+      }
     }
   }, [items, isLoaded]);
 

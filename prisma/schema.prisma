@@ -55,6 +55,7 @@ model Product {
   order_items  OrderItem[]
   view_history ViewHistory[]
   reviews      Review[]
+  quote_items  QuoteItem[]
 }
 
 model Category {
@@ -310,4 +311,75 @@ model ProductImportBatch {
 
   @@index([status])
   @@index([supplier_id])
+}
+
+// B2B Quote Management System
+model Quote {
+  id                  Int       @id @default(autoincrement())
+  quote_number        String    @unique
+  customer_name       String
+  customer_email      String
+  customer_phone      String?
+  customer_company    String?
+  status              String    @default("DRAFT") // DRAFT, SENT, VIEWED, ACCEPTED, REJECTED, EXPIRED
+  subtotal            Float     @default(0)
+  vat_amount          Float     @default(0)
+  total               Float     @default(0)
+  notes               String?
+  expires_at          DateTime?
+  sent_at             DateTime?
+  accepted_at         DateTime?
+  converted_to_order_id Int?
+  created_by_user_id  Int?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  items               QuoteItem[]
+  status_history      QuoteStatusHistory[]
+  attachments         QuoteAttachment[]
+
+  @@index([quote_number])
+  @@index([status])
+  @@index([customer_email])
+  @@index([created_at])
+}
+
+model QuoteItem {
+  id           Int      @id @default(autoincrement())
+  quote_id     Int
+  product_id   Int?
+  product_name String
+  product_sku  String?
+  description  String?
+  quantity     Int      @default(1)
+  unit_price   Float
+  total_price  Float
+  created_at   DateTime @default(now())
+
+  quote   Quote   @relation(fields: [quote_id], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [product_id], references: [id], onDelete: SetNull)
+
+  @@index([quote_id])
+}
+
+model QuoteStatusHistory {
+  id         Int      @id @default(autoincrement())
+  quote_id   Int
+  status     String
+  notes      String?
+  created_at DateTime @default(now())
+
+  quote Quote @relation(fields: [quote_id], references: [id], onDelete: Cascade)
+}
+
+model QuoteAttachment {
+  id         Int      @id @default(autoincrement())
+  quote_id   Int
+  filename   String
+  file_url   String
+  file_size  Int?
+  mime_type  String?
+  uploaded_at DateTime @default(now())
+
+  quote Quote @relation(fields: [quote_id], references: [id], onDelete: Cascade)
 }

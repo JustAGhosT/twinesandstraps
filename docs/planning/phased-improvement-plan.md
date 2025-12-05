@@ -3,7 +3,8 @@
 Comprehensive roadmap for enhancing the Twines and Straps SA e-commerce platform, organized by priority, business impact, and technical complexity.
 
 **Last Updated:** December 2024  
-**Status:** Active Planning
+**Status:** Active Development - Phases 0-4 Core Features Complete  
+**Current Phase:** Phase 2-4 Optimization & Phase 5 Preparation
 
 ---
 
@@ -601,21 +602,126 @@ Some tasks depend on others being completed first:
 
 ## Timeline Summary
 
-| Phase    | Duration | Key Deliverables                           |
-| -------- | -------- | ------------------------------------------ |
-| Phase 0  | 2 weeks  | Critical bugs fixed, code quality improved |
-| Phase 1  | 4 weeks  | Enhanced UX, product discovery             |
-| Phase 2  | 4 weeks  | SEO optimized, analytics implemented       |
-| Phase 3  | 4 weeks  | Trust elements, email marketing            |
-| Phase 4  | 4 weeks  | Payment processing live                    |
-| Phase 5  | 4 weeks  | Shipping automation                        |
-| Phase 6  | 6 weeks  | B2B quote system complete                  |
-| Phase 7  | 4 weeks  | Accounting integration                     |
-| Phase 8  | 4 weeks  | Advanced features, optimization            |
-| Phase 9  | 4 weeks  | Marketplace integrations                   |
-| Phase 10 | Ongoing  | Testing, documentation, maintenance        |
+| Phase    | Duration | Key Deliverables                           | Status         |
+| -------- | -------- | ------------------------------------------ | -------------- |
+| Phase 0  | 2 weeks  | Critical bugs fixed, code quality improved | ✅ Complete     |
+| Phase 1  | 4 weeks  | Enhanced UX, product discovery             | ✅ Complete     |
+| Phase 2  | 4 weeks  | SEO optimized, analytics implemented       | 🟡 85% Complete |
+| Phase 3  | 4 weeks  | Trust elements, email marketing            | 🟡 90% Complete |
+| Phase 4  | 4 weeks  | Payment processing live                    | 🟡 85% Complete |
+| Phase 5  | 4 weeks  | Shipping automation                        | 🟡 40% Complete |
+| Phase 6  | 6 weeks  | B2B quote system complete                  | 🟡 30% Complete |
+| Phase 7  | 4 weeks  | Accounting integration                     | ⏳ Not Started  |
+| Phase 8  | 4 weeks  | Advanced features, optimization            | ⏳ Not Started  |
+| Phase 9  | 4 weeks  | Marketplace integrations                   | ⏳ Not Started  |
+| Phase 10 | Ongoing  | Testing, documentation, maintenance        | ⏳ In Progress  |
 
-**Total Timeline:** ~40 weeks (10 months) for core phases, with Phase 10 ongoing
+**Total Timeline:** ~40 weeks (10 months) for core phases, with Phase 10 ongoing  
+**Current Progress:** 
+- ✅ Phases 0-4: Core features complete (85-100%)
+- 🟡 Phase 5: Shipping integration foundation created (40%)
+- 🟡 Phase 6: B2B quote system foundation created (30%)
+- ⏳ Remaining: SEO URL optimization, image blur placeholders, and Phase 5-6 completion
+
+---
+
+## Next Steps & Priority Queue
+
+### Immediate Next Steps (High Priority)
+
+Based on current completion status, here are the recommended next tasks to tackle:
+
+#### 🔴 Critical Priority
+1. **Test all payment methods (Phase 4)** - 8h
+   - Test credit/debit cards, EFT, and other PayFast payment methods
+   - Verify end-to-end payment flow in sandbox and production
+   - Document any issues and edge cases
+   - **Impact:** Very High - Essential for payment processing
+
+#### 🟠 High Priority
+2. **Implement database query optimization (Phase 2)** - 8h
+   - Analyze slow queries using database logs
+   - Add proper indexes on frequently queried fields
+   - Optimize N+1 query patterns
+   - Implement query result caching where appropriate
+   - **Impact:** High - Improves page load times and user experience
+
+3. **Add caching strategy for API responses (Phase 2)** - 10h
+   - Implement Redis or in-memory caching for product listings
+   - Cache category data and site settings
+   - Set appropriate TTL values
+   - Add cache invalidation on data updates
+   - **Impact:** High - Reduces database load and improves performance
+
+4. **Set up abandoned cart automation (Phase 3)** - 8h
+   - Create scheduled job to detect abandoned carts (24h, 48h, 72h)
+   - Design email templates for cart recovery
+   - Integrate with Brevo for automated email sending
+   - Track recovery rates
+   - **Impact:** Medium - Can significantly improve conversion rates
+
+5. **Implement refund API for cancellations (Phase 4)** - 6h
+   - Integrate PayFast refund API
+   - Create admin interface for processing refunds
+   - Add refund tracking and status updates
+   - Send refund confirmation emails
+   - **Impact:** Medium - Important for customer service
+
+6. **Add payment method selection UI (Phase 4)** - 6h
+   - Display available payment methods at checkout
+   - Allow users to choose preferred method
+   - Show method-specific information (processing time, fees)
+   - **Impact:** Medium - Improves user experience
+
+#### 🟡 Medium Priority
+7. **Optimize URL structure for SEO (Phase 2)** - 4h
+   - Review current URL patterns
+   - Implement slug-based URLs for products/categories
+   - Add redirects for old URLs
+   - **Impact:** Medium - Improves SEO and user experience
+
+8. **Add blur placeholders for loading images (Phase 2)** - 4h
+   - Generate blur data URLs for product images
+   - Implement progressive image loading
+   - **Impact:** Medium - Improves perceived performance
+
+9. **Create welcome email series (Phase 3)** - 6h
+   - Design welcome email template
+   - Set up automated series (day 1, day 3, day 7)
+   - Track engagement metrics
+   - **Impact:** Medium - Improves customer engagement
+
+10. **Add post-purchase follow-up emails (Phase 3)** - 6h
+    - Create post-purchase email template
+    - Request reviews/feedback
+    - Suggest related products
+    - **Impact:** Medium - Increases customer lifetime value
+
+### Recommended Implementation Order
+
+**Week 1-2:**
+- Test all payment methods (Critical)
+- Database query optimization (High)
+- Caching strategy (High)
+
+**Week 3-4:**
+- Abandoned cart automation (High)
+- Refund API (High)
+- Payment method selection UI (High)
+
+**Week 5-6:**
+- SEO URL optimization (Medium)
+- Image blur placeholders (Medium)
+- Email automation (Medium)
+
+### Low Priority (Can be deferred)
+- Exit-intent popup
+- Minimum order quantities display
+- A/B testing framework
+- Analytics dashboard for admin
+- Order history for logged-in users
+- Fraud detection basics
+- Bundle size analysis
 
 ---
 
@@ -623,7 +729,7 @@ Some tasks depend on others being completed first:
 
 1. **Review & Prioritize:** Review this plan with stakeholders and adjust priorities based on business needs
 2. **Resource Planning:** Allocate development resources for each phase
-3. **Kickoff Phase 0:** Begin with critical fixes and foundation work
+3. **Focus on Critical Items:** Prioritize payment testing and performance optimizations
 4. **Regular Reviews:** Schedule bi-weekly reviews to track progress and adjust plan
 5. **Documentation:** Update this plan as priorities shift or new requirements emerge
 
