@@ -153,6 +153,14 @@ resource webApp 'Microsoft.Web/sites@2023-12-01' = {
           name: 'HOSTNAME'
           value: '0.0.0.0'
         }
+        {
+          name: 'PORT'
+          value: '8080'
+        }
+        {
+          name: 'WEBSITES_PORT'
+          value: '8080'
+        }
       ]
     }
   }
@@ -252,6 +260,14 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2023-12-01' = if (environment ==
         {
           name: 'HOSTNAME'
           value: '0.0.0.0'
+        }
+        {
+          name: 'PORT'
+          value: '8080'
+        }
+        {
+          name: 'WEBSITES_PORT'
+          value: '8080'
         }
       ]
     }
