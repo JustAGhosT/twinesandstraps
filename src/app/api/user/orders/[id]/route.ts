@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/user-auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Get order details
 export async function GET(
@@ -16,11 +16,19 @@ export async function GET(
   const { id } = await params;
 
   try {
-    // Try to find by order number first, then by ID
-    let order = await prisma.order.findFirst({
+    // Optimized: Single query using OR condition instead of two separate queries
+    const orderId = parseInt(id);
+    const isNumericId = !isNaN(orderId) && orderId > 0;
+
+    const order = await prisma.order.findFirst({
       where: {
-        order_number: id,
         user_id: user.userId,
+        OR: isNumericId
+          ? [
+              { order_number: id },
+              { id: orderId },
+            ]
+          : [{ order_number: id }],
       },
       include: {
         items: {
@@ -37,33 +45,6 @@ export async function GET(
         },
       },
     });
-
-    // If not found by order number, try by ID
-    if (!order) {
-      const orderId = parseInt(id);
-      if (!isNaN(orderId)) {
-        order = await prisma.order.findFirst({
-          where: {
-            id: orderId,
-            user_id: user.userId,
-          },
-          include: {
-            items: {
-              include: {
-                product: {
-                  select: { id: true, name: true, image_url: true, sku: true },
-                },
-              },
-            },
-            shipping_address: true,
-            billing_address: true,
-            status_history: {
-              orderBy: { created_at: 'desc' },
-            },
-          },
-        });
-      }
-    }
 
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });

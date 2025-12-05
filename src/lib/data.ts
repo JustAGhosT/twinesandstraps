@@ -1,6 +1,6 @@
 import { STOCK_STATUS } from '@/constants';
+import { CacheKeys, getOrSetCache } from './cache';
 import prisma from './prisma';
-import { getOrSetCache, CacheKeys } from './cache';
 
 export async function getProduct(idOrSlug: string) {
   // Try to parse as ID first (for backward compatibility)
@@ -42,20 +42,21 @@ export async function getRelatedProducts(productId: number, categoryId?: number)
       async () => {
         let finalCategoryId = categoryId;
 
-        // If categoryId is not provided, fetch it from the product
+        // If categoryId is not provided, fetch it from the product (optimized: only fetch category_id)
         if (finalCategoryId === undefined) {
           const product = await prisma.product.findUnique({
             where: { id: productId },
             select: { category_id: true },
           });
 
-          if (product) {
-            finalCategoryId = product.category_id;
-          } else {
+          if (!product) {
             return [];
           }
+
+          finalCategoryId = product.category_id;
         }
 
+        // Single optimized query with selective includes
         const relatedProducts = await prisma.product.findMany({
           where: {
             category_id: finalCategoryId,
@@ -67,13 +68,20 @@ export async function getRelatedProducts(productId: number, categoryId?: number)
             },
           },
           include: {
-            category: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
           },
           take: 4,
           orderBy: {
             created_at: 'desc',
           },
         });
+
         return relatedProducts;
       },
       3600 * 1000 // 1 hour cache
