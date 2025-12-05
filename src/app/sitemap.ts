@@ -1,7 +1,9 @@
 import prisma from '@/lib/prisma';
 import { MetadataRoute } from 'next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+import { getSiteUrl } from '@/lib/env';
+
+const siteUrl = getSiteUrl();
 
 // Force dynamic generation at runtime (not build time)
 export const dynamic = 'force-dynamic';

@@ -1,9 +1,13 @@
 import React from 'react';
 import prisma from '@/lib/prisma';
 import ProductsClient from '@/components/ProductsClient';
+import { generateProductsMetadata } from './metadata';
 
-// Force dynamic rendering - data is fetched at request time
-export const dynamic = 'force-dynamic';
+// Generate metadata for products page
+export const metadata = generateProductsMetadata();
+
+// Use ISR for better performance - revalidate every hour
+export const revalidate = 3600;
 
 async function getProducts() {
   try {

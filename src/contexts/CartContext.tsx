@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import type { Product } from '@/types/database';
+import { trackAddToCart, trackBeginCheckout } from '@/lib/analytics';
 
 interface CartItem {
   product: Product;
@@ -59,14 +60,24 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const addToCart = (product: Product, quantity: number) => {
     setItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.product.id === product.id);
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      return [...prevItems, { product, quantity }];
+      const newItems = existingItem
+        ? prevItems.map((item) =>
+            item.product.id === product.id
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          )
+        : [...prevItems, { product, quantity }];
+      
+      // Track analytics
+      trackAddToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity,
+        category: (product as any).category?.name,
+      });
+      
+      return newItems;
     });
   };
 

@@ -6,13 +6,14 @@ import { Providers } from "@/components/Providers";
 import SkipLink from "@/components/SkipLink";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { featureFlags } from "@/config/featureFlags";
+import { getSiteUrl } from "@/lib/env";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useEffect } from 'react';
-import Link from 'next/link';
+import NotFound from '@/components/NotFound';
+import { Button } from '@/components/Button';
+import { useEffect } from 'react';
 
-// TODO: This is a basic error boundary. A production-ready implementation
-// would include more sophisticated logging and a more detailed error UI.
 export default function Error({
   error,
   reset,
@@ -13,23 +12,34 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
+    // Log error to error reporting service in production
+    console.error('Product page error:', error);
   }, [error]);
 
+  // If it's a "not found" type error, show NotFound component
+  if (error.message.includes('not found') || error.message.includes('Not Found')) {
+    return (
+      <NotFound
+        title="Product Not Found"
+        message="The product you are looking for does not exist or has been removed."
+      />
+    );
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8 text-center">
-      <h2 className="text-2xl font-bold mb-4">Something went wrong!</h2>
-      <p className="mb-4">{error.message}</p>
-      <button
-        onClick={() => reset()}
-        className="bg-primary-600 text-white px-4 py-2 rounded-lg mr-4"
-      >
-        Try again
-      </button>
-      <Link href="/products" className="text-primary-600">
-        Back to Products
-      </Link>
+    <div className="container mx-auto px-4 py-8">
+      <div className="bg-card text-card-foreground rounded-lg shadow-sm p-8 text-center max-w-2xl mx-auto">
+        <h1 className="text-2xl font-bold mb-4">Unable to Load Product</h1>
+        <p className="text-muted-foreground mb-6">
+          We encountered an error while loading this product. Please try again.
+        </p>
+        <div className="flex gap-4 justify-center">
+          <Button onClick={reset}>Try Again</Button>
+          <Button variant="secondary" onClick={() => window.location.href = '/products'}>
+            Browse Products
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

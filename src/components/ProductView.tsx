@@ -8,6 +8,7 @@ import WishlistButton from '@/components/WishlistButton';
 import CompareButton from '@/components/CompareButton';
 import { useFeatureFlag } from '@/hooks/useFeatureFlag';
 import { STOCK_STATUS, STOCK_STATUS_LABELS, ROUTES, TIMEOUTS, SUCCESS_MESSAGES } from '@/constants';
+import { trackViewItem } from '@/lib/analytics';
 
 interface ProductViewProps {
   product: ProductWithCategory;
@@ -23,6 +24,16 @@ const ProductView: React.FC<ProductViewProps> = ({ product }) => {
   const showCompare = useFeatureFlag('compareProducts');
   const showPrices = useFeatureFlag('showPrices');
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Track product view
+  useEffect(() => {
+    trackViewItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      category: product.category?.name,
+    });
+  }, [product.id, product.name, product.price, product.category?.name]);
 
   useEffect(() => {
     if (isZoomed) {

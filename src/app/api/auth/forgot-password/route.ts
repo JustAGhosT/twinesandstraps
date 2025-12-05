@@ -49,7 +49,8 @@ export async function POST(request: NextRequest) {
       });
 
       // Build reset URL
-      const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+      const { getSiteUrl } = await import('@/lib/env');
+      const resetUrl = `${getSiteUrl()}/reset-password?token=${token}`;
 
       // Only log reset URL in development (security: never log tokens in production)
       if (process.env.NODE_ENV === 'development') {

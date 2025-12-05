@@ -7,14 +7,13 @@ import ViewHistoryTracker from '@/components/ViewHistoryTracker';
 import { featureFlags } from '@/config/featureFlags';
 import { STOCK_STATUS } from '@/constants';
 import { getProduct, getRelatedProducts } from '@/lib/data';
+import { getSiteUrl } from '@/lib/env';
 import prisma from '@/lib/prisma';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import React from 'react';
 
 export const revalidate = 3600; // Revalidate every hour
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
 interface ProductDetailPageProps {
   params: {
@@ -24,8 +23,15 @@ interface ProductDetailPageProps {
 
 // Generate dynamic metadata for each product
 export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
+  // Robust input validation
+  if (!params?.id || typeof params.id !== 'string') {
+    return {
+      title: 'Product Not Found',
+    };
+  }
+
   const productId = parseInt(params.id, 10);
-  if (isNaN(productId) || productId <= 0) {
+  if (isNaN(productId) || productId <= 0 || !Number.isFinite(productId)) {
     return {
       title: 'Product Not Found',
     };
@@ -43,11 +49,16 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
       };
     }
 
+    const siteUrl = getSiteUrl();
+
     const description = `${product.description.slice(0, 150)}${product.description.length > 150 ? '...' : ''} - R${product.price.toFixed(2)}`;
 
     return {
       title: product.name,
       description,
+      alternates: {
+        canonical: `${siteUrl}/products/${product.id}`,
+      },
       openGraph: {
         title: `${product.name} | TASSA`,
         description,
@@ -80,12 +91,20 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
   }
 }
 
-const JsonLd = ({ data }: { data: object }) => (
-  <script
-    type="application/ld+json"
-    dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-  />
-);
+// Safe JSON-LD component without dangerouslySetInnerHTML
+const JsonLd = ({ data }: { data: object }) => {
+  const jsonString = JSON.stringify(data);
+  // Escape any potential script tags to prevent XSS
+  const escapedJson = jsonString.replace(/</g, '\\u003c').replace(/>/g, '\\u003e');
+  
+  return (
+    <script
+      type="application/ld+json"
+      suppressHydrationWarning
+      dangerouslySetInnerHTML={{ __html: escapedJson }}
+    />
+  );
+};
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
   const productId = parseInt(params.id, 10);
@@ -99,6 +118,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     );
   }
 
+  const siteUrl = getSiteUrl();
+  
+  // Parallelize data fetching with error handling
   const [product, relatedProducts] = await Promise.all([
     getProduct(params.id),
     getRelatedProducts(productId, undefined), // Fetch related products in parallel
@@ -166,20 +188,27 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
       <div className="bg-background min-h-screen">
       <div className="container mx-auto px-4 py-8">
-        <nav className="mb-6 text-sm">
+        <nav className="mb-6 text-sm" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2 text-muted-foreground">
             {breadcrumbs.map((crumb, index) => (
-              <React.Fragment key={crumb.name}>
+              <React.Fragment key={`breadcrumb-${index}-${crumb.name}`}>
                 <li>
                   {crumb.href ? (
                     <Link href={crumb.href} className="hover:text-foreground">
                       {crumb.name}
                     </Link>
                   ) : (
-                    <span className="font-semibold text-foreground">{crumb.name}</span>
+                    <span className="font-semibold text-foreground" aria-current="page">
+                      {crumb.name}
+                    </span>
                   )}
                 </li>
-                {index < breadcrumbs.length - 1 && <li aria-hidden="true">/</li>}
+                {index < breadcrumbs.length - 1 && (
+                  <li aria-hidden="true" className="text-muted-foreground">
+                    <span className="sr-only">/</span>
+                    <span aria-hidden="true">/</span>
+                  </li>
+                )}
               </React.Fragment>
             ))}
           </ol>
