@@ -628,7 +628,7 @@ jobs:
           URL="${{ steps.env.outputs.url }}"
           echo "Checking health at: $URL"
           
-          # Retry logic with exponential backoff for cold start scenarios
+          # Retry logic with backoff for cold start scenarios
           MAX_RETRIES=5
           RETRY_DELAY=30
           
@@ -637,7 +637,7 @@ jobs:
             echo "Attempt $i of $MAX_RETRIES..."
             
             # Use longer timeout for cold start scenarios
-            STATUS=$(curl -s -o /tmp/response.txt -w "%{http_code}" --max-time 60 "$URL")
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 "$URL")
             echo "Homepage status: $STATUS"
             
             HEALTH_STATUS=$(curl -s -o /tmp/health_response.txt -w "%{http_code}" --max-time 60 "$URL/api/health")
@@ -648,7 +648,8 @@ jobs:
               echo "Health response: $(cat /tmp/health_response.txt)"
             fi
             
-            if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+            # Check both homepage and health endpoint
+            if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ] && [ "$HEALTH_STATUS" -ge 200 ] && [ "$HEALTH_STATUS" -lt 400 ]; then
               echo "✓ Application is responding"
               exit 0
             fi
@@ -656,7 +657,7 @@ jobs:
             if [ $i -lt $MAX_RETRIES ]; then
               echo "Waiting ${RETRY_DELAY}s before retry..."
               sleep $RETRY_DELAY
-              # Increase delay for next retry (exponential backoff)
+              # Increase delay for next retry
               RETRY_DELAY=$((RETRY_DELAY + 15))
             fi
           done
