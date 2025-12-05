@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import LowStockWidget from '@/components/admin/LowStockWidget';
 
 interface DashboardStats {
   totalProducts: number;
@@ -172,6 +173,11 @@ export default function AdminDashboard() {
             </Link>
           ))}
         </div>
+      </div>
+
+      {/* Low Stock Widget */}
+      <div className="mb-8">
+        <LowStockWidget />
       </div>
 
       {/* Setup Checklist */}
