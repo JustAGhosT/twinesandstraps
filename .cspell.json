@@ -2,11 +2,26 @@
   "version": "0.2",
   "language": "en",
   "words": [
-    "nextjs",
+    "appsettings",
+    "baselining",
+    "Brevo",
     "creds",
-    "webapps",
+    "elif",
+    "GITHUBACTIONS",
+    "GTIN",
+    "nextjs",
+    "Pargo",
+    "PIPESTATUS",
+    "POPIA",
+    "runbook",
+    "Sendinblue",
+    "signup",
+    "sslmode",
+    "Takealot",
     "tassa",
-    "elif"
+    "WCAG",
+    "webapps",
+    "Xero"
   ],
   "ignoreWords": [],
   "flagWords": [],
@@ -18,4 +33,3 @@
     ".next/**"
   ]
 }
-
