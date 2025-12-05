@@ -42,6 +42,18 @@ Welcome to the Twines and Straps SA documentation. This index helps you find the
 
 ---
 
+## Analysis & Reports
+
+| Document | Description |
+|----------|-------------|
+| [Project Analysis](./PROJECT_ANALYSIS.md) | Technology assessment and project context overview |
+| [Core Analysis](./CORE_ANALYSIS.md) | Detailed findings on bugs, improvements, and recommendations |
+| [Detailed Report](./DETAILED_REPORT.md) | Comprehensive analysis with design system assessment |
+| [Summary Table](./SUMMARY_TABLE.md) | Quick reference table of all identified issues |
+| [Dark Mode & Usability](./DARK_MODE_AND_USABILITY.md) | Dark mode implementation and usability improvements |
+
+---
+
 ## Reference
 
 | Document | Description |
@@ -53,5 +65,8 @@ Welcome to the Twines and Straps SA documentation. This index helps you find the
 
 ## Quick Links
 
-- 🌐 **Live Site:** Deployed on Azure App Service
+- 🌐 **Live Sites:**
+  - **Production:** [https://prod-app-san-tassa.azurewebsites.net](https://prod-app-san-tassa.azurewebsites.net)
+  - **Staging:** [https://staging-app-san-tassa.azurewebsites.net](https://staging-app-san-tassa.azurewebsites.net)
+  - **Development:** [https://dev-app-san-tassa.azurewebsites.net](https://dev-app-san-tassa.azurewebsites.net)
 - 💻 **Repository:** [github.com/JustAGhosT/twinesandstraps](https://github.com/JustAGhosT/twinesandstraps)
