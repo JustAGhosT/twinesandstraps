@@ -6,6 +6,8 @@
 
 import { IPaymentProvider, PaymentRequest, PaymentResult, RefundRequest, RefundResult, WebhookPayload } from '../provider.interface';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const PAYSTACK_PUBLIC_KEY = process.env.PAYSTACK_PUBLIC_KEY || '';
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || '';
 const PAYSTACK_API_URL = 'https://api.paystack.co';
@@ -64,7 +66,7 @@ export class PayStackProvider implements IPaymentProvider {
         redirectUrl: data.data.authorization_url,
       };
     } catch (error) {
-      console.error('PayStack payment initiation error:', error);
+      logError('PayStack payment initiation error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to initiate payment',
@@ -128,7 +130,7 @@ export class PayStackProvider implements IPaymentProvider {
         status: 'pending',
       };
     } catch (error) {
-      console.error('PayStack webhook processing error:', error);
+      logError('PayStack webhook processing error:', error);
       return {
         success: false,
         status: 'failed',
@@ -175,7 +177,7 @@ export class PayStackProvider implements IPaymentProvider {
         amount: data.data.amount / 100,
       };
     } catch (error) {
-      console.error('PayStack refund error:', error);
+      logError('PayStack refund error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to process refund',
@@ -197,7 +199,7 @@ export class PayStackProvider implements IPaymentProvider {
 
       return hash === signature;
     } catch (error) {
-      console.error('PayStack signature verification error:', error);
+      logError('PayStack signature verification error:', error);
       return false;
     }
   }

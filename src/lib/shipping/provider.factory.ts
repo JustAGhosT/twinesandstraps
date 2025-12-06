@@ -10,6 +10,8 @@ import { FastWayProvider } from './providers/fastway.provider';
 import { MockShippingProvider } from './providers/mock.provider';
 import { ShippingQuoteRequest, ShippingQuote } from './types';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 type ProviderName = 'courier-guy' | 'pargo' | 'fastway' | 'auto' | 'mock';
 
 class ShippingProviderFactory {
@@ -93,7 +95,7 @@ class ShippingProviderFactory {
         const quote = await provider.getQuote(request);
         return quote;
       } catch (error) {
-        console.error(`Error getting quote from ${provider.name}:`, error);
+        logError(`Error getting quote from ${provider.name}:`, error);
         return null;
       }
     });

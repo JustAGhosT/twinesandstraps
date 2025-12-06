@@ -6,6 +6,8 @@ import { createCategorySchema, validateBody, formatZodErrors } from '@/lib/valid
 import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 async function handlePOST(request: NextRequest) {
   // Verify CSRF token
   const csrfError = requireCsrfToken(request);
@@ -68,7 +70,7 @@ async function handlePOST(request: NextRequest) {
 
     return NextResponse.json(category, { status: 201 });
   } catch (error) {
-    console.error('Error creating category:', error);
+    logError('Error creating category:', error);
     return NextResponse.json(
       { error: 'Failed to create category. Please try again.' },
       { status: 500 }

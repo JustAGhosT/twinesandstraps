@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { featureFlags, type FeatureFlags } from '@/config/featureFlags';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface FeatureConfig {
   key: keyof FeatureFlags;
   name: string;
@@ -159,7 +161,7 @@ export default function FeaturesPage() {
       try {
         setOverrides(JSON.parse(stored));
       } catch (e) {
-        console.error('Error loading feature overrides:', e);
+        logError('Error loading feature overrides:', e);
       }
     }
   }, []);

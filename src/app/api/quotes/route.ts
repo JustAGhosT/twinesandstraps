@@ -9,6 +9,8 @@ import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const quoteRequestSchema = z.object({
   customerName: z.string().min(1, 'Name is required'),
   customerEmail: z.string().email('Valid email is required'),
@@ -75,7 +77,7 @@ async function handlePOST(request: NextRequest) {
       );
     } catch (emailError) {
       // Log but don't fail the request if email fails
-      console.error('Failed to send quote confirmation email:', emailError);
+      logError('Failed to send quote confirmation email:', emailError);
     }
 
     return NextResponse.json({
@@ -84,7 +86,7 @@ async function handlePOST(request: NextRequest) {
       quoteNumber: quote.quote_number,
     });
   } catch (error) {
-    console.error('Error creating quote:', error);
+    logError('Error creating quote:', error);
     return NextResponse.json(
       { error: 'Failed to submit quote request. Please try again.' },
       { status: 500 }

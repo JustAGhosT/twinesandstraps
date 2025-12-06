@@ -8,6 +8,8 @@ import { exchangeXeroCode } from '@/lib/xero/auth';
 import { storeXeroTokenInDb } from '@/lib/xero/token-storage';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(request: NextRequest) {
   // Verify admin authentication
   const authError = await requireAdminAuth(request);
@@ -52,7 +54,7 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch (error: any) {
-    console.error('Xero OAuth error:', error);
+    logError('Xero OAuth error:', error);
     return NextResponse.redirect(
       `/admin/settings?xero_error=${encodeURIComponent(error.message || 'oauth_failed')}`
     );

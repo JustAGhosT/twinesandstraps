@@ -5,6 +5,8 @@
 
 import { IEmailProvider, EmailOptions, SendEmailResult, EmailTemplate } from '../provider.interface';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
 const BREVO_API_URL = 'https://api.brevo.com/v3';
 
@@ -78,7 +80,7 @@ export class BrevoProvider implements IEmailProvider {
         messageId: data.messageId,
       };
     } catch (error) {
-      console.error('Failed to send email via Brevo:', error);
+      logError('Failed to send email via Brevo:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -124,7 +126,7 @@ export class BrevoProvider implements IEmailProvider {
         variables: template.variables || [],
       }));
     } catch (error) {
-      console.error('Brevo get templates error:', error);
+      logError('Brevo get templates error:', error);
       return [];
     }
   }

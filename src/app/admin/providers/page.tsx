@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 type ProviderType = 'shipping' | 'payment' | 'email' | 'accounting' | 'marketplace';
 
 interface Provider {
@@ -74,7 +76,7 @@ export default function ProvidersPage() {
       const data = await response.json();
       setProviders(data.providers);
     } catch (err) {
-      console.error('Error loading providers:', err);
+      logError('Error loading providers:', err);
       error('Failed to load providers');
     } finally {
       setLoading(false);
@@ -91,7 +93,7 @@ export default function ProvidersPage() {
       setConfigData(data.config?.configData || {});
       setCredentials({}); // Don't load credentials for security
     } catch (err) {
-      console.error('Error loading provider config:', err);
+      logError('Error loading provider config:', err);
       error('Failed to load provider configuration');
     }
   };
@@ -130,7 +132,7 @@ export default function ProvidersPage() {
       setCredentials({});
       loadProviders();
     } catch (err) {
-      console.error('Error saving provider:', err);
+      logError('Error saving provider:', err);
       error('Failed to save provider configuration');
     } finally {
       setSaving(false);
@@ -168,7 +170,7 @@ export default function ProvidersPage() {
       );
       loadProviders();
     } catch (err) {
-      console.error('Error toggling provider:', err);
+      logError('Error toggling provider:', err);
       error('Failed to toggle provider');
     }
   };

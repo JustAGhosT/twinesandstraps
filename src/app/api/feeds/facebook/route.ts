@@ -6,6 +6,8 @@
 import { NextResponse } from 'next/server';
 import { generateFacebookCatalogFeed } from '@/lib/marketplace/feeds';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // Revalidate every hour
 
@@ -20,7 +22,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Error generating Facebook catalog feed:', error);
+    logError('Error generating Facebook catalog feed:', error);
     return NextResponse.json(
       { error: 'Failed to generate feed' },
       { status: 500 }

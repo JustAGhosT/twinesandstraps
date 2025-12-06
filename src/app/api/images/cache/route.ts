@@ -4,6 +4,8 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { ALLOWED_IMAGE_CACHE_DOMAINS, SUPPORTED_IMAGE_CONTENT_TYPES } from '@/constants';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Cache directory path
 const CACHE_DIR = path.join(process.cwd(), 'public', 'images', 'cache');
 
@@ -162,7 +164,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Image caching error:', error);
+    logError('Image caching error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
       { error: 'Failed to cache image', details: errorMessage },

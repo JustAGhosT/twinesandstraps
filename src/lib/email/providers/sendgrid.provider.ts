@@ -5,6 +5,8 @@
 
 import { IEmailProvider, EmailOptions, SendEmailResult, EmailTemplate } from '../provider.interface';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY || '';
 const SENDGRID_API_URL = 'https://api.sendgrid.com/v3';
 
@@ -98,7 +100,7 @@ export class SendGridProvider implements IEmailProvider {
         messageId,
       };
     } catch (error) {
-      console.error('SendGrid email error:', error);
+      logError('SendGrid email error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to send email',
@@ -144,7 +146,7 @@ export class SendGridProvider implements IEmailProvider {
         variables: [],
       }));
     } catch (error) {
-      console.error('SendGrid get templates error:', error);
+      logError('SendGrid get templates error:', error);
       return [];
     }
   }

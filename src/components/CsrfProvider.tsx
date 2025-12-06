@@ -7,6 +7,8 @@
 
 import { useEffect, useState } from 'react';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export function CsrfProvider({ children }: { children: React.ReactNode }) {
   const [csrfToken, setCsrfToken] = useState<string | null>(null);
 
@@ -20,7 +22,7 @@ export function CsrfProvider({ children }: { children: React.ReactNode }) {
         }
       })
       .catch(error => {
-        console.error('Failed to fetch CSRF token:', error);
+        logError('Failed to fetch CSRF token:', error);
       });
   }, []);
 

@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { getLowStockProducts } from '@/lib/inventory/low-stock';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(request: NextRequest) {
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
@@ -18,7 +20,7 @@ export async function GET(request: NextRequest) {
       ...alert,
     });
   } catch (error) {
-    console.error('Error fetching low stock products:', error);
+    logError('Error fetching low stock products:', error);
     return NextResponse.json(
       { error: 'Failed to fetch low stock products' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
 /**
  * AI Integration Library for Azure OpenAI and OpenAI
  * 
@@ -275,7 +276,7 @@ Provide market insights, competitor analysis, pricing suggestions (in ZAR), and 
 
     return extractJSON<ProductAnalysis>(response);
   } catch (error) {
-    console.error('Error analyzing product:', error);
+    logError('Error analyzing product:', error);
     throw error;
   }
 }
@@ -326,7 +327,7 @@ Provide an enhanced description suitable for a B2B e-commerce website.`;
 
     return extractJSON<DescriptionEnhancement>(response);
   } catch (error) {
-    console.error('Error enhancing description:', error);
+    logError('Error enhancing description:', error);
     throw error;
   }
 }
@@ -368,7 +369,7 @@ Provide comprehensive market research analysis in valid JSON format with the fol
       competitors: string[];
     }>(response);
   } catch (error) {
-    console.error('Error getting market research:', error);
+    logError('Error getting market research:', error);
     throw error;
   }
 }
@@ -429,7 +430,7 @@ Provide a pricing recommendation in South African Rand (ZAR).`;
       strategy: string;
     }>(response);
   } catch (error) {
-    console.error('Error suggesting pricing:', error);
+    logError('Error suggesting pricing:', error);
     throw error;
   }
 }
@@ -487,7 +488,7 @@ Provide detailed strategic insights for the South African market.`;
 
     return extractJSON<SWOTAnalysis>(response);
   } catch (error) {
-    console.error('Error performing SWOT analysis:', error);
+    logError('Error performing SWOT analysis:', error);
     throw error;
   }
 }
@@ -555,7 +556,7 @@ Identify key competitors, their positioning, and provide strategic recommendatio
 
     return extractJSON<CompetitorResearch>(response);
   } catch (error) {
-    console.error('Error performing competitor research:', error);
+    logError('Error performing competitor research:', error);
     throw error;
   }
 }
@@ -637,7 +638,7 @@ Suggest related products, bundles, and sales strategies for the South African ma
 
     return extractJSON<ProductRecommendations>(response);
   } catch (error) {
-    console.error('Error getting product recommendations:', error);
+    logError('Error getting product recommendations:', error);
     throw error;
   }
 }
@@ -749,7 +750,7 @@ Provide actionable insights and a clear action plan.`;
 
     return extractJSON<BusinessInsights>(response);
   } catch (error) {
-    console.error('Error getting business insights:', error);
+    logError('Error getting business insights:', error);
     throw error;
   }
 }

@@ -1,3 +1,4 @@
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
 /**
  * Takealot Seller Portal Integration
  * Handles product listings, inventory sync, and order fulfillment
@@ -86,7 +87,7 @@ export async function syncProductToTakealot(
       takealotSku: data.seller_sku || takealotProduct.seller_sku,
     };
   } catch (error) {
-    console.error('Error syncing product to Takealot:', error);
+    logError('Error syncing product to Takealot:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -118,7 +119,7 @@ export async function syncInventoryToTakealot(
 
     return response.ok;
   } catch (error) {
-    console.error('Error syncing inventory to Takealot:', error);
+    logError('Error syncing inventory to Takealot:', error);
     return false;
   }
 }
@@ -155,7 +156,7 @@ export async function getTakealotOrders(filters?: {
     const data = await response.json();
     return data.orders || [];
   } catch (error) {
-    console.error('Error fetching Takealot orders:', error);
+    logError('Error fetching Takealot orders:', error);
     return [];
   }
 }
@@ -188,7 +189,7 @@ export async function fulfillTakealotOrder(
 
     return response.ok;
   } catch (error) {
-    console.error('Error fulfilling Takealot order:', error);
+    logError('Error fulfilling Takealot order:', error);
     return false;
   }
 }

@@ -5,6 +5,8 @@ import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const addressSchema = z.object({
   label: z.string().max(50).default('Home'),
   street_address: z.string().min(1, 'Street address is required').max(255),
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ addresses });
   } catch (error) {
-    console.error('Error fetching addresses:', error);
+    logError('Error fetching addresses:', error);
     return NextResponse.json({ error: 'Failed to fetch addresses' }, { status: 500 });
   }
 }
@@ -84,7 +86,7 @@ async function handlePOST(request: NextRequest) {
 
     return NextResponse.json({ success: true, address }, { status: 201 });
   } catch (error) {
-    console.error('Error creating address:', error);
+    logError('Error creating address:', error);
     return NextResponse.json({ error: 'Failed to create address' }, { status: 500 });
   }
 }

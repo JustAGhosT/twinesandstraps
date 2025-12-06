@@ -4,6 +4,8 @@ import { requireAdminAuth } from '@/lib/admin-auth';
 import { productImportRowSchema, validateBody, formatZodErrors } from '@/lib/validations';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface RouteParams {
   params: { id: string };
 }
@@ -229,7 +231,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       ...result,
     });
   } catch (error) {
-    console.error('Error importing products:', error);
+    logError('Error importing products:', error);
     return NextResponse.json(
       { error: 'Failed to import products' },
       { status: 500 }

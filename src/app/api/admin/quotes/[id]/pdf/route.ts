@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getQuote } from '@/lib/quotes/quote-management';
 import { generateQuoteHTML, generateQuotePDF } from '@/lib/quotes/pdf-generation';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -106,7 +108,7 @@ export async function GET(
       });
     }
   } catch (error) {
-    console.error('Error generating quote PDF:', error);
+    logError('Error generating quote PDF:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

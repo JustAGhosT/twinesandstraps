@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { warmCache } from '@/lib/cache/warm-cache';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(request: NextRequest) {
   // Verify cron secret (if configured)
   const authHeader = request.headers.get('authorization');
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
       message: 'Cache warming completed',
     });
   } catch (error) {
-    console.error('Error in cache warming cron:', error);
+    logError('Error in cache warming cron:', error);
     return NextResponse.json(
       { error: 'Failed to warm cache' },
       { status: 500 }

@@ -8,6 +8,8 @@ import { invalidateProductCache, invalidateCategoryCache } from '@/lib/cache';
 import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 async function handlePOST(request: NextRequest) {
   // Verify CSRF token
   const csrfError = requireCsrfToken(request);
@@ -82,7 +84,7 @@ async function handlePOST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error creating product:', error);
+    logError('Error creating product:', error);
     return NextResponse.json(
       errorResponse('Failed to create product. Please try again.'),
       { status: 500 }

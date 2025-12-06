@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import LowStockWidget from '@/components/admin/LowStockWidget';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface DashboardStats {
   totalProducts: number;
   totalCategories: number;
@@ -69,7 +71,7 @@ export default function AdminDashboard() {
         setSetupTasks(data);
       }
     } catch (error) {
-      console.error('Failed to toggle task:', error);
+      logError('Failed to toggle task:', error);
     }
   };
 

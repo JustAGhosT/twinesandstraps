@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import ProductsClient from '@/components/ProductsClient';
 import { generateProductsMetadata } from './metadata';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Generate metadata for products page
 export const metadata = generateProductsMetadata();
 
@@ -21,7 +23,7 @@ async function getProducts() {
     });
     return products;
   } catch (error) {
-    console.error('Failed to fetch products:', error);
+    logError('Failed to fetch products:', error);
     return [];
   }
 }
@@ -35,7 +37,7 @@ async function getCategories() {
     });
     return categories;
   } catch (error) {
-    console.error('Failed to fetch categories:', error);
+    logError('Failed to fetch categories:', error);
     return [];
   }
 }

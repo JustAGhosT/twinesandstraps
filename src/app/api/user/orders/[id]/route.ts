@@ -2,6 +2,8 @@ import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/user-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Get order details
 export async function GET(
   request: NextRequest,
@@ -52,7 +54,7 @@ export async function GET(
 
     return NextResponse.json({ order });
   } catch (error) {
-    console.error('Error fetching order:', error);
+    logError('Error fetching order:', error);
     return NextResponse.json({ error: 'Failed to fetch order' }, { status: 500 });
   }
 }

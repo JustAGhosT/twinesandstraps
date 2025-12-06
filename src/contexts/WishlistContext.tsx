@@ -3,6 +3,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { Product } from '@/types/database';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface WishlistContextType {
   items: Product[];
   addToWishlist: (product: Product) => void;
@@ -33,7 +35,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       // Validate that parsed data is an array
       if (!Array.isArray(parsed)) {
-        console.warn('Invalid wishlist data in localStorage, ignoring');
+        logWarn('Invalid wishlist data in localStorage, ignoring');
         setIsLoaded(true);
         return;
       }
@@ -46,7 +48,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       })) as Product[];
       setItems(rehydrated);
     } catch (error) {
-      console.error('Error loading wishlist:', error);
+      logError('Error loading wishlist:', error);
     } finally {
       setIsLoaded(true);
     }
@@ -58,7 +60,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(items));
       } catch (error) {
-        console.error('Error saving wishlist:', error);
+        logError('Error saving wishlist:', error);
       }
     }
   }, [items, isLoaded]);

@@ -10,6 +10,7 @@ import prisma from '@/lib/prisma';
 import { logInfo, logError, logWarn } from '@/lib/logging/logger';
 import { getMarketplaceProvider } from '@/lib/marketplace/provider.factory';
 import { getSupplierProvider } from '@/lib/suppliers/provider.factory';
+import type { FeedProduct } from '@/lib/marketplace/feeds';
 
 const CRON_SECRET = process.env.CRON_SECRET;
 
@@ -147,8 +148,10 @@ async function syncIntegration(integration: any): Promise<void> {
 
     const availableQty = Math.max(0, availableQuantity - (integration.reserve_quantity || 0));
 
-    // Create/update product listing
-    await marketplaceProvider.createOrUpdateProduct({
+    // Sync product to marketplace
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://twinesandstraps.co.za';
+    
+    const marketplaceProduct = {
       id: product.id.toString(),
       sellerSku: product.sku,
       title: product.name,
@@ -156,10 +159,17 @@ async function syncIntegration(integration: any): Promise<void> {
       price: effectivePrice,
       currency: 'ZAR',
       quantity: availableQty,
-      categoryId: product.category?.name,
+      categoryId: product.category?.name || '',
+      brand: 'Twines and Straps SA',
       images: product.image_url ? [product.image_url] : [],
-      condition: 'new',
-    });
+      condition: 'new' as const,
+      attributes: {
+        mpn: product.sku,
+        sku: product.sku,
+      },
+    };
+    
+    await marketplaceProvider.createOrUpdateProduct(marketplaceProduct);
 
     logInfo('Marketplace integration synced', {
       integrationId: integration.id,

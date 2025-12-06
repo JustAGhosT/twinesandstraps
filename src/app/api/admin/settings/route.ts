@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { siteSettingsSchema, validateBody, formatZodErrors } from '@/lib/validations';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Singleton ID for site settings - there's only one settings record
 const SITE_SETTINGS_ID = 1;
 
@@ -144,7 +146,7 @@ export async function GET(request: NextRequest) {
     // Return default settings if not found in database
     return NextResponse.json(DEFAULT_SETTINGS);
   } catch (error) {
-    console.error('Error fetching settings:', error);
+    logError('Error fetching settings:', error);
     return NextResponse.json(DEFAULT_SETTINGS);
   }
 }
@@ -257,7 +259,7 @@ async function handlePOST(request: NextRequest) {
       changeCount: changedFields.length,
     });
   } catch (error) {
-    console.error('Error saving settings:', error);
+    logError('Error saving settings:', error);
     return NextResponse.json(
       { error: 'Failed to save settings. Please try again.' },
       { status: 500 }

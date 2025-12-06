@@ -8,6 +8,8 @@ import prisma from '@/lib/prisma';
 import { sendEmail } from '@/lib/email/brevo';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 /**
  * Map The Courier Guy status to our order status
  */
@@ -68,7 +70,7 @@ async function sendShippingUpdateEmail(
       html: emailBody,
     });
   } catch (error) {
-    console.error('Failed to send shipping update email:', error);
+    logError('Failed to send shipping update email:', error);
     // Don't fail the webhook if email fails
   }
 }
@@ -139,7 +141,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!order) {
-      console.warn('Order not found for webhook:', { waybillNumber, reference, provider });
+      logWarn('Order not found for webhook:', { waybillNumber, reference, provider });
       return NextResponse.json(
         { error: 'Order not found' },
         { status: 404 }
@@ -204,7 +206,7 @@ export async function POST(request: NextRequest) {
       status: orderStatus,
     });
   } catch (error) {
-    console.error('Shipping webhook error:', error);
+    logError('Shipping webhook error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

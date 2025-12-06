@@ -8,6 +8,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface ConsentPreferences {
   marketing: boolean;
   analytics: boolean;
@@ -72,7 +74,7 @@ export default function CookieConsentBanner() {
         body: JSON.stringify(prefs),
       });
     } catch (error) {
-      console.error('Failed to save consent to database:', error);
+      logError('Failed to save consent to database:', error);
     }
 
     setShowBanner(false);

@@ -7,6 +7,8 @@ import TrustBadges from '@/components/TrustBadges';
 import { featureFlags } from '@/config/featureFlags';
 import type { Product, Category } from '@/types/database';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Force dynamic rendering - data is fetched at request time
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +22,7 @@ async function getFeaturedProducts() {
     });
     return products;
   } catch (error) {
-    console.error('Failed to fetch featured products:', error);
+    logError('Failed to fetch featured products:', error);
     return [];
   }
 }
@@ -34,7 +36,7 @@ async function getCategories() {
     });
     return categories;
   } catch (error) {
-    console.error('Failed to fetch categories:', error);
+    logError('Failed to fetch categories:', error);
     return [];
   }
 }

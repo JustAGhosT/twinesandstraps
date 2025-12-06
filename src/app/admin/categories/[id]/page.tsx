@@ -4,6 +4,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface Category {
   id: number;
   name: string;
@@ -45,7 +47,7 @@ export default function CategoryEditPage() {
         setCategories(data.data || []);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      logError('Error fetching categories:', error);
     }
   }, []);
 
@@ -64,7 +66,7 @@ export default function CategoryEditPage() {
         setError('Category not found');
       }
     } catch (error) {
-      console.error('Error fetching category:', error);
+      logError('Error fetching category:', error);
       setError('Failed to load category');
     } finally {
       setLoading(false);
@@ -123,7 +125,7 @@ export default function CategoryEditPage() {
         setError(data.error || 'Failed to save category');
       }
     } catch (error) {
-      console.error('Error saving category:', error);
+      logError('Error saving category:', error);
       setError('Failed to save category');
     } finally {
       setSaving(false);

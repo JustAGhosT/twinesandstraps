@@ -1,3 +1,4 @@
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
 /**
  * PDF Quote Generation
  * Generates branded PDF quotes for customers
@@ -50,7 +51,7 @@ export async function generateQuotePDF(data: QuotePDFData): Promise<Buffer | nul
   // ... add content ...
   // return doc.end();
   
-  console.warn('PDF generation not yet implemented. Install a PDF library to enable this feature.');
+  logWarn('PDF generation not yet implemented. Install a PDF library to enable this feature.');
   return null;
 }
 

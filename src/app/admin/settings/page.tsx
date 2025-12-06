@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { useToast } from '@/components/Toast';
 import { useConfirm } from '@/components/ConfirmModal';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface SiteSettings {
   companyName: string;
   tagline: string;
@@ -137,10 +139,10 @@ export default function SettingsPage() {
       } else if (res.status === 401) {
         setLoadError('Session expired. Please log in again.');
       } else {
-        console.warn('Failed to load settings, using defaults');
+        logWarn('Failed to load settings, using defaults');
       }
     } catch (error) {
-      console.error('Error loading settings:', error);
+      logError('Error loading settings:', error);
       setLoadError('Failed to load settings. Please refresh the page.');
     } finally {
       setLoading(false);
@@ -192,7 +194,7 @@ export default function SettingsPage() {
       setLogoSuccess('Logo uploaded successfully! It will appear in the header after refreshing.');
       setTimeout(() => setLogoSuccess(null), 5000);
     } catch (error) {
-      console.error('Error uploading logo:', error);
+      logError('Error uploading logo:', error);
       setLogoError('Failed to upload logo. Please try again.');
     } finally {
       setLogoLoading(false);
@@ -233,7 +235,7 @@ export default function SettingsPage() {
       setLogoSuccess('Logo removed successfully! The default logo will be used.');
       setTimeout(() => setLogoSuccess(null), 5000);
     } catch (error) {
-      console.error('Error removing logo:', error);
+      logError('Error removing logo:', error);
       setLogoError('Failed to remove logo. Please try again.');
     } finally {
       setLogoLoading(false);
@@ -285,7 +287,7 @@ export default function SettingsPage() {
         setSaveResult(null);
       }, 5000);
     } catch (error) {
-      console.error('Error saving settings:', error);
+      logError('Error saving settings:', error);
       showError(error instanceof Error ? error.message : 'Failed to save settings. Please try again.');
     } finally {
       setSaving(false);

@@ -12,6 +12,8 @@ import { sendPostPurchaseEmailDay1 } from '@/lib/email/post-purchase';
 import { syncPaymentToXero } from '@/lib/xero/payments';
 import prisma from '@/lib/prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function POST(request: NextRequest) {
   try {
     if (!isPayFastConfigured()) {
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     // Validate signature
     if (!validateSignature(itnData, config.passphrase)) {
-      console.error('Invalid PayFast signature:', itnData);
+      logError('Invalid PayFast signature:', itnData);
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 400 }
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
     const pfPaymentId = itnData.pf_payment_id;
     const amount = parseFloat(itnData.amount_gross || '0');
 
-    console.log('PayFast ITN received:', {
+    logInfo('PayFast ITN received:', {
       paymentId,
       paymentStatus,
       pfPaymentId,
@@ -89,7 +91,7 @@ export async function POST(request: NextRequest) {
         break;
 
       default:
-        console.warn('Unknown payment status:', paymentStatus);
+        logWarn('Unknown payment status:', paymentStatus);
     }
 
     // PayFast expects a specific response format
@@ -103,7 +105,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('PayFast ITN error:', error);
+    logError('PayFast ITN error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -137,7 +139,7 @@ async function handlePaymentSuccess(
     });
 
     if (!order) {
-      console.error(`Order not found for payment ID: ${paymentId}`);
+      logError(`Order not found for payment ID: ${paymentId}`);
       return;
     }
 
@@ -166,9 +168,9 @@ async function handlePaymentSuccess(
           new Date(),
           pfPaymentId
         );
-        console.log(`Payment synced to Xero for order ${order.order_number}`);
+        logInfo(`Payment synced to Xero for order ${order.order_number}`);
       } catch (xeroError: any) {
-        console.error('Failed to sync payment to Xero:', xeroError);
+        logError('Failed to sync payment to Xero:', xeroError);
         // Don't fail the whole webhook if Xero sync fails
       }
     }
@@ -208,13 +210,13 @@ async function handlePaymentSuccess(
         });
       } catch (emailError) {
         // Log but don't fail payment processing if email fails
-        console.error('Failed to send order confirmation email:', emailError);
+        logError('Failed to send order confirmation email:', emailError);
       }
     }
 
-    console.log('Payment successful:', { paymentId, pfPaymentId, amount, orderId: order.id });
+    logInfo('Payment successful:', { paymentId, pfPaymentId, amount, orderId: order.id });
   } catch (error) {
-    console.error('Error handling payment success:', error);
+    logError('Error handling payment success:', error);
     throw error;
   }
 }
@@ -243,9 +245,9 @@ async function handlePaymentFailure(paymentId: string, status: string) {
       });
     }
 
-    console.log('Payment failed:', { paymentId, status });
+    logInfo('Payment failed:', { paymentId, status });
   } catch (error) {
-    console.error('Error handling payment failure:', error);
+    logError('Error handling payment failure:', error);
   }
 }
 
@@ -273,9 +275,9 @@ async function handlePaymentPending(paymentId: string, pfPaymentId: string) {
       });
     }
 
-    console.log('Payment pending:', { paymentId, pfPaymentId });
+    logInfo('Payment pending:', { paymentId, pfPaymentId });
   } catch (error) {
-    console.error('Error handling payment pending:', error);
+    logError('Error handling payment pending:', error);
   }
 }
 

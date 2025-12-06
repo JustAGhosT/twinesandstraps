@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { searchCollectionPoints } from '@/lib/shipping/service';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const searchSchema = z.object({
   postalCode: z.string().min(1),
   city: z.string().optional(),
@@ -35,7 +37,7 @@ export async function POST(request: NextRequest) {
       count: points.length,
     });
   } catch (error) {
-    console.error('Collection points search error:', error);
+    logError('Collection points search error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

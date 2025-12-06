@@ -6,6 +6,8 @@
 import { sendEmail, isBrevoConfigured } from './brevo';
 import { getSiteUrl } from '../env';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export interface WelcomeEmailRecipient {
   email: string;
   firstName?: string;
@@ -63,7 +65,7 @@ export function getRecipientsNeedingWelcomeEmail(day: 1 | 3 | 7): WelcomeEmailRe
  */
 export async function sendWelcomeEmailDay1(recipient: WelcomeEmailRecipient): Promise<boolean> {
   if (!isBrevoConfigured()) {
-    console.warn('Brevo not configured. Welcome email not sent.');
+    logWarn('Brevo not configured. Welcome email not sent.');
     return false;
   }
 
@@ -300,7 +302,7 @@ export async function processWelcomeEmailSeries() {
         results.sentDay1++;
       }
     } catch (error) {
-      console.error('Error sending Day 1 welcome email:', error);
+      logError('Error sending Day 1 welcome email:', error);
       results.errors++;
     }
   }
@@ -312,7 +314,7 @@ export async function processWelcomeEmailSeries() {
         results.sentDay3++;
       }
     } catch (error) {
-      console.error('Error sending Day 3 welcome email:', error);
+      logError('Error sending Day 3 welcome email:', error);
       results.errors++;
     }
   }
@@ -324,7 +326,7 @@ export async function processWelcomeEmailSeries() {
         results.sentDay7++;
       }
     } catch (error) {
-      console.error('Error sending Day 7 welcome email:', error);
+      logError('Error sending Day 7 welcome email:', error);
       results.errors++;
     }
   }

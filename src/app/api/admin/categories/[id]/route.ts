@@ -6,6 +6,8 @@ import { invalidateCategoryCache, invalidateProductCache } from '@/lib/cache';
 import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 async function handlePUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -106,7 +108,7 @@ async function handlePUT(
 
     return NextResponse.json(category);
   } catch (error) {
-    console.error('Error updating category:', error);
+    logError('Error updating category:', error);
     return NextResponse.json(
       { error: 'Failed to update category. Please try again.' },
       { status: 500 }
@@ -190,7 +192,7 @@ async function handleDELETE(
 
     return NextResponse.json({ success: true, message: 'Category deleted successfully' });
   } catch (error) {
-    console.error('Error deleting category:', error);
+    logError('Error deleting category:', error);
     return NextResponse.json(
       { error: 'Failed to delete category. Please try again.' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
 /**
  * Image blur placeholder utilities
  * Generates blur data URLs for progressive image loading
@@ -61,7 +62,7 @@ export async function generateBlurFromImage(imageUrl: string): Promise<string> {
       img.src = imageUrl;
     });
   } catch (error) {
-    console.error('Error generating blur from image:', error);
+    logError('Error generating blur from image:', error);
     return getProductImageBlur();
   }
 }

@@ -9,6 +9,8 @@ import { getRateLimitConfig, withRateLimit } from '@/lib/security/rate-limit-wra
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const supplierDeliverySchema = z.object({
   productId: z.number().int().positive(),
   quantity: z.number().int().positive(),
@@ -47,7 +49,7 @@ async function handlePOST(request: NextRequest) {
       message: 'Supplier delivery recorded successfully',
     });
   } catch (error) {
-    console.error('Error recording supplier delivery:', error);
+    logError('Error recording supplier delivery:', error);
     return NextResponse.json(
       { error: 'Failed to record supplier delivery' },
       { status: 500 }

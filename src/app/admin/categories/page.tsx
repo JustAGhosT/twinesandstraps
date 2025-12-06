@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface Category {
   id: number;
   name: string;
@@ -31,7 +33,7 @@ export default function CategoriesPage() {
         setCategories(data.data || []);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      logError('Error fetching categories:', error);
     } finally {
       setLoading(false);
     }
@@ -99,7 +101,7 @@ export default function CategoriesPage() {
         cancelEdit();
       }
     } catch (error) {
-      console.error('Error saving category:', error);
+      logError('Error saving category:', error);
     } finally {
       setSaving(false);
     }
@@ -113,7 +115,7 @@ export default function CategoriesPage() {
         setDeleteConfirm(null);
       }
     } catch (error) {
-      console.error('Error deleting category:', error);
+      logError('Error deleting category:', error);
     }
   };
 

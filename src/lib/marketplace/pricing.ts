@@ -5,6 +5,8 @@
 
 import prisma from '../prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export type SalesChannel = 'WEBSITE' | 'TAKEALOT' | 'FACEBOOK' | 'GOOGLE_SHOPPING' | 'BOB_SHOP';
 
 export interface ChannelPricing {
@@ -100,6 +102,6 @@ export async function updateChannelPrice(
 ): Promise<void> {
   // In production, update ChannelPricing table
   // For now, this is a placeholder
-  console.log(`Updating ${channel} price for product ${productId} to R${price}`);
+  logInfo(`Updating ${channel} price for product ${productId} to R${price}`);
 }
 

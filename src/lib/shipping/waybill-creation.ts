@@ -8,6 +8,8 @@ import { createWaybill } from './service';
 import { WaybillRequest } from './types';
 import prisma from '../prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export interface OrderForWaybill {
   id: number;
   order_number: string;
@@ -128,7 +130,7 @@ export async function createWaybillForOrder(order: OrderForWaybill): Promise<{
       provider: waybill.provider,
     };
   } catch (error) {
-    console.error('Error creating waybill:', error);
+    logError('Error creating waybill:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

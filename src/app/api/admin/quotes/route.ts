@@ -5,6 +5,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { listQuotes } from '@/lib/quotes/quote-management';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(request: NextRequest) {
   try {
     // TODO: Add admin authentication check
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
       hasMore: result.hasMore,
     });
   } catch (error) {
-    console.error('Error fetching quotes:', error);
+    logError('Error fetching quotes:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

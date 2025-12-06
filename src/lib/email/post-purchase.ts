@@ -6,6 +6,8 @@
 import { sendEmail, isBrevoConfigured } from './brevo';
 import { getSiteUrl } from '../env';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export interface PostPurchaseOrder {
   orderId: string;
   email: string;
@@ -26,7 +28,7 @@ export interface PostPurchaseOrder {
  */
 export async function sendPostPurchaseEmailDay1(order: PostPurchaseOrder): Promise<boolean> {
   if (!isBrevoConfigured()) {
-    console.warn('Brevo not configured. Post-purchase email not sent.');
+    logWarn('Brevo not configured. Post-purchase email not sent.');
     return false;
   }
 

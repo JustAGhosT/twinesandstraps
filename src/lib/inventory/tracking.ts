@@ -5,6 +5,8 @@
 
 import prisma from '@/lib/prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export enum InventoryEventType {
   STOCK_ADDED = 'STOCK_ADDED',
   STOCK_REMOVED = 'STOCK_REMOVED',
@@ -56,7 +58,7 @@ export async function createInventoryEvent(
     });
   } catch (error) {
     // Log error but don't throw - inventory tracking shouldn't break main operations
-    console.error('Failed to create inventory event:', error);
+    logError('Failed to create inventory event:', error);
   }
 }
 

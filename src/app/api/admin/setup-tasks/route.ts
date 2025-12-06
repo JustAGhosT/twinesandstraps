@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import prisma from '@/lib/prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // GET - Fetch all setup tasks with statistics
 export async function GET(request: NextRequest) {
   const authError = await requireAdminAuth(request);
@@ -63,7 +65,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching setup tasks:', error);
+    logError('Error fetching setup tasks:', error);
     return NextResponse.json(
       { error: 'Failed to fetch setup tasks' },
       { status: 500 }
@@ -116,7 +118,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ success: true, task });
   } catch (error) {
-    console.error('Error updating setup task:', error);
+    logError('Error updating setup task:', error);
     return NextResponse.json(
       { error: 'Failed to update setup task' },
       { status: 500 }

@@ -5,6 +5,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { convertQuoteToOrder, acceptQuoteAndConvert } from '@/lib/quotes/quote-to-order';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -50,7 +52,7 @@ export async function POST(
       paymentUrl: result.paymentUrl,
     });
   } catch (error) {
-    console.error('Error converting quote to order:', error);
+    logError('Error converting quote to order:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

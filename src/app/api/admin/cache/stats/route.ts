@@ -7,6 +7,8 @@ import { requireAdminAuth } from '@/lib/admin-auth';
 import { getCacheStats, getCacheInstance } from '@/lib/cache';
 import { isRedisConnected } from '@/lib/cache/redis';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(request: NextRequest) {
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
       redisConnected: isRedis,
     });
   } catch (error) {
-    console.error('Error fetching cache stats:', error);
+    logError('Error fetching cache stats:', error);
     return NextResponse.json(
       { error: 'Failed to fetch cache stats' },
       { status: 500 }

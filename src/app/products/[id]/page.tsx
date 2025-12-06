@@ -13,6 +13,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import React from 'react';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export const revalidate = 3600; // Revalidate every hour
 
 interface ProductDetailPageProps {
@@ -73,7 +75,7 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
       },
     };
   } catch (error) {
-    console.error('Failed to generate metadata:', error);
+    logError('Failed to generate metadata:', error);
     return {
       title: 'Error',
       description: 'Could not generate metadata for this product.',

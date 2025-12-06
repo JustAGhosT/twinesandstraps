@@ -4,6 +4,8 @@
 
 import { getRedisClient, isRedisConnected } from './redis';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface CacheStats {
   hits: number;
   misses: number;
@@ -42,7 +44,7 @@ class RedisCache {
       this.stats.hits++;
       return JSON.parse(data) as T;
     } catch (error) {
-      console.error('Redis get error:', error);
+      logError('Redis get error:', error);
       this.stats.misses++;
       return null;
     }
@@ -74,7 +76,7 @@ class RedisCache {
       this.stats.sets++;
       return true;
     } catch (error) {
-      console.error('Redis set error:', error);
+      logError('Redis set error:', error);
       return false;
     }
   }
@@ -97,7 +99,7 @@ class RedisCache {
       this.stats.deletes++;
       return true;
     } catch (error) {
-      console.error('Redis delete error:', error);
+      logError('Redis delete error:', error);
       return false;
     }
   }
@@ -145,7 +147,7 @@ class RedisCache {
 
       return keys.length;
     } catch (error) {
-      console.error('Redis deletePattern error:', error);
+      logError('Redis deletePattern error:', error);
       return 0;
     }
   }
@@ -167,7 +169,7 @@ class RedisCache {
       await client.flushdb();
       return true;
     } catch (error) {
-      console.error('Redis clear error:', error);
+      logError('Redis clear error:', error);
       return false;
     }
   }

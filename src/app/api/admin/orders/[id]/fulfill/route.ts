@@ -12,6 +12,8 @@ import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 async function handlePOST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -179,7 +181,7 @@ async function handlePOST(
       trackingUrl: waybillResult.trackingUrl,
     });
   } catch (error) {
-    console.error('Error fulfilling order:', error);
+    logError('Error fulfilling order:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

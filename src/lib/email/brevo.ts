@@ -1,3 +1,4 @@
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
 /**
  * Brevo (formerly Sendinblue) email integration
  * Handles transactional emails and marketing automation
@@ -27,7 +28,7 @@ interface SendEmailResult {
  */
 export async function sendEmail(options: EmailOptions): Promise<SendEmailResult> {
   if (!BREVO_API_KEY) {
-    console.warn('Brevo API key not configured. Email not sent.');
+    logWarn('Brevo API key not configured. Email not sent.');
     return {
       success: false,
       error: 'Brevo API key not configured',
@@ -86,7 +87,7 @@ export async function sendEmail(options: EmailOptions): Promise<SendEmailResult>
       messageId: data.messageId,
     };
   } catch (error) {
-    console.error('Failed to send email via Brevo:', error);
+    logError('Failed to send email via Brevo:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

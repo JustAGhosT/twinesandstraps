@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ORDER_STATUS, PAYMENT_STATUS, ORDER_STATUS_LABELS, PAYMENT_STATUS_LABELS } from '@/constants';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface Order {
   id: number;
   order_number: string;
@@ -65,7 +67,7 @@ export default function AdminOrdersPage() {
         setPagination(data.pagination);
       }
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      logError('Error fetching orders:', error);
     } finally {
       setLoading(false);
     }
@@ -131,7 +133,7 @@ export default function AdminOrdersPage() {
                   setSelectedOrders([]);
                 }
               } catch (error) {
-                console.error('Error printing labels:', error);
+                logError('Error printing labels:', error);
               } finally {
                 setProcessingBulk(false);
               }
@@ -300,7 +302,7 @@ export default function AdminOrdersPage() {
                                   fetchOrders();
                                 }
                               } catch (error) {
-                                console.error('Error fulfilling order:', error);
+                                logError('Error fulfilling order:', error);
                               }
                             }}
                             className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"

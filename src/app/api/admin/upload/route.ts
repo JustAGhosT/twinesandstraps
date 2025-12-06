@@ -6,6 +6,8 @@ import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wra
 import type { UploadData } from '@/types/api';
 import { successResponse, errorResponse } from '@/types/api';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Allowed MIME types for image uploads with display names
 // Note: SVG is intentionally excluded due to XSS risks (can contain embedded JavaScript)
 const ALLOWED_MIME_TYPES: Record<string, string> = {
@@ -85,7 +87,7 @@ async function handlePOST(request: NextRequest) {
       successResponse(uploadData, message)
     );
   } catch (error) {
-    console.error('Error uploading file:', error);
+    logError('Error uploading file:', error);
     
     // Provide a more helpful error message for Azure configuration issues
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

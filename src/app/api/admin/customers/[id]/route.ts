@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -81,7 +83,7 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error fetching customer:', error);
+    logError('Error fetching customer:', error);
     return NextResponse.json(
       { error: 'Failed to fetch customer' },
       { status: 500 }

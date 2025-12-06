@@ -1,3 +1,4 @@
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
 /**
  * The Courier Guy API integration
  * Handles shipping quotes, waybill creation, and tracking
@@ -82,7 +83,7 @@ export function isCourierGuyConfigured(): boolean {
  */
 export async function getShippingQuote(request: ShippingQuoteRequest): Promise<ShippingQuote | null> {
   if (!isCourierGuyConfigured()) {
-    console.warn('The Courier Guy API key not configured');
+    logWarn('The Courier Guy API key not configured');
     return null;
   }
 
@@ -119,7 +120,7 @@ export async function getShippingQuote(request: ShippingQuoteRequest): Promise<S
       currency: data.currency || 'ZAR',
     };
   } catch (error) {
-    console.error('Error fetching shipping quote:', error);
+    logError('Error fetching shipping quote:', error);
     
     // Fallback to estimated cost based on weight and distance
     return estimateShippingCost(request);
@@ -154,7 +155,7 @@ function estimateShippingCost(request: ShippingQuoteRequest): ShippingQuote {
  */
 export async function createWaybill(request: WaybillRequest): Promise<Waybill | null> {
   if (!isCourierGuyConfigured()) {
-    console.warn('The Courier Guy API key not configured');
+    logWarn('The Courier Guy API key not configured');
     return null;
   }
 
@@ -187,7 +188,7 @@ export async function createWaybill(request: WaybillRequest): Promise<Waybill | 
       estimatedDelivery: new Date(data.estimated_delivery),
     };
   } catch (error) {
-    console.error('Error creating waybill:', error);
+    logError('Error creating waybill:', error);
     return null;
   }
 }
@@ -235,7 +236,7 @@ export async function getTrackingInfo(waybillNumber: string): Promise<{
       })),
     };
   } catch (error) {
-    console.error('Error fetching tracking info:', error);
+    logError('Error fetching tracking info:', error);
     return null;
   }
 }

@@ -6,6 +6,7 @@
 import prisma from '@/lib/prisma';
 import { STOCK_STATUS } from '@/constants';
 import { sendEmail } from '@/lib/email/brevo';
+import { logError, logWarn } from '@/lib/logging/logger';
 
 export interface LowStockProduct {
   id: number;
@@ -123,8 +124,7 @@ export async function sendLowStockAlert(
     });
     return true;
   } catch (error) {
-    // Replaced with logger - see migration script
-// console.error('Failed to send low stock alert:', error);
+    logError('Failed to send low stock alert', error, { adminEmail });
     return false;
   }
 }
@@ -160,8 +160,7 @@ export async function checkAndSendLowStockAlerts(adminEmail?: string): Promise<{
     }
 
     if (!emailToUse) {
-      // Replaced with logger - see migration script
-// console.warn('No admin email configured for low stock alerts');
+      logWarn('No admin email configured for low stock alerts');
       return {
         success: false,
         alertSent: false,
@@ -177,8 +176,7 @@ export async function checkAndSendLowStockAlerts(adminEmail?: string): Promise<{
       productCount: alert.totalCount,
     };
   } catch (error) {
-    // Replaced with logger - see migration script
-// console.error('Error checking low stock:', error);
+    logError('Error checking low stock', error);
     return {
       success: false,
       alertSent: false,

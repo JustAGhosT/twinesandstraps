@@ -7,6 +7,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { syncInventoryToChannel, getProductsNeedingSync } from '@/lib/marketplace/inventory';
 import { syncInventoryToTakealot, isTakealotConfigured } from '@/lib/marketplace/takealot';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function POST(request: NextRequest) {
   try {
     // TODO: Add admin authentication check
@@ -40,7 +42,7 @@ export async function POST(request: NextRequest) {
       result,
     });
   } catch (error) {
-    console.error('Error syncing inventory:', error);
+    logError('Error syncing inventory:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -64,7 +66,7 @@ export async function GET(request: NextRequest) {
       count: productIds.length,
     });
   } catch (error) {
-    console.error('Error getting products needing sync:', error);
+    logError('Error getting products needing sync:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

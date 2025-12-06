@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { processAbandonedCartReminders } from '@/lib/abandoned-cart';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Optional: Add authentication to prevent unauthorized access
 const CRON_SECRET = process.env.CRON_SECRET;
 
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Abandoned cart cron job error:', error);
+    logError('Abandoned cart cron job error:', error);
     return NextResponse.json(
       { 
         success: false, 

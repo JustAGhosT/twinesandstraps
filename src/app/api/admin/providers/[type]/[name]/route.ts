@@ -18,6 +18,8 @@ import {
 } from '@/lib/providers/config-manager';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const updateConfigSchema = z.object({
   configData: z.record(z.any()).optional(),
   credentials: z.record(z.any()).optional(),
@@ -53,7 +55,7 @@ async function handleGET(
       hasCredentials: !!credentials && Object.keys(credentials).length > 0,
     });
   } catch (error) {
-    console.error('Error fetching provider config:', error);
+    logError('Error fetching provider config:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
@@ -130,7 +132,7 @@ async function handlePUT(
       config: safeConfig,
     });
   } catch (error) {
-    console.error('Error updating provider config:', error);
+    logError('Error updating provider config:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
@@ -156,7 +158,7 @@ async function handleDELETE(
       message: 'Provider configuration deleted',
     });
   } catch (error) {
-    console.error('Error deleting provider config:', error);
+    logError('Error deleting provider config:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

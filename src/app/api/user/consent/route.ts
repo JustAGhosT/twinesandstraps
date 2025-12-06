@@ -9,6 +9,8 @@ import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const consentSchema = z.object({
   marketing: z.boolean(),
   analytics: z.boolean(),
@@ -47,7 +49,7 @@ async function handlePOST(request: NextRequest) {
       message: 'Consent preferences saved successfully',
     });
   } catch (error) {
-    console.error('Error saving consent:', error);
+    logError('Error saving consent:', error);
     return NextResponse.json(
       { error: 'Failed to save consent preferences' },
       { status: 500 }

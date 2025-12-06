@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 async function handlePUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -124,7 +126,7 @@ async function handlePUT(
       successResponse(product as ProductWithCategory, 'Product updated successfully')
     );
   } catch (error) {
-    console.error('Error updating product:', error);
+    logError('Error updating product:', error);
     return NextResponse.json(
       errorResponse('Failed to update product. Please try again.'),
       { status: 500 }
@@ -179,7 +181,7 @@ async function handleDELETE(
       successResponse(null, 'Product deleted successfully')
     );
   } catch (error) {
-    console.error('Error deleting product:', error);
+    logError('Error deleting product:', error);
     return NextResponse.json(
       errorResponse('Failed to delete product. Please try again.'),
       { status: 500 }

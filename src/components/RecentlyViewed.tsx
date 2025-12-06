@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useUserAuth } from '@/contexts/UserAuthContext';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface ViewHistoryItem {
   id: number;
   viewed_at: string;
@@ -40,7 +42,7 @@ export default function RecentlyViewed({ excludeProductId, limit = 4 }: Recently
         setItems(filtered.slice(0, limit));
       }
     } catch (error) {
-      console.error('Error fetching view history:', error);
+      logError('Error fetching view history:', error);
     } finally {
       setLoading(false);
     }

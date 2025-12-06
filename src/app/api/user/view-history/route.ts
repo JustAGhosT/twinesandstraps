@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/user-auth';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Get user's view history
 export async function GET(request: NextRequest) {
   const user = getCurrentUser(request);
@@ -36,7 +38,7 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error('Error fetching view history:', error);
+    logError('Error fetching view history:', error);
     return NextResponse.json(
       { error: 'Failed to fetch view history' },
       { status: 500 }
@@ -96,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, id: viewHistory.id });
   } catch (error) {
-    console.error('Error recording view:', error);
+    logError('Error recording view:', error);
     return NextResponse.json(
       { error: 'Failed to record view' },
       { status: 500 }
@@ -122,7 +124,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error clearing view history:', error);
+    logError('Error clearing view history:', error);
     return NextResponse.json(
       { error: 'Failed to clear view history' },
       { status: 500 }

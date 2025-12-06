@@ -5,6 +5,8 @@ import { createSupplierSchema, validateBody, formatZodErrors } from '@/lib/valid
 import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // GET - List all suppliers with pagination and search
 export async function GET(request: NextRequest) {
   const authError = await requireAdminAuth(request);
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching suppliers:', error);
+    logError('Error fetching suppliers:', error);
     return NextResponse.json(
       { error: 'Failed to fetch suppliers' },
       { status: 500 }
@@ -116,7 +118,7 @@ async function handlePOST(request: NextRequest) {
 
     return NextResponse.json(supplier, { status: 201 });
   } catch (error) {
-    console.error('Error creating supplier:', error);
+    logError('Error creating supplier:', error);
     return NextResponse.json(
       { error: 'Failed to create supplier' },
       { status: 500 }

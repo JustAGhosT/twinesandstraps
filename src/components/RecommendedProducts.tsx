@@ -7,6 +7,8 @@ import type { Product } from '@/types/database';
 import { useCart } from '@/contexts/CartContext';
 import { STOCK_STATUS, STOCK_STATUS_LABELS } from '@/constants';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface RecommendedProductsProps {
   title?: string;
   maxProducts?: number;
@@ -33,7 +35,7 @@ const RecommendedProducts: React.FC<RecommendedProductsProps> = ({
         setLoading(false);
       })
       .catch((error) => {
-        console.error('Error fetching recommended products:', error);
+        logError('Error fetching recommended products:', error);
         setLoading(false);
       });
   }, [maxProducts]);

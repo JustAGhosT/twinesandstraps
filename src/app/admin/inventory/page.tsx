@@ -7,6 +7,8 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Define types locally for client component (can't import server-side enums)
 const InventoryEventType = {
   STOCK_ADDED: 'STOCK_ADDED',
@@ -96,7 +98,7 @@ export default function InventoryHistoryPage() {
       setPagination(prev => ({ ...prev, total: data.total }));
     } catch (e: any) {
       setError(e.message || 'Failed to fetch inventory history');
-      console.error('Error fetching inventory history:', e);
+      logError('Error fetching inventory history:', e);
     } finally {
       setLoading(false);
     }

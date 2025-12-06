@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { warmCache } from '@/lib/cache/warm-cache';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function POST(request: NextRequest) {
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
@@ -18,7 +20,7 @@ export async function POST(request: NextRequest) {
       message: 'Cache warming completed',
     });
   } catch (error) {
-    console.error('Error warming cache:', error);
+    logError('Error warming cache:', error);
     return NextResponse.json(
       { error: 'Failed to warm cache' },
       { status: 500 }

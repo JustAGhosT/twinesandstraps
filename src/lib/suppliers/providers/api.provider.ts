@@ -5,6 +5,8 @@
 
 import { ISupplierProvider, SupplierProduct, SupplierOrder } from '../provider.interface';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export class ApiSupplierProvider implements ISupplierProvider {
   readonly name = 'api';
   readonly displayName = 'API Integration';
@@ -64,7 +66,7 @@ export class ApiSupplierProvider implements ISupplierProvider {
         updatedAt: p.updated_at ? new Date(p.updated_at) : undefined,
       }));
     } catch (error) {
-      console.error('Error fetching products from supplier API:', error);
+      logError('Error fetching products from supplier API:', error);
       return [];
     }
   }
@@ -102,7 +104,7 @@ export class ApiSupplierProvider implements ISupplierProvider {
         updatedAt: data.updated_at ? new Date(data.updated_at) : undefined,
       };
     } catch (error) {
-      console.error('Error fetching product from supplier API:', error);
+      logError('Error fetching product from supplier API:', error);
       return null;
     }
   }
@@ -136,7 +138,7 @@ export class ApiSupplierProvider implements ISupplierProvider {
 
       return inventory;
     } catch (error) {
-      console.error('Error fetching inventory from supplier API:', error);
+      logError('Error fetching inventory from supplier API:', error);
       return new Map();
     }
   }
@@ -170,7 +172,7 @@ export class ApiSupplierProvider implements ISupplierProvider {
 
       return pricing;
     } catch (error) {
-      console.error('Error fetching pricing from supplier API:', error);
+      logError('Error fetching pricing from supplier API:', error);
       return new Map();
     }
   }
@@ -248,7 +250,7 @@ export class ApiSupplierProvider implements ISupplierProvider {
         estimatedDelivery: data.estimated_delivery ? new Date(data.estimated_delivery) : undefined,
       };
     } catch (error) {
-      console.error('Error fetching order status from supplier API:', error);
+      logError('Error fetching order status from supplier API:', error);
       return null;
     }
   }

@@ -5,6 +5,8 @@ import type { PaginatedData } from '@/types/api';
 import type { ProductWithCategory } from '@/types/database';
 import { successResponse, errorResponse } from '@/types/api';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
 
@@ -80,7 +82,7 @@ export async function GET(request: NextRequest) {
       successResponse(paginatedData, 'Products retrieved successfully')
     );
   } catch (error) {
-    console.error('Error fetching products:', error);
+    logError('Error fetching products:', error);
     return NextResponse.json(
       errorResponse('Failed to fetch products'),
       { status: 500 }

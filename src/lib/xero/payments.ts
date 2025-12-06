@@ -7,6 +7,8 @@ import { XeroToken } from './auth';
 import { getActiveXeroToken } from './token-storage';
 import prisma from '@/lib/prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export interface XeroPayment {
   Invoice: {
     InvoiceID: string;
@@ -101,7 +103,7 @@ export async function syncPaymentToXero(
     });
 
     if (!invoiceMapping) {
-      console.warn(`No Xero invoice found for order ${orderId}. Invoice must be synced first.`);
+      logWarn(`No Xero invoice found for order ${orderId}. Invoice must be synced first.`);
       return null;
     }
 
@@ -119,7 +121,7 @@ export async function syncPaymentToXero(
 
     return paymentId;
   } catch (error: any) {
-    console.error('Error syncing payment to Xero:', error);
+    logError('Error syncing payment to Xero:', error);
     throw error;
   }
 }

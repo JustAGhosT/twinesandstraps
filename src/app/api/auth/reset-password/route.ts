@@ -4,6 +4,8 @@ import { hashPassword, validatePasswordStrength } from '@/lib/user-auth';
 import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 async function handlePOST(request: NextRequest) {
   // Verify CSRF token
   const csrfError = requireCsrfToken(request);
@@ -96,7 +98,7 @@ async function handlePOST(request: NextRequest) {
       message: 'Password has been reset successfully. You can now log in with your new password.',
     });
   } catch (error) {
-    console.error('Reset password error:', error);
+    logError('Reset password error:', error);
     return NextResponse.json(
       { error: 'An error occurred. Please try again.' },
       { status: 500 }
@@ -137,7 +139,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ valid: true });
   } catch (error) {
-    console.error('Token validation error:', error);
+    logError('Token validation error:', error);
     return NextResponse.json(
       { valid: false, error: 'An error occurred' },
       { status: 500 }

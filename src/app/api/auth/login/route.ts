@@ -5,6 +5,8 @@ import { userLoginSchema, validateBody, formatZodErrors } from '@/lib/validation
 import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 async function handlePOST(request: NextRequest) {
   // Verify CSRF token
   const csrfError = requireCsrfToken(request);
@@ -79,7 +81,7 @@ async function handlePOST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Login error:', error);
+    logError('Login error:', error);
     return NextResponse.json(
       { error: 'An error occurred during login' },
       { status: 500 }

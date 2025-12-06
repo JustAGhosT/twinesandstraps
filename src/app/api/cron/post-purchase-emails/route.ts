@@ -8,6 +8,8 @@ import prisma from '@/lib/prisma';
 import { sendPostPurchaseEmailDay1, sendPostPurchaseEmailDay3, sendPostPurchaseEmailDay7 } from '@/lib/email/post-purchase';
 import { trackEvent } from '@/lib/monitoring/app-insights';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const CRON_SECRET = process.env.CRON_SECRET;
 
 export async function GET(request: NextRequest) {
@@ -111,7 +113,7 @@ export async function GET(request: NextRequest) {
           if (success) results.sentDay1++;
         }
       } catch (error) {
-        console.error('Error sending Day 1 post-purchase email:', error);
+        logError('Error sending Day 1 post-purchase email:', error);
         results.errors++;
       }
     }
@@ -137,7 +139,7 @@ export async function GET(request: NextRequest) {
           if (success) results.sentDay3++;
         }
       } catch (error) {
-        console.error('Error sending Day 3 post-purchase email:', error);
+        logError('Error sending Day 3 post-purchase email:', error);
         results.errors++;
       }
     }
@@ -163,7 +165,7 @@ export async function GET(request: NextRequest) {
           if (success) results.sentDay7++;
         }
       } catch (error) {
-        console.error('Error sending Day 7 post-purchase email:', error);
+        logError('Error sending Day 7 post-purchase email:', error);
         results.errors++;
       }
     }
@@ -182,7 +184,7 @@ export async function GET(request: NextRequest) {
       results,
     });
   } catch (error: any) {
-    console.error('Error in post-purchase email cron:', error);
+    logError('Error in post-purchase email cron:', error);
     
     trackEvent('PostPurchaseEmailSeriesFailed', {
       error: error.message,

@@ -5,6 +5,8 @@
 
 import { IMarketplaceProvider, MarketplaceProduct, MarketplaceOrder, InventoryUpdate } from '../provider.interface';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export class MockMarketplaceProvider implements IMarketplaceProvider {
   readonly name = 'mock';
   readonly displayName = 'Mock Marketplace';
@@ -18,7 +20,7 @@ export class MockMarketplaceProvider implements IMarketplaceProvider {
     sellerSku?: string;
     error?: string;
   }> {
-    console.log('[Mock] Creating/updating product:', product.id);
+    logInfo('[Mock] Creating/updating product:', product.id);
     return {
       success: true,
       sellerSku: product.sellerSku || `mock_${product.id}`,
@@ -29,7 +31,7 @@ export class MockMarketplaceProvider implements IMarketplaceProvider {
     success: boolean;
     error?: string;
   }> {
-    console.log('[Mock] Deleting product:', sellerSku);
+    logInfo('[Mock] Deleting product:', sellerSku);
     return {
       success: true,
     };
@@ -39,7 +41,7 @@ export class MockMarketplaceProvider implements IMarketplaceProvider {
     success: boolean;
     errors?: Array<{ sellerSku: string; error: string }>;
   }> {
-    console.log('[Mock] Updating inventory:', updates);
+    logInfo('[Mock] Updating inventory:', updates);
     return {
       success: true,
     };
@@ -50,7 +52,7 @@ export class MockMarketplaceProvider implements IMarketplaceProvider {
     startDate?: Date;
     endDate?: Date;
   }): Promise<MarketplaceOrder[]> {
-    console.log('[Mock] Getting orders with filters:', filters);
+    logInfo('[Mock] Getting orders with filters:', filters);
     return [];
   }
 
@@ -62,14 +64,14 @@ export class MockMarketplaceProvider implements IMarketplaceProvider {
     success: boolean;
     error?: string;
   }> {
-    console.log('[Mock] Fulfilling order:', marketplaceOrderId, trackingNumber);
+    logInfo('[Mock] Fulfilling order:', marketplaceOrderId, trackingNumber);
     return {
       success: true,
     };
   }
 
   async generateFeed(products: MarketplaceProduct[]): Promise<string> {
-    console.log('[Mock] Generating feed for', products.length, 'products');
+    logInfo('[Mock] Generating feed for', products.length, 'products');
     return JSON.stringify(products, null, 2);
   }
 

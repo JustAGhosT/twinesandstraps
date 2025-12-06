@@ -5,6 +5,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function POST(request: NextRequest) {
   try {
     // TODO: Add admin authentication check
@@ -89,7 +91,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error generating shipping labels:', error);
+    logError('Error generating shipping labels:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

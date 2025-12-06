@@ -9,6 +9,8 @@ import { processRefund as payfastRefund } from '../../payfast/refund';
 import { parseITNData, validateSignature } from '../../payfast/signature';
 import { IPaymentProvider, PaymentRequest, PaymentResult, RefundRequest, RefundResult, WebhookPayload } from '../provider.interface';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export class PayFastProvider implements IPaymentProvider {
   readonly name = 'payfast';
   readonly displayName = 'PayFast';
@@ -53,7 +55,7 @@ export class PayFastProvider implements IPaymentProvider {
         paymentId: request.orderNumber,
       };
     } catch (error) {
-      console.error('PayFast payment initiation error:', error);
+      logError('PayFast payment initiation error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to initiate payment',
@@ -131,7 +133,7 @@ export class PayFastProvider implements IPaymentProvider {
         amount,
       };
     } catch (error) {
-      console.error('PayFast webhook processing error:', error);
+      logError('PayFast webhook processing error:', error);
       return {
         success: false,
         status: 'failed',
@@ -162,7 +164,7 @@ export class PayFastProvider implements IPaymentProvider {
         error: result.error,
       };
     } catch (error) {
-      console.error('PayFast refund error:', error);
+      logError('PayFast refund error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to process refund',
@@ -183,7 +185,7 @@ export class PayFastProvider implements IPaymentProvider {
 
       return validateSignature(itnData, config.passphrase);
     } catch (error) {
-      console.error('PayFast signature verification error:', error);
+      logError('PayFast signature verification error:', error);
       return false;
     }
   }

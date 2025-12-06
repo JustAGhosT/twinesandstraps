@@ -5,6 +5,8 @@
  */
 
 import { IShippingProvider } from '../provider.interface';
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 import {
   ShippingQuoteRequest,
   ShippingQuote,
@@ -76,7 +78,7 @@ export class PargoProvider implements IShippingProvider {
         phone: point.phone,
       }));
     } catch (error) {
-      console.error('Error searching Pargo collection points:', error);
+      logError('Error searching Pargo collection points:', error);
       return [];
     }
   }
@@ -91,7 +93,7 @@ export class PargoProvider implements IShippingProvider {
 
   async getQuote(request: ShippingQuoteRequest): Promise<ShippingQuote | null> {
     if (!this.isConfigured()) {
-      console.warn('Pargo API key not configured');
+      logWarn('Pargo API key not configured');
       return null;
     }
 
@@ -147,7 +149,7 @@ export class PargoProvider implements IShippingProvider {
 
       return quote;
     } catch (error) {
-      console.error('Error fetching shipping quote from Pargo:', error);
+      logError('Error fetching shipping quote from Pargo:', error);
       
       // Fallback to estimated cost
       return {
@@ -169,7 +171,7 @@ export class PargoProvider implements IShippingProvider {
 
   async createWaybill(request: WaybillRequest): Promise<Waybill | null> {
     if (!this.isConfigured()) {
-      console.warn('Pargo API key not configured');
+      logWarn('Pargo API key not configured');
       return null;
     }
 
@@ -226,7 +228,7 @@ export class PargoProvider implements IShippingProvider {
         provider: this.name,
       };
     } catch (error) {
-      console.error('Error creating waybill with Pargo:', error);
+      logError('Error creating waybill with Pargo:', error);
       return null;
     }
   }
@@ -262,7 +264,7 @@ export class PargoProvider implements IShippingProvider {
         })),
       };
     } catch (error) {
-      console.error('Error fetching tracking info from Pargo:', error);
+      logError('Error fetching tracking info from Pargo:', error);
       return null;
     }
   }
@@ -285,7 +287,7 @@ export class PargoProvider implements IShippingProvider {
 
       return response.ok;
     } catch (error) {
-      console.error('Error canceling waybill with Pargo:', error);
+      logError('Error canceling waybill with Pargo:', error);
       return false;
     }
   }

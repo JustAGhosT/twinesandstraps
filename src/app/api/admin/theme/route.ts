@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Verify admin authentication
 async function verifyAdmin(): Promise<boolean> {
   const cookieStore = await cookies();
@@ -57,7 +59,7 @@ export async function POST(request: NextRequest) {
       colors,
     });
   } catch (error) {
-    console.error('Error saving theme:', error);
+    logError('Error saving theme:', error);
     return NextResponse.json(
       { error: 'Failed to save theme colors' },
       { status: 500 }
@@ -93,7 +95,7 @@ export async function GET() {
       source: 'default',
     });
   } catch (error) {
-    console.error('Error fetching admin theme:', error);
+    logError('Error fetching admin theme:', error);
     return NextResponse.json(
       { error: 'Failed to fetch theme' },
       { status: 500 }

@@ -11,6 +11,8 @@ import { getRateLimitConfig, withRateLimit } from '@/lib/security/rate-limit-wra
 import prisma from '@/lib/prisma';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const integrationSchema = z.object({
   integrationType: z.enum(['supplier', 'marketplace']),
   integrationId: z.number(),
@@ -82,7 +84,7 @@ async function handleGET(
 
     return NextResponse.json({ integrations: formattedIntegrations });
   } catch (error) {
-    console.error('Error fetching product integrations:', error);
+    logError('Error fetching product integrations:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
@@ -198,7 +200,7 @@ async function handlePOST(
       integration,
     });
   } catch (error) {
-    console.error('Error saving product integration:', error);
+    logError('Error saving product integration:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

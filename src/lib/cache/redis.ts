@@ -5,6 +5,8 @@
 
 import Redis from 'ioredis';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 let redisClient: Redis | null = null;
 let isRedisAvailable = false;
 
@@ -15,7 +17,7 @@ export function initRedis(): void {
   const redisUrl = process.env.REDIS_URL;
   
   if (!redisUrl) {
-    console.warn('Redis URL not configured, using in-memory cache');
+    logWarn('Redis URL not configured, using in-memory cache');
     return;
   }
 
@@ -36,25 +38,25 @@ export function initRedis(): void {
     });
 
     redisClient.on('connect', () => {
-      console.log('✅ Redis connected');
+      logInfo('✅ Redis connected');
       isRedisAvailable = true;
     });
 
     redisClient.on('error', (err) => {
-      console.error('Redis connection error:', err);
+      logError('Redis connection error:', err);
       isRedisAvailable = false;
     });
 
     redisClient.on('close', () => {
-      console.warn('Redis connection closed');
+      logWarn('Redis connection closed');
       isRedisAvailable = false;
     });
 
     redisClient.on('reconnecting', () => {
-      console.log('Redis reconnecting...');
+      logInfo('Redis reconnecting...');
     });
   } catch (error) {
-    console.error('Failed to initialize Redis:', error);
+    logError('Failed to initialize Redis:', error);
     isRedisAvailable = false;
   }
 }

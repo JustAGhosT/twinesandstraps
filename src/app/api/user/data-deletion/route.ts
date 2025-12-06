@@ -10,6 +10,8 @@ import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const deletionSchema = z.object({
   confirm: z.literal(true, {
     errorMap: () => ({ message: 'You must confirm deletion' }),
@@ -115,7 +117,7 @@ async function handlePOST(request: NextRequest) {
       message: 'Your account and personal data have been deleted successfully.',
     });
   } catch (error) {
-    console.error('Error deleting user data:', error);
+    logError('Error deleting user data:', error);
     return NextResponse.json(
       { error: 'Failed to delete user data' },
       { status: 500 }

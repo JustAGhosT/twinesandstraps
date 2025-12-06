@@ -12,6 +12,8 @@ import { z } from 'zod';
 
 import { getActiveXeroToken } from '@/lib/xero/token-storage';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const syncOrderSchema = z.object({
   orderId: z.number().int().positive(),
 });
@@ -109,7 +111,7 @@ async function handlePOST(request: NextRequest) {
       message: 'Order synced to Xero successfully',
     });
   } catch (error: any) {
-    console.error('Error syncing order to Xero:', error);
+    logError('Error syncing order to Xero:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to sync order to Xero' },
       { status: 500 }

@@ -9,6 +9,8 @@ import prisma from '@/lib/prisma';
 import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 async function handleGET(request: NextRequest) {
   // Verify CSRF token (for POST requests, but GET is read-only so we'll allow it)
   const user = getCurrentUser(request);
@@ -122,7 +124,7 @@ async function handleGET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error exporting user data:', error);
+    logError('Error exporting user data:', error);
     return NextResponse.json(
       { error: 'Failed to export user data' },
       { status: 500 }

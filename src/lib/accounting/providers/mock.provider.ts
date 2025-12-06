@@ -5,6 +5,8 @@
 
 import { IAccountingProvider, InvoiceRequest, InvoiceResult, PaymentRequest, PaymentResult, ContactRequest, ContactResult } from '../provider.interface';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export class MockAccountingProvider implements IAccountingProvider {
   readonly name = 'mock';
   readonly displayName = 'Mock Accounting Provider';
@@ -51,7 +53,7 @@ export class MockAccountingProvider implements IAccountingProvider {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('📊 [MOCK ACCOUNTING] Invoice Created', {
+      logInfo('📊 [MOCK ACCOUNTING] Invoice Created', {
         invoiceId,
         invoiceNumber,
         orderNumber: request.orderNumber,
@@ -87,7 +89,7 @@ export class MockAccountingProvider implements IAccountingProvider {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('💰 [MOCK ACCOUNTING] Payment Recorded', {
+      logInfo('💰 [MOCK ACCOUNTING] Payment Recorded', {
         paymentId,
         invoiceId: request.invoiceId,
         amount: request.amount,
@@ -113,7 +115,7 @@ export class MockAccountingProvider implements IAccountingProvider {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('👤 [MOCK ACCOUNTING] Contact Created/Updated', {
+      logInfo('👤 [MOCK ACCOUNTING] Contact Created/Updated', {
         contactId,
         name: request.name,
         email: request.email,

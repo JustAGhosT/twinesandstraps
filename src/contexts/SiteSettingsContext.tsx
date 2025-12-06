@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export interface SiteSettings {
   companyName: string;
   tagline: string;
@@ -63,10 +65,10 @@ export function SiteSettingsProvider({ children }: SiteSettingsProviderProps) {
         const data = await res.json();
         setSettings({ ...defaultSettings, ...(data.data || {}) });
       } else {
-        console.warn('Failed to fetch settings, using defaults');
+        logWarn('Failed to fetch settings, using defaults');
       }
     } catch (err) {
-      console.error('Error fetching settings:', err);
+      logError('Error fetching settings:', err);
       setError('Failed to load site settings');
     } finally {
       setLoading(false);

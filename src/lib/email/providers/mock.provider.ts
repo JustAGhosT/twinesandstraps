@@ -5,6 +5,8 @@
 
 import { EmailOptions, EmailTemplate, IEmailProvider, SendEmailResult } from '../provider.interface';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export class MockEmailProvider implements IEmailProvider {
   readonly name = 'mock';
   readonly displayName = 'Mock Email Provider';
@@ -24,7 +26,7 @@ export class MockEmailProvider implements IEmailProvider {
 
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('📧 [MOCK EMAIL]', {
+      logInfo('📧 [MOCK EMAIL]', {
         to: options.to,
         subject: options.subject,
         hasHtml: !!options.htmlContent,

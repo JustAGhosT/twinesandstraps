@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import { getCurrentUser, hashPassword, verifyPassword } from '@/lib/user-auth';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const updateProfileSchema = z.object({
   name: z.string().min(2).max(100).optional(),
   phone: z.string().max(20).optional().nullable(),
@@ -60,7 +62,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ user });
   } catch (error) {
-    console.error('Error fetching profile:', error);
+    logError('Error fetching profile:', error);
     return NextResponse.json(
       { error: 'Failed to fetch profile' },
       { status: 500 }
@@ -110,7 +112,7 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({ success: true, user });
   } catch (error) {
-    console.error('Error updating profile:', error);
+    logError('Error updating profile:', error);
     return NextResponse.json(
       { error: 'Failed to update profile' },
       { status: 500 }
@@ -172,7 +174,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Password updated successfully' });
   } catch (error) {
-    console.error('Error changing password:', error);
+    logError('Error changing password:', error);
     return NextResponse.json(
       { error: 'Failed to change password' },
       { status: 500 }

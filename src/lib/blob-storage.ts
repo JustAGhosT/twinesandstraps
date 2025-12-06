@@ -15,6 +15,8 @@
 
 import { v4 as uuidv4 } from 'uuid';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Blob storage configuration
 interface BlobStorageConfig {
   accountName: string;
@@ -131,7 +133,7 @@ async function uploadToAzureBlob(
   const contentLength = buffer.length;
   const blobUrl = `${config.endpoint}/${config.containerName}/${blobName}`;
   
-  console.log(`[BLOB STORAGE] Uploading to container: ${config.containerName}, blob: ${blobName}`);
+  logInfo(`[BLOB STORAGE] Uploading to container: ${config.containerName}, blob: ${blobName}`);
   
   // Azure Storage REST API authorization
   const stringToSign = [
@@ -174,11 +176,11 @@ async function uploadToAzureBlob(
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(`[BLOB STORAGE] Upload failed: ${response.status} - ${errorText}`);
+    logError(`[BLOB STORAGE] Upload failed: ${response.status} - ${errorText}`);
     throw new Error(`Failed to upload to Azure Blob Storage (container: ${config.containerName}): ${response.status} - ${errorText}`);
   }
 
-  console.log(`[BLOB STORAGE] Upload successful: ${blobUrl}`);
+  logInfo(`[BLOB STORAGE] Upload successful: ${blobUrl}`);
   return blobUrl;
 }
 
@@ -236,7 +238,7 @@ export async function uploadFile(
   }
 
   // In development, allow base64 fallback with a warning
-  console.warn(
+  logWarn(
     '[BLOB STORAGE] Azure Blob Storage is not configured. ' +
     'Falling back to base64 encoding. ' +
     'This is only allowed in development mode. ' +
@@ -290,7 +292,7 @@ export async function deleteBlob(blobUrl: string): Promise<boolean> {
 
     return response.ok || response.status === 404;
   } catch (error) {
-    console.error('Failed to delete blob:', error);
+    logError('Failed to delete blob:', error);
     return false;
   }
 }

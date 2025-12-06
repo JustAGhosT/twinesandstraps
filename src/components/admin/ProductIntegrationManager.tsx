@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface ProductIntegration {
   id?: number;
   integrationType: 'supplier' | 'marketplace';
@@ -91,7 +93,7 @@ export default function ProductIntegrationManager({
       const data = await response.json();
       setIntegrations(data.integrations || []);
     } catch (err) {
-      console.error('Error loading integrations:', err);
+      logError('Error loading integrations:', err);
       error('Failed to load integrations');
     } finally {
       setLoading(false);
@@ -119,7 +121,7 @@ export default function ProductIntegrationManager({
         })),
       });
     } catch (err) {
-      console.error('Error loading available integrations:', err);
+      logError('Error loading available integrations:', err);
     }
   };
 
@@ -140,7 +142,7 @@ export default function ProductIntegrationManager({
       setEditingIntegration(null);
       loadIntegrations();
     } catch (err) {
-      console.error('Error saving integration:', err);
+      logError('Error saving integration:', err);
       error(err instanceof Error ? err.message : 'Failed to save integration');
     }
   };

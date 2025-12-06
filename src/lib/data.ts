@@ -2,6 +2,8 @@ import { STOCK_STATUS } from '@/constants';
 import { CacheKeys, getOrSetCache } from './cache';
 import prisma from './prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function getProduct(idOrSlug: string) {
   // Try to parse as ID first (for backward compatibility)
   const productId = parseInt(idOrSlug, 10);
@@ -30,7 +32,7 @@ export async function getProduct(idOrSlug: string) {
       3600 * 1000 // 1 hour cache
     );
   } catch (error) {
-    console.error('Failed to fetch product:', error);
+    logError('Failed to fetch product:', error);
     return null;
   }
 }
@@ -87,7 +89,7 @@ export async function getRelatedProducts(productId: number, categoryId?: number)
       3600 * 1000 // 1 hour cache
     );
   } catch (error) {
-    console.error('Failed to fetch related products:', error);
+    logError('Failed to fetch related products:', error);
     return [];
   }
 }
@@ -116,7 +118,7 @@ export async function getFeaturedProducts(count: number = 4) {
       1800 * 1000 // 30 minutes cache
     );
   } catch (error) {
-    console.error('Failed to fetch featured products:', error);
+    logError('Failed to fetch featured products:', error);
     return [];
   }
 }

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/user-auth';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Get user's orders
 export async function GET(request: NextRequest) {
   const user = getCurrentUser(request);
@@ -51,7 +53,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching orders:', error);
+    logError('Error fetching orders:', error);
     return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 });
   }
 }

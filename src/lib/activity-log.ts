@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma';
+import { logError } from '@/lib/logging/logger';
 
 export type ActivityAction =
   | 'CREATE'
@@ -27,7 +28,9 @@ export type EntityType =
   | 'THEME'
   | 'FEATURE'
   | 'ADMIN'
-  | 'LOGO';
+  | 'LOGO'
+  | 'SUPPLIER'
+  | 'MARKETPLACE';
 
 interface LogActivityParams {
   action: ActivityAction;
@@ -65,7 +68,7 @@ export async function logActivity({
     });
   } catch (error) {
     // Log error but don't throw - activity logging should not break the main operation
-    console.error('Failed to log activity:', error);
+    logError('Failed to log activity', error, { action, entityType, entityId });
   }
 }
 

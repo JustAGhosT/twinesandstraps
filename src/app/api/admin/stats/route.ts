@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(request: NextRequest) {
   // Verify admin authentication
   const authError = await requireAdminAuth(request);
@@ -22,7 +24,7 @@ export async function GET(request: NextRequest) {
       outOfStockProducts,
     });
   } catch (error) {
-    console.error('Error fetching admin stats:', error);
+    logError('Error fetching admin stats:', error);
     return NextResponse.json(
       { error: 'Failed to fetch stats' },
       { status: 500 }

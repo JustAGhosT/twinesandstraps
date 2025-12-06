@@ -4,6 +4,8 @@
  */
 
 import { IShippingProvider } from '../provider.interface';
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 import {
   ShippingQuoteRequest,
   ShippingQuote,
@@ -42,7 +44,7 @@ export class CourierGuyProvider implements IShippingProvider {
 
   async getQuote(request: ShippingQuoteRequest): Promise<ShippingQuote | null> {
     if (!this.isConfigured()) {
-      console.warn('The Courier Guy API key not configured');
+      logWarn('The Courier Guy API key not configured');
       return null;
     }
 
@@ -76,7 +78,7 @@ export class CourierGuyProvider implements IShippingProvider {
         currency: data.currency || 'ZAR',
       };
     } catch (error) {
-      console.error('Error fetching shipping quote from Courier Guy:', error);
+      logError('Error fetching shipping quote from Courier Guy:', error);
       
       // Fallback to estimated cost
       return this.estimateShippingCost(request);
@@ -105,7 +107,7 @@ export class CourierGuyProvider implements IShippingProvider {
 
   async createWaybill(request: WaybillRequest): Promise<Waybill | null> {
     if (!this.isConfigured()) {
-      console.warn('The Courier Guy API key not configured');
+      logWarn('The Courier Guy API key not configured');
       return null;
     }
 
@@ -139,7 +141,7 @@ export class CourierGuyProvider implements IShippingProvider {
         provider: this.name,
       };
     } catch (error) {
-      console.error('Error creating waybill with Courier Guy:', error);
+      logError('Error creating waybill with Courier Guy:', error);
       return null;
     }
   }
@@ -174,7 +176,7 @@ export class CourierGuyProvider implements IShippingProvider {
         })),
       };
     } catch (error) {
-      console.error('Error fetching tracking info from Courier Guy:', error);
+      logError('Error fetching tracking info from Courier Guy:', error);
       return null;
     }
   }
@@ -196,7 +198,7 @@ export class CourierGuyProvider implements IShippingProvider {
 
       return response.ok;
     } catch (error) {
-      console.error('Error canceling waybill with Courier Guy:', error);
+      logError('Error canceling waybill with Courier Guy:', error);
       return false;
     }
   }

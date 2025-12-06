@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface Product {
   id: number;
   name: string;
@@ -34,7 +36,7 @@ export default function ProductsPage() {
         setProducts(data.data?.items || []);
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
+      logError('Error fetching products:', error);
     } finally {
       setLoading(false);
     }
@@ -48,7 +50,7 @@ export default function ProductsPage() {
         setDeleteConfirm(null);
       }
     } catch (error) {
-      console.error('Error deleting product:', error);
+      logError('Error deleting product:', error);
     }
   };
 

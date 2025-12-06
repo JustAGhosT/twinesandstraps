@@ -8,6 +8,8 @@ import { getSiteUrl } from '../env';
 import { getQuote } from './quote-management';
 import { generateQuoteHTML } from './pdf-generation';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export interface QuoteEmailData {
   quoteId: number;
   customerEmail: string;
@@ -21,13 +23,13 @@ export interface QuoteEmailData {
  */
 export async function sendQuoteEmail(data: QuoteEmailData): Promise<boolean> {
   if (!isBrevoConfigured()) {
-    console.warn('Brevo not configured. Quote email not sent.');
+    logWarn('Brevo not configured. Quote email not sent.');
     return false;
   }
 
   const quote = await getQuote(data.quoteId);
   if (!quote) {
-    console.error('Quote not found:', data.quoteId);
+    logError('Quote not found:', data.quoteId);
     return false;
   }
 
@@ -157,7 +159,7 @@ export async function sendQuoteRequestConfirmation(
   quoteNumber: string
 ): Promise<boolean> {
   if (!isBrevoConfigured()) {
-    console.warn('Brevo not configured. Quote confirmation email not sent.');
+    logWarn('Brevo not configured. Quote confirmation email not sent.');
     return false;
   }
 

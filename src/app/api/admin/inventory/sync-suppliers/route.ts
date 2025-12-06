@@ -9,6 +9,8 @@ import { syncAllSuppliers, syncSupplierProducts } from '@/lib/inventory/supplier
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const syncSchema = z.object({
   supplierId: z.number().int().positive().optional(),
 });
@@ -52,7 +54,7 @@ async function handlePOST(request: NextRequest) {
       });
     }
   } catch (error: any) {
-    console.error('Error syncing suppliers:', error);
+    logError('Error syncing suppliers:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to sync suppliers' },
       { status: 500 }

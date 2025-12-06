@@ -9,6 +9,8 @@ import UseAIButton from '@/components/UseAIButton';
 import ProductIntegrationManager from '@/components/admin/ProductIntegrationManager';
 import { STOCK_STATUS, STOCK_STATUS_LABELS } from '@/constants';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface Category {
   id: number;
   name: string;
@@ -64,7 +66,7 @@ export default function ProductEditPage() {
         setCategories(data.data || []);
       }
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      logError('Error fetching categories:', error);
     }
   }, []);
 
@@ -94,7 +96,7 @@ export default function ProductEditPage() {
         }
       }
     } catch (error) {
-      console.error('Error fetching product:', error);
+      logError('Error fetching product:', error);
       setError('Failed to load product');
     } finally {
       setLoading(false);
@@ -136,7 +138,7 @@ export default function ProductEditPage() {
         setForm(prev => ({ ...prev, image_url: data.data?.url || '' }));
       }
     } catch (error) {
-      console.error('Error uploading image:', error);
+      logError('Error uploading image:', error);
     }
   };
 
@@ -177,7 +179,7 @@ export default function ProductEditPage() {
         setError(data.error || 'Failed to save product');
       }
     } catch (error) {
-      console.error('Error saving product:', error);
+      logError('Error saving product:', error);
       setError('Failed to save product');
     } finally {
       setSaving(false);

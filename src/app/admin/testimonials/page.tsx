@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface Testimonial {
   id: string;
   name: string;
@@ -64,7 +66,7 @@ export default function TestimonialsPage() {
       try {
         setTestimonials(JSON.parse(stored));
       } catch (e) {
-        console.error('Error loading testimonials:', e);
+        logError('Error loading testimonials:', e);
       }
     }
   }, []);

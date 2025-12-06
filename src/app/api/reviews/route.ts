@@ -5,6 +5,8 @@ import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wra
 import { z } from 'zod';
 import { successResponse, errorResponse } from '@/types/api';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
 
@@ -49,7 +51,7 @@ export async function GET(request: NextRequest) {
       successResponse(reviews, 'Reviews retrieved successfully')
     );
   } catch (error) {
-    console.error('Error fetching reviews:', error);
+    logError('Error fetching reviews:', error);
     return NextResponse.json(
       errorResponse('Failed to fetch reviews'),
       { status: 500 }
@@ -118,7 +120,7 @@ async function handlePOST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Error creating review:', error);
+    logError('Error creating review:', error);
     return NextResponse.json(
       errorResponse('Failed to submit review. Please try again.'),
       { status: 500 }

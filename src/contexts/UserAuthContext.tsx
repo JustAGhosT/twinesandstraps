@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface User {
   id: number;
   name: string;
@@ -52,7 +54,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
       }
     } catch (err) {
-      console.error('Auth check failed:', err);
+      logError('Auth check failed:', err);
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -80,7 +82,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
         return false;
       }
     } catch (err) {
-      console.error('Login error:', err);
+      logError('Login error:', err);
       setError('An error occurred during login');
       return false;
     } finally {
@@ -115,7 +117,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
         return false;
       }
     } catch (err) {
-      console.error('Registration error:', err);
+      logError('Registration error:', err);
       setError('An error occurred during registration');
       return false;
     } finally {
@@ -127,7 +129,7 @@ export function UserAuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
     } catch (err) {
-      console.error('Logout error:', err);
+      logError('Logout error:', err);
     } finally {
       setUser(null);
     }

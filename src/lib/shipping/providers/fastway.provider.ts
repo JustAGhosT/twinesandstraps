@@ -5,6 +5,8 @@
  */
 
 import { IShippingProvider } from '../provider.interface';
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 import {
   ShippingQuoteRequest,
   ShippingQuote,
@@ -76,7 +78,7 @@ export class FastWayProvider implements IShippingProvider {
         phone: depot.phone,
       }));
     } catch (error) {
-      console.error('Error searching FastWay depots:', error);
+      logError('Error searching FastWay depots:', error);
       return [];
     }
   }
@@ -91,7 +93,7 @@ export class FastWayProvider implements IShippingProvider {
 
   async getQuote(request: ShippingQuoteRequest): Promise<ShippingQuote | null> {
     if (!this.isConfigured()) {
-      console.warn('FastWay API key not configured');
+      logWarn('FastWay API key not configured');
       return null;
     }
 
@@ -126,7 +128,7 @@ export class FastWayProvider implements IShippingProvider {
         currency: 'ZAR',
       };
     } catch (error) {
-      console.error('Error fetching shipping quote from FastWay:', error);
+      logError('Error fetching shipping quote from FastWay:', error);
       
       // Fallback to estimated cost
       return {
@@ -147,7 +149,7 @@ export class FastWayProvider implements IShippingProvider {
 
   async createWaybill(request: WaybillRequest): Promise<Waybill | null> {
     if (!this.isConfigured()) {
-      console.warn('FastWay API key not configured');
+      logWarn('FastWay API key not configured');
       return null;
     }
 
@@ -206,7 +208,7 @@ export class FastWayProvider implements IShippingProvider {
         provider: this.name,
       };
     } catch (error) {
-      console.error('Error creating waybill with FastWay:', error);
+      logError('Error creating waybill with FastWay:', error);
       return null;
     }
   }
@@ -242,7 +244,7 @@ export class FastWayProvider implements IShippingProvider {
         })),
       };
     } catch (error) {
-      console.error('Error fetching tracking info from FastWay:', error);
+      logError('Error fetching tracking info from FastWay:', error);
       return null;
     }
   }
@@ -265,7 +267,7 @@ export class FastWayProvider implements IShippingProvider {
 
       return response.ok;
     } catch (error) {
-      console.error('Error canceling waybill with FastWay:', error);
+      logError('Error canceling waybill with FastWay:', error);
       return false;
     }
   }

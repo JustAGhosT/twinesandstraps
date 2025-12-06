@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { sendEmail, isBrevoConfigured } from '@/lib/email/brevo';
 import { addToWelcomeSeries } from '@/lib/email/welcome-series';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface NewsletterSignupProps {
   variant?: 'footer' | 'inline';
 }
@@ -96,7 +98,7 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({ variant = 'footer' 
         setMessage('');
       }, 3000);
     } catch (error) {
-      console.error('Newsletter signup error:', error);
+      logError('Newsletter signup error:', error);
       setStatus('error');
       setMessage('Something went wrong. Please try again.');
     }

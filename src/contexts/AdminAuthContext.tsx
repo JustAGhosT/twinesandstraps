@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface AdminAuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -67,7 +69,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         }
       } catch (err) {
         // On error, clear session for security but log for debugging
-        console.error('Session verification failed:', err);
+        logError('Session verification failed:', err);
         localStorage.removeItem(ADMIN_SESSION_KEY);
       }
       setIsLoading(false);
@@ -111,7 +113,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       return false;
     } catch (err) {
       setError('Network error. Please check your connection.');
-      console.error('Login error:', err);
+      logError('Login error:', err);
       return false;
     }
   }, []);
@@ -125,7 +127,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         credentials: 'include',
       });
     } catch (err) {
-      console.error('Logout error:', err);
+      logError('Logout error:', err);
     }
 
     // Clear local session regardless of server response

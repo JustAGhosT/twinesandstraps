@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const updateReviewSchema = z.object({
   status: z.enum(['PENDING', 'APPROVED', 'REJECTED']).optional(),
   adminNotes: z.string().max(1000).optional(),
@@ -52,7 +54,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(review);
   } catch (error) {
-    console.error('Error fetching review:', error);
+    logError('Error fetching review:', error);
     return NextResponse.json(
       { error: 'Failed to fetch review' },
       { status: 500 }
@@ -135,7 +137,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         : 'Review updated successfully',
     });
   } catch (error) {
-    console.error('Error updating review:', error);
+    logError('Error updating review:', error);
     return NextResponse.json(
       { error: 'Failed to update review' },
       { status: 500 }
@@ -167,7 +169,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true, message: 'Review deleted successfully' });
   } catch (error) {
-    console.error('Error deleting review:', error);
+    logError('Error deleting review:', error);
     return NextResponse.json(
       { error: 'Failed to delete review' },
       { status: 500 }

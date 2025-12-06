@@ -5,6 +5,8 @@
 
 import { shippingProviderFactory } from './provider.factory';
 import { IShippingProvider } from './provider.interface';
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 import {
   ShippingQuoteRequest,
   ShippingQuote,
@@ -121,7 +123,7 @@ export async function searchCollectionPoints(
         const points = await provider.searchCollectionPoints(postalCode, city, province, radiusKm);
         allPoints.push(...points);
       } catch (error) {
-        console.error(`Error searching collection points with ${provider.name}:`, error);
+        logError(`Error searching collection points with ${provider.name}:`, error);
       }
     }
   }

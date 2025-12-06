@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface Customer {
   id: number;
   name: string;
@@ -55,7 +57,7 @@ export default function AdminCustomersPage() {
         setPagination(data.pagination);
       }
     } catch (error) {
-      console.error('Error fetching customers:', error);
+      logError('Error fetching customers:', error);
     } finally {
       setLoading(false);
     }

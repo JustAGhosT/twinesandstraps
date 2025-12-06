@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import type { ProductWithCategory } from '@/types/database';
 import { successResponse, errorResponse } from '@/types/api';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -35,7 +37,7 @@ export async function GET(
       successResponse(product as ProductWithCategory, 'Product retrieved successfully')
     );
   } catch (error) {
-    console.error('Error fetching product:', error);
+    logError('Error fetching product:', error);
     return NextResponse.json(
       errorResponse('Failed to fetch product'),
       { status: 500 }

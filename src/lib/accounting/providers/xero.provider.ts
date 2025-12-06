@@ -9,6 +9,8 @@ import { syncOrderToXero } from '../../xero/invoices';
 import { createXeroPayment, syncPaymentToXero } from '../../xero/payments';
 import prisma from '../../prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export class XeroProvider implements IAccountingProvider {
   readonly name = 'xero';
   readonly displayName = 'Xero';
@@ -140,7 +142,7 @@ export class XeroProvider implements IAccountingProvider {
         invoiceUrl: `https://go.xero.com/AccountsReceivable/View.aspx?InvoiceID=${xeroInvoiceId}`,
       };
     } catch (error) {
-      console.error('Xero invoice creation error:', error);
+      logError('Xero invoice creation error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to create invoice',
@@ -198,7 +200,7 @@ export class XeroProvider implements IAccountingProvider {
         paymentId,
       };
     } catch (error) {
-      console.error('Xero payment recording error:', error);
+      logError('Xero payment recording error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to record payment',
@@ -314,7 +316,7 @@ export class XeroProvider implements IAccountingProvider {
         contactId: contact?.ContactID || contactId,
       };
     } catch (error) {
-      console.error('Xero contact creation error:', error);
+      logError('Xero contact creation error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to create/update contact',
@@ -377,7 +379,7 @@ export class XeroProvider implements IAccountingProvider {
         invoiceUrl: `https://go.xero.com/AccountsReceivable/View.aspx?InvoiceID=${invoice.InvoiceID}`,
       };
     } catch (error) {
-      console.error('Xero get invoice error:', error);
+      logError('Xero get invoice error:', error);
       return null;
     }
   }

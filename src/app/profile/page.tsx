@@ -8,6 +8,8 @@ import { useUserAuth } from '@/contexts/UserAuthContext';
 import { useToast } from '@/components/Toast';
 import { useConfirm } from '@/components/ConfirmModal';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface UserProfile {
   id: number;
   name: string;
@@ -99,7 +101,7 @@ export default function ProfilePage() {
         setProfile(data.user);
       }
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      logError('Error fetching profile:', error);
     } finally {
       setLoading(false);
     }
@@ -113,7 +115,7 @@ export default function ProfilePage() {
         setAddresses(data.addresses);
       }
     } catch (error) {
-      console.error('Error fetching addresses:', error);
+      logError('Error fetching addresses:', error);
     }
   };
 
@@ -125,7 +127,7 @@ export default function ProfilePage() {
         setViewHistory(data.items);
       }
     } catch (error) {
-      console.error('Error fetching view history:', error);
+      logError('Error fetching view history:', error);
     }
   };
 
@@ -137,7 +139,7 @@ export default function ProfilePage() {
         setRecentOrders(data.orders);
       }
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      logError('Error fetching orders:', error);
     }
   };
 

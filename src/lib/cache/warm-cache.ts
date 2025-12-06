@@ -7,12 +7,14 @@ import { getOrSetCache, CacheKeys } from '../cache';
 import prisma from '../prisma';
 import { STOCK_STATUS } from '@/constants';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 /**
  * Warm cache with commonly accessed data
  */
 export async function warmCache(): Promise<void> {
   try {
-    console.log('Starting cache warm-up...');
+    logInfo('Starting cache warm-up...');
 
     // Warm featured products
     await getOrSetCache(
@@ -62,9 +64,9 @@ export async function warmCache(): Promise<void> {
       3600 * 1000 // 1 hour
     );
 
-    console.log('✅ Cache warm-up completed');
+    logInfo('✅ Cache warm-up completed');
   } catch (error) {
-    console.error('Cache warm-up error:', error);
+    logError('Cache warm-up error:', error);
   }
 }
 
@@ -120,7 +122,7 @@ export async function warmProductCache(productId: number): Promise<void> {
       );
     }
   } catch (error) {
-    console.error('Error warming product cache:', error);
+    logError('Error warming product cache:', error);
   }
 }
 

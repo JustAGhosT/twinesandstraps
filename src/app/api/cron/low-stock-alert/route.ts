@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkAndSendLowStockAlerts } from '@/lib/inventory/low-stock';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(request: NextRequest) {
   // Verify cron secret (if configured)
   const authHeader = request.headers.get('authorization');
@@ -32,7 +34,7 @@ export async function GET(request: NextRequest) {
         : 'No low stock products found',
     });
   } catch (error) {
-    console.error('Error in low stock alert cron:', error);
+    logError('Error in low stock alert cron:', error);
     return NextResponse.json(
       { error: 'Failed to process low stock alert' },
       { status: 500 }

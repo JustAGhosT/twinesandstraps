@@ -8,6 +8,8 @@ import { getQuote, acceptQuote, type QuoteStatus } from './quote-management';
 import { generateCheckoutUrl } from '../payfast/checkout';
 import { getSiteUrl } from '../env';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export interface ConvertQuoteToOrderResult {
   success: boolean;
   orderId?: number;
@@ -115,7 +117,7 @@ export async function convertQuoteToOrder(
       paymentUrl,
     };
   } catch (error) {
-    console.error('Error converting quote to order:', error);
+    logError('Error converting quote to order:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

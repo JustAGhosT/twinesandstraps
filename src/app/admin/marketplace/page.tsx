@@ -9,6 +9,8 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/Button';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export default function MarketplacePage() {
   const [syncing, setSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string>('');
@@ -30,7 +32,7 @@ export default function MarketplacePage() {
         setSyncStatus('Error syncing inventory');
       }
     } catch (error) {
-      console.error('Sync error:', error);
+      logError('Sync error:', error);
       setSyncStatus('Error syncing inventory');
     } finally {
       setSyncing(false);

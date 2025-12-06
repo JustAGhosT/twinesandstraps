@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // In-memory session store - WARNING: Use Redis/database in production for persistence across restarts
 // This store will be cleared on server restart and doesn't work with multiple server instances
 if (process.env.NODE_ENV === 'production') {
-  console.warn('[SECURITY] Using in-memory session store. Configure Redis or database for production.');
+  logWarn('[SECURITY] Using in-memory session store. Configure Redis or database for production.');
 }
 const sessions = new Map<string, {
   userId: number;

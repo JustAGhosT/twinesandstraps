@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import type { Category } from '@/types/database';
 import { successResponse, errorResponse } from '@/types/api';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
 
@@ -41,7 +43,7 @@ export async function GET(request: NextRequest) {
       successResponse(categories as CategoryWithCount[], 'Categories retrieved successfully')
     );
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    logError('Error fetching categories:', error);
     return NextResponse.json(
       errorResponse('Failed to fetch categories'),
       { status: 500 }

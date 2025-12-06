@@ -5,6 +5,8 @@
 
 import { IAccountingProvider, InvoiceRequest, InvoiceResult, PaymentRequest, PaymentResult, ContactRequest, ContactResult } from '../provider.interface';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const QUICKBOOKS_CLIENT_ID = process.env.QUICKBOOKS_CLIENT_ID || '';
 const QUICKBOOKS_CLIENT_SECRET = process.env.QUICKBOOKS_CLIENT_SECRET || '';
 const QUICKBOOKS_REALM_ID = process.env.QUICKBOOKS_REALM_ID || '';
@@ -153,7 +155,7 @@ export class QuickBooksProvider implements IAccountingProvider {
         invoiceUrl: `https://app.qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
       };
     } catch (error) {
-      console.error('QuickBooks invoice creation error:', error);
+      logError('QuickBooks invoice creation error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to create invoice',
@@ -210,7 +212,7 @@ export class QuickBooksProvider implements IAccountingProvider {
         paymentId: payment.Id,
       };
     } catch (error) {
-      console.error('QuickBooks payment recording error:', error);
+      logError('QuickBooks payment recording error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to record payment',
@@ -271,7 +273,7 @@ export class QuickBooksProvider implements IAccountingProvider {
         contactId: contact.Id,
       };
     } catch (error) {
-      console.error('QuickBooks contact creation error:', error);
+      logError('QuickBooks contact creation error:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to create/update contact',
@@ -320,7 +322,7 @@ export class QuickBooksProvider implements IAccountingProvider {
         invoiceUrl: `https://app.qbo.intuit.com/app/invoice?txnId=${invoice.Id}`,
       };
     } catch (error) {
-      console.error('QuickBooks get invoice error:', error);
+      logError('QuickBooks get invoice error:', error);
       return null;
     }
   }

@@ -3,6 +3,8 @@
 import React from 'react';
 import { Button } from './Button';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
@@ -30,7 +32,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    logError('ErrorBoundary caught an error:', error, errorInfo);
     // In production, you might want to log this to an error reporting service
   }
 

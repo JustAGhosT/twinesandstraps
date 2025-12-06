@@ -6,6 +6,8 @@
 import prisma from '../prisma';
 import { STOCK_STATUS } from '@/constants';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export interface ChannelInventory {
   channel: string; // 'WEBSITE', 'TAKEALOT', 'FACEBOOK', etc.
   productId: number;
@@ -87,7 +89,7 @@ export async function reserveInventory(
     // For now, just return success
     return true;
   } catch (error) {
-    console.error('Error reserving inventory:', error);
+    logError('Error reserving inventory:', error);
     return false;
   }
 }
@@ -101,7 +103,7 @@ export async function releaseInventory(
   channel: string = 'WEBSITE'
 ): Promise<void> {
   // In production, update ChannelInventory table
-  console.log(`Releasing ${quantity} units of product ${productId} from ${channel}`);
+  logInfo(`Releasing ${quantity} units of product ${productId} from ${channel}`);
 }
 
 /**
@@ -115,7 +117,7 @@ export async function syncInventoryToChannel(
   try {
     // This would call the channel's API to update inventory
     // For now, just log the sync
-    console.log(`Syncing product ${productId} to ${channel}: ${quantity} units`);
+    logInfo(`Syncing product ${productId} to ${channel}: ${quantity} units`);
 
     return {
       productId,
@@ -125,7 +127,7 @@ export async function syncInventoryToChannel(
       syncedAt: new Date(),
     };
   } catch (error) {
-    console.error(`Error syncing inventory to ${channel}:`, error);
+    logError(`Error syncing inventory to ${channel}:`, error);
     return {
       productId,
       channel,

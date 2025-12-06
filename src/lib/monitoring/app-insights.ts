@@ -1,3 +1,4 @@
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
 /**
  * Azure Application Insights Integration
  * Provides monitoring, error tracking, and custom metrics
@@ -23,7 +24,7 @@ export function initializeAppInsights() {
   const instrumentationKey = process.env.APPINSIGHTS_INSTRUMENTATIONKEY;
 
   if (!connectionString && !instrumentationKey) {
-    console.warn('Application Insights not configured. Monitoring disabled.');
+    logWarn('Application Insights not configured. Monitoring disabled.');
     return null;
   }
 
@@ -46,10 +47,10 @@ export function initializeAppInsights() {
       appInsights.context.tags[appInsightsPackage.defaultClient.context.keys.cloudRoleInstance] = process.env.NODE_ENV || 'development';
     }
 
-    console.log('Application Insights initialized');
+    logInfo('Application Insights initialized');
     return appInsights;
   } catch (error) {
-    console.error('Failed to initialize Application Insights:', error);
+    logError('Failed to initialize Application Insights:', error);
     return null;
   }
 }
@@ -74,7 +75,7 @@ export function trackEvent(name: string, properties?: Record<string, string | nu
       client.trackEvent({ name, properties });
     }
   } catch (error) {
-    console.error('Failed to track event:', error);
+    logError('Failed to track event:', error);
   }
 }
 
@@ -88,7 +89,7 @@ export function trackException(error: Error, properties?: Record<string, string 
       client.trackException({ exception: error, properties });
     }
   } catch (err) {
-    console.error('Failed to track exception:', err);
+    logError('Failed to track exception:', err);
   }
 }
 
@@ -102,7 +103,7 @@ export function trackMetric(name: string, value: number, properties?: Record<str
       client.trackMetric({ name, value, properties });
     }
   } catch (error) {
-    console.error('Failed to track metric:', error);
+    logError('Failed to track metric:', error);
   }
 }
 
@@ -130,7 +131,7 @@ export function trackDependency(
       });
     }
   } catch (error) {
-    console.error('Failed to track dependency:', error);
+    logError('Failed to track dependency:', error);
   }
 }
 
@@ -144,7 +145,7 @@ export function trackTrace(message: string, severityLevel: number = 1, propertie
       client.trackTrace({ message, severityLevel, properties });
     }
   } catch (error) {
-    console.error('Failed to track trace:', error);
+    logError('Failed to track trace:', error);
   }
 }
 
@@ -158,7 +159,7 @@ export function startRequest(name: string, url: string, properties?: Record<stri
       return client.startTrackRequest(name, url, properties);
     }
   } catch (error) {
-    console.error('Failed to start request tracking:', error);
+    logError('Failed to start request tracking:', error);
   }
   return '';
 }
@@ -179,7 +180,7 @@ export function endRequest(
       client.stopTrackRequest(name, url, statusCode.toString(), success, properties);
     }
   } catch (error) {
-    console.error('Failed to end request tracking:', error);
+    logError('Failed to end request tracking:', error);
   }
 }
 

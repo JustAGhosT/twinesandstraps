@@ -9,6 +9,8 @@ import { GoogleShoppingProvider } from './providers/google-shopping.provider';
 import { FacebookProvider } from './providers/facebook.provider';
 import { MockMarketplaceProvider } from './providers/mock.provider';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 class MarketplaceProviderFactory {
   private providers: Map<string, IMarketplaceProvider> = new Map();
   private defaultProvider: string = 'takealot';
@@ -44,7 +46,7 @@ class MarketplaceProviderFactory {
     if (process.env.NODE_ENV === 'development' && name !== 'mock') {
       const mockProvider = this.providers.get('mock');
       if (mockProvider?.isConfigured()) {
-        console.warn(`Marketplace provider '${name}' not configured. Using MockMarketplaceProvider.`);
+        logWarn(`Marketplace provider '${name}' not configured. Using MockMarketplaceProvider.`);
         return mockProvider;
       }
     }

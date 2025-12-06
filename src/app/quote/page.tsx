@@ -7,6 +7,8 @@ import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import { useToast } from '@/components/Toast';
 import { event } from '@/lib/analytics';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export default function QuotePage() {
   const { items, getTotalItems, getTotalPrice } = useCart();
   const { settings } = useSiteSettings();
@@ -82,7 +84,7 @@ export default function QuotePage() {
       // Redirect to confirmation page
       window.location.href = `/quote/confirmation?quote=${encodeURIComponent(result.quoteNumber)}`;
     } catch (error) {
-      console.error('Error submitting quote:', error);
+      logError('Error submitting quote:', error);
       warning(error instanceof Error ? error.message : 'Failed to submit quote request. Please try again.');
       setIsSubmitting(false);
     }

@@ -3,6 +3,8 @@
 import { useCallback } from 'react';
 import { useUserAuth } from '@/contexts/UserAuthContext';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export function useViewHistory() {
   const { isAuthenticated } = useUserAuth();
 
@@ -18,7 +20,7 @@ export function useViewHistory() {
       });
     } catch (error) {
       // Silently fail - view tracking is not critical
-      console.error('Failed to track view:', error);
+      logError('Failed to track view:', error);
     }
   }, [isAuthenticated]);
 

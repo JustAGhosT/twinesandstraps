@@ -7,6 +7,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { syncAllSuppliers } from '@/lib/inventory/supplier-sync';
 import { trackEvent } from '@/lib/monitoring/app-insights';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const CRON_SECRET = process.env.CRON_SECRET;
 
 export async function GET(request: NextRequest) {
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest) {
       details: results,
     });
   } catch (error: any) {
-    console.error('Error in inventory sync cron:', error);
+    logError('Error in inventory sync cron:', error);
     
     trackEvent('InventorySyncFailed', {
       error: error.message,

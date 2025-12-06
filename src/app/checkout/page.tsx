@@ -9,6 +9,8 @@ import { isPayFastConfigured } from '@/lib/payfast/config';
 import { useToast } from '@/components/Toast';
 import { addressSchema, SA_PROVINCES, validateAddress, formatPhoneNumber, type AddressFormData } from '@/lib/validations/address';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart } = useCart();
   const router = useRouter();
@@ -119,7 +121,7 @@ export default function CheckoutPage() {
       // Redirect to PayFast
       window.location.href = checkoutUrl;
     } catch (error) {
-      console.error('Checkout error:', error);
+      logError('Checkout error:', error);
       showError('Failed to process checkout. Please try again.');
       setIsProcessing(false);
     }
@@ -233,7 +235,7 @@ export default function CheckoutPage() {
           }
         }
       } catch (error) {
-        console.error('Error calculating shipping:', error);
+        logError('Error calculating shipping:', error);
         // Fallback to free shipping for orders over R5000
         if (subtotal >= 5000) {
           setShippingCost(0);

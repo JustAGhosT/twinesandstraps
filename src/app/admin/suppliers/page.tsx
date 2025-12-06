@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface Supplier {
   id: number;
   name: string;
@@ -69,7 +71,7 @@ export default function SuppliersPage() {
         setSuppliers(data.suppliers);
       }
     } catch (error) {
-      console.error('Error fetching suppliers:', error);
+      logError('Error fetching suppliers:', error);
     } finally {
       setLoading(false);
     }
@@ -117,7 +119,7 @@ export default function SuppliersPage() {
         });
       }
     } catch (error) {
-      console.error('Error fetching supplier details:', error);
+      logError('Error fetching supplier details:', error);
     }
   };
 
@@ -175,7 +177,7 @@ export default function SuppliersPage() {
         setError(data.error || 'Failed to save supplier');
       }
     } catch (error) {
-      console.error('Error saving supplier:', error);
+      logError('Error saving supplier:', error);
       setError('Failed to save supplier');
     } finally {
       setSaving(false);
@@ -190,7 +192,7 @@ export default function SuppliersPage() {
         setDeleteConfirm(null);
       }
     } catch (error) {
-      console.error('Error deleting supplier:', error);
+      logError('Error deleting supplier:', error);
     }
   };
 

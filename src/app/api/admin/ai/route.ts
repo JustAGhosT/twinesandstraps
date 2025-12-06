@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 import { 
   isAIConfigured,
   getAIStatus,
@@ -229,7 +231,7 @@ export async function POST(request: NextRequest) {
         );
     }
   } catch (error) {
-    console.error('AI API error:', error);
+    logError('AI API error:', error);
     return NextResponse.json(
       { 
         error: 'AI operation failed',

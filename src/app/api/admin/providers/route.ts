@@ -21,6 +21,8 @@ import { getAllAccountingProviders } from '@/lib/accounting/provider.factory';
 import { getAllMarketplaceProviders } from '@/lib/marketplace/provider.factory';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const providerConfigSchema = z.object({
   providerType: z.enum(['shipping', 'payment', 'email', 'accounting', 'marketplace']),
   providerName: z.string(),
@@ -136,7 +138,7 @@ async function handleGET(request: NextRequest) {
 
     return NextResponse.json({ providers });
   } catch (error) {
-    console.error('Error fetching providers:', error);
+    logError('Error fetching providers:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
@@ -198,7 +200,7 @@ async function handlePOST(request: NextRequest) {
       config,
     });
   } catch (error) {
-    console.error('Error updating provider config:', error);
+    logError('Error updating provider config:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

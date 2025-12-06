@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
 import prisma from '@/lib/prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Constants for input validation
 const MAX_LIMIT = 100;
 const DEFAULT_LIMIT = 50;
@@ -90,7 +92,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching activity logs:', error);
+    logError('Error fetching activity logs:', error);
     return NextResponse.json(
       { error: 'Failed to fetch activity logs' },
       { status: 500 }
@@ -128,7 +130,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, log });
   } catch (error) {
-    console.error('Error creating activity log:', error);
+    logError('Error creating activity log:', error);
     return NextResponse.json(
       { error: 'Failed to create activity log' },
       { status: 500 }

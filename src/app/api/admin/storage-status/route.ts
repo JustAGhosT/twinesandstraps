@@ -3,6 +3,8 @@ import { getStorageStatus } from '@/lib/blob-storage';
 import { errorResponse, successResponse } from '@/types/api';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 /**
  * GET /api/admin/storage-status
  * 
@@ -53,7 +55,7 @@ export async function GET(request: NextRequest) {
       })
     );
   } catch (error) {
-    console.error('Error getting storage status:', error);
+    logError('Error getting storage status:', error);
     return NextResponse.json(
       errorResponse('Failed to get storage status'),
       { status: 500 }

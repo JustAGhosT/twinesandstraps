@@ -7,6 +7,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { processWelcomeEmailSeries } from '@/lib/email/welcome-series';
 import { trackEvent } from '@/lib/monitoring/app-insights';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const CRON_SECRET = process.env.CRON_SECRET;
 
 export async function GET(request: NextRequest) {
@@ -44,7 +46,7 @@ export async function GET(request: NextRequest) {
       results,
     });
   } catch (error: any) {
-    console.error('Error in welcome email cron:', error);
+    logError('Error in welcome email cron:', error);
     
     trackEvent('WelcomeEmailSeriesFailed', {
       error: error.message,

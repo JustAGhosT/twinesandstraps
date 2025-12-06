@@ -6,6 +6,8 @@ import { requireAdminAuth } from '@/lib/admin-auth';
 import { InventoryEventType, ReferenceType, getAllInventoryEvents, getProductInventoryHistory } from '@/lib/inventory/tracking';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(request: NextRequest) {
   const authError = await requireAdminAuth(request);
   if (authError) return authError;
@@ -46,7 +48,7 @@ export async function GET(request: NextRequest) {
       ...result,
     });
   } catch (error) {
-    console.error('Error fetching inventory history:', error);
+    logError('Error fetching inventory history:', error);
     return NextResponse.json(
       { error: 'Failed to fetch inventory history' },
       { status: 500 }

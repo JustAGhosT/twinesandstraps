@@ -4,6 +4,8 @@ import { requireAdminAuth } from '@/lib/admin-auth';
 import { Prisma } from '@prisma/client';
 import { logActivity, getRequestInfo } from '@/lib/activity-log';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -51,7 +53,7 @@ export async function GET(
 
     return NextResponse.json({ order });
   } catch (error) {
-    console.error('Error fetching order:', error);
+    logError('Error fetching order:', error);
     return NextResponse.json(
       { error: 'Failed to fetch order' },
       { status: 500 }
@@ -173,7 +175,7 @@ export async function PUT(
       order: updatedOrder,
     });
   } catch (error) {
-    console.error('Error updating order:', error);
+    logError('Error updating order:', error);
     return NextResponse.json(
       { error: 'Failed to update order' },
       { status: 500 }

@@ -9,6 +9,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/Button';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface Quote {
   id: number;
   quote_number: string;
@@ -44,7 +46,7 @@ export default function AdminQuotesPage() {
         setQuotes(data.quotes || []);
       }
     } catch (error) {
-      console.error('Error fetching quotes:', error);
+      logError('Error fetching quotes:', error);
     } finally {
       setLoading(false);
     }

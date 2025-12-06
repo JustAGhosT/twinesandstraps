@@ -5,6 +5,8 @@ import { updateSupplierSchema, validateBody, formatZodErrors } from '@/lib/valid
 import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface RouteParams {
   params: { id: string };
 }
@@ -47,7 +49,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(supplier);
   } catch (error) {
-    console.error('Error fetching supplier:', error);
+    logError('Error fetching supplier:', error);
     return NextResponse.json(
       { error: 'Failed to fetch supplier' },
       { status: 500 }
@@ -121,7 +123,7 @@ async function handlePUT(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json(supplier);
   } catch (error) {
-    console.error('Error updating supplier:', error);
+    logError('Error updating supplier:', error);
     return NextResponse.json(
       { error: 'Failed to update supplier' },
       { status: 500 }
@@ -171,7 +173,7 @@ async function handleDELETE(request: NextRequest, { params }: RouteParams) {
     await prisma.supplier.delete({ where: { id } });
     return NextResponse.json({ message: 'Supplier deleted', deleted: true });
   } catch (error) {
-    console.error('Error deleting supplier:', error);
+    logError('Error deleting supplier:', error);
     return NextResponse.json(
       { error: 'Failed to delete supplier' },
       { status: 500 }

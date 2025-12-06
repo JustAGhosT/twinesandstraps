@@ -5,6 +5,8 @@
 
 import { ILoggingProvider, LogLevel, LogContext } from '../provider.interface';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export class ConsoleLoggingProvider implements ILoggingProvider {
   readonly name = 'console';
   readonly displayName = 'Console';
@@ -17,19 +19,19 @@ export class ConsoleLoggingProvider implements ILoggingProvider {
 
   debug(message: string, context?: LogContext): void {
     if (this.level <= LogLevel.DEBUG) {
-      console.debug(`[DEBUG] ${message}`, context || '');
+      logDebug(`[DEBUG] ${message}`, context || '');
     }
   }
 
   info(message: string, context?: LogContext): void {
     if (this.level <= LogLevel.INFO) {
-      console.info(`[INFO] ${message}`, context || '');
+      logInfo(`[INFO] ${message}`, context || '');
     }
   }
 
   warn(message: string, context?: LogContext): void {
     if (this.level <= LogLevel.WARN) {
-      console.warn(`[WARN] ${message}`, context || '');
+      logWarn(`[WARN] ${message}`, context || '');
     }
   }
 
@@ -38,7 +40,7 @@ export class ConsoleLoggingProvider implements ILoggingProvider {
       const errorInfo = error instanceof Error 
         ? { message: error.message, stack: error.stack, ...error }
         : error;
-      console.error(`[ERROR] ${message}`, { error: errorInfo, ...context });
+      logError(`[ERROR] ${message}`, { error: errorInfo, ...context });
     }
   }
 

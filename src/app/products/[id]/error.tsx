@@ -4,6 +4,8 @@ import NotFound from '@/components/NotFound';
 import { Button } from '@/components/Button';
 import { useEffect } from 'react';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export default function Error({
   error,
   reset,
@@ -13,7 +15,7 @@ export default function Error({
 }) {
   useEffect(() => {
     // Log error to error reporting service in production
-    console.error('Product page error:', error);
+    logError('Product page error:', error);
   }, [error]);
 
   // If it's a "not found" type error, show NotFound component

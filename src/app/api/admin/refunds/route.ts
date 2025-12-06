@@ -12,6 +12,8 @@ import { sendEmail } from '@/lib/email/brevo';
 import prisma from '@/lib/prisma';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const refundSchema = z.object({
   orderId: z.number().int().positive(),
   pfPaymentId: z.string().min(1, 'PayFast payment ID is required'),
@@ -105,7 +107,7 @@ async function handlePOST(request: NextRequest) {
           tags: ['refund', 'order-update'],
         });
       } catch (emailError) {
-        console.error('Failed to send refund confirmation email:', emailError);
+        logError('Failed to send refund confirmation email:', emailError);
         // Don't fail the request if email fails
       }
     }
@@ -117,7 +119,7 @@ async function handlePOST(request: NextRequest) {
       orderNumber: order.order_number,
     });
   } catch (error) {
-    console.error('Refund API error:', error);
+    logError('Refund API error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

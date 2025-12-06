@@ -4,6 +4,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import type { Product } from '@/types/database';
 import { trackAddToCart, trackBeginCheckout } from '@/lib/analytics';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface CartItem {
   product: Product;
   quantity: number;
@@ -44,7 +46,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       try {
         setItems(JSON.parse(savedCart));
       } catch (e) {
-        console.error('Failed to load cart from localStorage', e);
+        logError('Failed to load cart from localStorage', e);
       }
     }
     setIsLoaded(true);

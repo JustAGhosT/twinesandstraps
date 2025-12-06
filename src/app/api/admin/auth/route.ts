@@ -12,6 +12,8 @@ import {
 } from '@/lib/admin-auth';
 import { loginSchema, validateBody, formatZodErrors } from '@/lib/validations';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 /**
  * GET - Verify if the current session is valid
  */
@@ -40,7 +42,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ valid: true });
   } catch (error) {
-    console.error('Session verification error:', error);
+    logError('Session verification error:', error);
     return NextResponse.json({ valid: false }, { status: 500 });
   }
 }
@@ -82,7 +84,7 @@ export async function POST(request: NextRequest) {
     // Get admin password from environment
     const adminPassword = getAdminPassword();
     if (!adminPassword) {
-      console.error('Admin login attempted but ADMIN_PASSWORD not configured');
+      logError('Admin login attempted but ADMIN_PASSWORD not configured');
       return NextResponse.json(
         { error: 'Admin access is not configured. Please contact the administrator.' },
         { status: 503 }
@@ -120,7 +122,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Login error:', error);
+    logError('Login error:', error);
     return NextResponse.json(
       { error: 'An error occurred during login' },
       { status: 500 }

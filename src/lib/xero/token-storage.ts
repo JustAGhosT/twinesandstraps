@@ -6,6 +6,8 @@
 import prisma from '@/lib/prisma';
 import { refreshXeroToken, XeroToken, XeroTokenResponse } from './auth';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 /**
  * Get the active Xero token, refreshing if necessary
  */
@@ -36,7 +38,7 @@ export async function getActiveXeroToken(): Promise<XeroToken | null> {
         scope: refreshed.scope,
       };
     } catch (error: any) {
-      console.error('Failed to refresh Xero token:', error);
+      logError('Failed to refresh Xero token:', error);
       // Mark token as inactive if refresh fails
       await prisma.xeroToken.update({
         where: { id: tokenRecord.id },

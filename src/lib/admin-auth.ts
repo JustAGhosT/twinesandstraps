@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 import prisma from '@/lib/prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Rate limiting store (kept in memory - acceptable for short-term rate limiting)
 const loginAttempts = new Map<string, { count: number; resetAt: number }>();
 
@@ -15,11 +17,11 @@ const LOGIN_LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
 export function getAdminPassword(): string | null {
   const password = process.env.ADMIN_PASSWORD;
   if (!password) {
-    console.error('ADMIN_PASSWORD environment variable is not set!');
+    logError('ADMIN_PASSWORD environment variable is not set!');
     return null;
   }
   if (password.length < 8) {
-    console.error('ADMIN_PASSWORD must be at least 8 characters!');
+    logError('ADMIN_PASSWORD must be at least 8 characters!');
     return null;
   }
   return password;
@@ -113,7 +115,7 @@ export async function verifySession(token: string | null): Promise<boolean> {
 
     return true;
   } catch (error) {
-    console.error('Error verifying session:', error);
+    logError('Error verifying session:', error);
     return false;
   }
 }
@@ -126,7 +128,7 @@ export async function invalidateSession(token: string): Promise<void> {
     await prisma.adminSession.delete({ where: { token } });
   } catch (error) {
     // Session may not exist, which is fine
-    console.error('Error invalidating session:', error);
+    logError('Error invalidating session:', error);
   }
 }
 
@@ -143,7 +145,7 @@ async function cleanupSessions(): Promise<void> {
       },
     });
   } catch (error) {
-    console.error('Error cleaning up sessions:', error);
+    logError('Error cleaning up sessions:', error);
   }
 }
 

@@ -7,6 +7,8 @@ import { getShippingQuotes, getBestShippingQuote } from '@/lib/shipping/service'
 import { ShippingQuoteRequest } from '@/lib/shipping/types';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const quoteRequestSchema = z.object({
   origin: z.object({
     city: z.string().min(1),
@@ -82,7 +84,7 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error('Shipping quote error:', error);
+    logError('Shipping quote error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }

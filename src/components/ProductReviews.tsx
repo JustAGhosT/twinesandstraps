@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface Review {
   id: number;
   author_name: string;
@@ -68,7 +70,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
         setReviews(data.data || []);
       }
     } catch (err) {
-      console.error('Error fetching reviews:', err);
+      logError('Error fetching reviews:', err);
     } finally {
       setLoading(false);
     }
@@ -115,7 +117,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
         setError(data.error || 'Failed to submit review');
       }
     } catch (err) {
-      console.error('Error submitting review:', err);
+      logError('Error submitting review:', err);
       setError('Failed to submit review. Please try again.');
     } finally {
       setSubmitting(false);

@@ -7,6 +7,8 @@ import { isBrevoConfigured, sendEmail } from './email/brevo';
 import { getSiteUrl } from './env';
 import prisma from './prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export interface AbandonedCartItem {
   productId: number;
   productName: string;
@@ -71,7 +73,7 @@ export async function trackAbandonedCart(
       });
     }
   } catch (error) {
-    console.error('Error tracking abandoned cart:', error);
+    logError('Error tracking abandoned cart:', error);
     // Don't throw - cart tracking shouldn't break the application
   }
 }
@@ -92,7 +94,7 @@ export async function markCartRecovered(email: string): Promise<void> {
       },
     });
   } catch (error) {
-    console.error('Error marking cart as recovered:', error);
+    logError('Error marking cart as recovered:', error);
   }
 }
 
@@ -137,7 +139,7 @@ export async function getCartsNeedingReminder(
       updatedAt: cart.updated_at,
     }));
   } catch (error) {
-    console.error('Error getting carts needing reminder:', error);
+    logError('Error getting carts needing reminder:', error);
     return [];
   }
 }
@@ -150,7 +152,7 @@ export async function sendAbandonedCartEmail(
   hoursSinceAbandonment: number
 ): Promise<boolean> {
   if (!isBrevoConfigured()) {
-    console.warn('Brevo not configured. Abandoned cart email not sent.');
+    logWarn('Brevo not configured. Abandoned cart email not sent.');
     return false;
   }
 
@@ -258,7 +260,7 @@ export async function sendAbandonedCartEmail(
         },
       });
     } catch (error) {
-      console.error('Error updating reminder status:', error);
+      logError('Error updating reminder status:', error);
     }
   }
 
@@ -287,7 +289,7 @@ export async function processAbandonedCartReminders() {
         results.sent24h++;
       }
     } catch (error) {
-      console.error('Error sending 24h reminder:', error);
+      logError('Error sending 24h reminder:', error);
       results.errors++;
     }
   }
@@ -299,7 +301,7 @@ export async function processAbandonedCartReminders() {
         results.sent48h++;
       }
     } catch (error) {
-      console.error('Error sending 48h reminder:', error);
+      logError('Error sending 48h reminder:', error);
       results.errors++;
     }
   }
@@ -311,7 +313,7 @@ export async function processAbandonedCartReminders() {
         results.sent72h++;
       }
     } catch (error) {
-      console.error('Error sending 72h reminder:', error);
+      logError('Error sending 72h reminder:', error);
       results.errors++;
     }
   }

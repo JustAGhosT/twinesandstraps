@@ -5,6 +5,8 @@ import { isValidEmail, generatePasswordResetToken, getPasswordResetExpiry } from
 import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 async function handlePOST(request: NextRequest) {
   // Verify CSRF token
   const csrfError = requireCsrfToken(request);
@@ -60,7 +62,7 @@ async function handlePOST(request: NextRequest) {
 
       // Only log reset URL in development (security: never log tokens in production)
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[DEV] Password reset link for ${email}: ${resetUrl}`);
+        logInfo(`[DEV] Password reset link for ${email}: ${resetUrl}`);
       }
 
       // TODO: Send email with reset link in production
@@ -73,7 +75,7 @@ async function handlePOST(request: NextRequest) {
       message: 'If an account with that email exists, a password reset link has been sent.',
     });
   } catch (error) {
-    console.error('Forgot password error:', error);
+    logError('Forgot password error:', error);
     return NextResponse.json(
       { error: 'An error occurred. Please try again.' },
       { status: 500 }

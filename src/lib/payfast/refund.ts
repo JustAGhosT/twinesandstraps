@@ -6,6 +6,8 @@
 import { getPayFastConfig, isPayFastConfigured } from './config';
 import { generateSignature, type PayFastData } from './signature';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export interface RefundRequest {
   pfPaymentId: string; // PayFast payment ID
   amount?: number; // Partial refund amount (optional, defaults to full refund)
@@ -88,7 +90,7 @@ export async function processRefund(request: RefundRequest): Promise<RefundResul
       };
     }
   } catch (error) {
-    console.error('PayFast refund error:', error);
+    logError('PayFast refund error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

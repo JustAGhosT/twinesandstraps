@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Default brand colors (TASSA Red theme)
 const defaultColors = {
   primary: '#E31E24',
@@ -30,7 +32,7 @@ export async function GET() {
       source: 'default',
     });
   } catch (error) {
-    console.error('Error fetching theme:', error);
+    logError('Error fetching theme:', error);
     // Return defaults on error
     return NextResponse.json({
       colors: defaultColors,

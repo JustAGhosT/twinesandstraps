@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import type { Product } from '@/types/database';
 import { successResponse, errorResponse } from '@/types/api';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
@@ -23,7 +25,7 @@ export async function GET() {
       successResponse(products as Product[], 'Featured products retrieved successfully')
     );
   } catch (error) {
-    console.error('Error fetching featured products:', error);
+    logError('Error fetching featured products:', error);
     return NextResponse.json(
       errorResponse('Failed to fetch featured products'),
       { status: 500 }

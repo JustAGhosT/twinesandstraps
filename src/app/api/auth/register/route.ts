@@ -6,6 +6,8 @@ import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { addToWelcomeSeries } from '@/lib/email/welcome-series';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 async function handlePOST(request: NextRequest) {
   // Verify CSRF token
   const csrfError = requireCsrfToken(request);
@@ -61,7 +63,7 @@ async function handlePOST(request: NextRequest) {
         );
       } catch (emailError) {
         // Log but don't fail registration if email series fails
-        console.error('Failed to add user to welcome series:', emailError);
+        logError('Failed to add user to welcome series:', emailError);
       }
     }
 
@@ -94,7 +96,7 @@ async function handlePOST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('Registration error:', error);
+    logError('Registration error:', error);
     return NextResponse.json(
       { error: 'An error occurred during registration' },
       { status: 500 }

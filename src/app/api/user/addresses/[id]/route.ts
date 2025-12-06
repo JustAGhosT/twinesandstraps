@@ -6,6 +6,8 @@ import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import { z } from 'zod';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 const updateAddressSchema = z.object({
   label: z.string().max(50).optional(),
   street_address: z.string().min(1).max(255).optional(),
@@ -77,7 +79,7 @@ async function handlePUT(
 
     return NextResponse.json({ success: true, address });
   } catch (error) {
-    console.error('Error updating address:', error);
+    logError('Error updating address:', error);
     return NextResponse.json({ error: 'Failed to update address' }, { status: 500 });
   }
 }
@@ -135,7 +137,7 @@ async function handleDELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting address:', error);
+    logError('Error deleting address:', error);
     return NextResponse.json({ error: 'Failed to delete address' }, { status: 500 });
   }
 }

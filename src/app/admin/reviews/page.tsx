@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useConfirm } from '@/components/ConfirmModal';
 import { REVIEW_STATUS, REVIEW_STATUS_LABELS } from '@/constants';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 interface Review {
   id: number;
   product_id: number | null;
@@ -47,7 +49,7 @@ export default function AdminReviewsPage() {
         setReviews(data.reviews || []);
       }
     } catch (error) {
-      console.error('Error fetching reviews:', error);
+      logError('Error fetching reviews:', error);
     } finally {
       setLoading(false);
     }
@@ -76,7 +78,7 @@ export default function AdminReviewsPage() {
         setMessage({ type: 'error', text: error.error });
       }
     } catch (err) {
-      console.error('Error updating review:', err);
+      logError('Error updating review:', err);
       setMessage({ type: 'error', text: 'Failed to update review' });
     } finally {
       setActionLoading(null);
@@ -107,7 +109,7 @@ export default function AdminReviewsPage() {
         setMessage({ type: 'error', text: 'Failed to delete review' });
       }
     } catch (err) {
-      console.error('Error deleting review:', err);
+      logError('Error deleting review:', err);
       setMessage({ type: 'error', text: 'Failed to delete review' });
     } finally {
       setActionLoading(null);

@@ -5,6 +5,8 @@ import type { UploadData } from '@/types/api';
 import { errorResponse, successResponse } from '@/types/api';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+
 // Only allow SVG format for logos
 const ALLOWED_MIME_TYPE = 'image/svg+xml';
 // Maximum file size:
@@ -106,7 +108,7 @@ export async function GET(request: NextRequest) {
       successResponse(logoData, logoData.hasLogo ? 'Logo found' : 'No logo configured')
     );
   } catch (error) {
-    console.error('Error fetching logo:', error);
+    logError('Error fetching logo:', error);
     return NextResponse.json(
       successResponse({ hasLogo: false, url: null }, 'Error fetching logo, returning default')
     );
@@ -218,7 +220,7 @@ export async function POST(request: NextRequest) {
       );
     } else {
       // In development, allow base64 fallback with a warning
-      console.warn('[LOGO UPLOAD] Azure Blob Storage not configured. Using base64 fallback (development only).');
+      logWarn('[LOGO UPLOAD] Azure Blob Storage not configured. Using base64 fallback (development only).');
       const base64Content = Buffer.from(sanitizedContent).toString('base64');
       logoUrl = `data:image/svg+xml;base64,${base64Content}`;
     }
@@ -246,7 +248,7 @@ export async function POST(request: NextRequest) {
       successResponse(uploadData, 'Logo uploaded successfully')
     );
   } catch (error) {
-    console.error('Error uploading logo:', error);
+    logError('Error uploading logo:', error);
     return NextResponse.json(
       errorResponse('Failed to upload logo. Please try again.'),
       { status: 500 }
@@ -276,7 +278,7 @@ export async function DELETE(request: NextRequest) {
       successResponse(null, 'Logo removed successfully')
     );
   } catch (error) {
-    console.error('Error removing logo:', error);
+    logError('Error removing logo:', error);
     return NextResponse.json(
       errorResponse('Failed to remove logo. Please try again.'),
       { status: 500 }
