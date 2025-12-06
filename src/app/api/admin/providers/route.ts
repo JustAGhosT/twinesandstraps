@@ -18,10 +18,11 @@ import { getAllShippingProviders } from '@/lib/shipping/provider.factory';
 import { getAllPaymentProviders } from '@/lib/payment/provider.factory';
 import { getAllEmailProviders } from '@/lib/email/provider.factory';
 import { getAllAccountingProviders } from '@/lib/accounting/provider.factory';
+import { getAllMarketplaceProviders } from '@/lib/marketplace/provider.factory';
 import { z } from 'zod';
 
 const providerConfigSchema = z.object({
-  providerType: z.enum(['shipping', 'payment', 'email', 'accounting']),
+  providerType: z.enum(['shipping', 'payment', 'email', 'accounting', 'marketplace']),
   providerName: z.string(),
   configData: z.record(z.any()).optional(),
   credentials: z.record(z.any()).optional(),
@@ -39,12 +40,14 @@ async function handleGET(request: NextRequest) {
     const paymentProviders = getAllPaymentProviders();
     const emailProviders = getAllEmailProviders();
     const accountingProviders = getAllAccountingProviders();
+    const marketplaceProviders = getAllMarketplaceProviders();
 
     // Get configurations from database
     const shippingConfigs = await getProviderConfigs('shipping');
     const paymentConfigs = await getProviderConfigs('payment');
     const emailConfigs = await getProviderConfigs('email');
     const accountingConfigs = await getProviderConfigs('accounting');
+    const marketplaceConfigs = await getProviderConfigs('marketplace');
 
     // Merge provider info with configurations
     const providers = {
@@ -98,6 +101,22 @@ async function handleGET(request: NextRequest) {
       }),
       accounting: accountingProviders.map(provider => {
         const config = accountingConfigs.find(c => c.providerName === provider.name);
+        return {
+          name: provider.name,
+          displayName: provider.displayName,
+          isConfigured: provider.isConfigured(),
+          isEnabled: config?.isEnabled || false,
+          isActive: config?.isActive || false,
+          config: config ? {
+            id: config.id,
+            featureFlags: config.featureFlags,
+            lastSyncedAt: config.lastSyncedAt,
+            errorMessage: config.errorMessage,
+          } : null,
+        };
+      }),
+      marketplace: marketplaceProviders.map(provider => {
+        const config = marketplaceConfigs.find(c => c.providerName === provider.name);
         return {
           name: provider.name,
           displayName: provider.displayName,

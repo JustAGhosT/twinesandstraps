@@ -5,7 +5,7 @@
 
 import prisma from '../prisma';
 
-export type ProviderType = 'shipping' | 'payment' | 'email' | 'accounting';
+export type ProviderType = 'shipping' | 'payment' | 'email' | 'accounting' | 'marketplace';
 
 export interface ProviderConfigData {
   [key: string]: any;
@@ -201,6 +201,11 @@ export function validateProviderConfig(
     accounting: {
       'xero': ['clientId', 'clientSecret', 'tenantId'],
       'quickbooks': ['clientId', 'clientSecret'],
+    },
+    marketplace: {
+      'takealot': ['apiKey', 'sellerId'],
+      'google-shopping': ['merchantId'],
+      'facebook': ['catalogId', 'accessToken'],
     },
   };
 

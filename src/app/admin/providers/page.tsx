@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '@/components/Toast';
 
-type ProviderType = 'shipping' | 'payment' | 'email' | 'accounting';
+type ProviderType = 'shipping' | 'payment' | 'email' | 'accounting' | 'marketplace';
 
 interface Provider {
   name: string;
@@ -44,10 +44,15 @@ const PROVIDER_REQUIREMENTS: Record<string, Record<string, string[]>> = {
     'xero': ['Client ID', 'Client Secret', 'Tenant ID'],
     'quickbooks': ['Client ID', 'Client Secret', 'Realm ID'],
   },
+  marketplace: {
+    'takealot': ['API Key', 'Seller ID'],
+    'google-shopping': ['Merchant ID'],
+    'facebook': ['Catalog ID', 'Access Token'],
+  },
 };
 
 export default function ProvidersPage() {
-  const { showToast } = useToast();
+  const { success, error } = useToast();
   const [providers, setProviders] = useState<ProvidersData | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingProvider, setEditingProvider] = useState<{
@@ -68,8 +73,8 @@ export default function ProvidersPage() {
       if (!response.ok) throw new Error('Failed to load providers');
       const data = await response.json();
       setProviders(data.providers);
-    } catch (error) {
-      console.error('Error loading providers:', error);
+    } catch (err) {
+      console.error('Error loading providers:', err);
       error('Failed to load providers');
     } finally {
       setLoading(false);
@@ -85,8 +90,8 @@ export default function ProvidersPage() {
       setEditingProvider({ type, name });
       setConfigData(data.config?.configData || {});
       setCredentials({}); // Don't load credentials for security
-    } catch (error) {
-      console.error('Error loading provider config:', error);
+    } catch (err) {
+      console.error('Error loading provider config:', err);
       error('Failed to load provider configuration');
     }
   };
@@ -124,8 +129,8 @@ export default function ProvidersPage() {
       setConfigData({});
       setCredentials({});
       loadProviders();
-    } catch (error) {
-      console.error('Error saving provider:', error);
+    } catch (err) {
+      console.error('Error saving provider:', err);
       error('Failed to save provider configuration');
     } finally {
       setSaving(false);
@@ -162,8 +167,8 @@ export default function ProvidersPage() {
         `${enabled ? 'Enabled' : 'Disabled'} ${name}`
       );
       loadProviders();
-    } catch (error) {
-      console.error('Error toggling provider:', error);
+    } catch (err) {
+      console.error('Error toggling provider:', err);
       error('Failed to toggle provider');
     }
   };
@@ -382,6 +387,7 @@ export default function ProvidersPage() {
     { type: 'payment', label: 'Payment Providers', icon: '💳' },
     { type: 'email', label: 'Email Providers', icon: '📧' },
     { type: 'accounting', label: 'Accounting Providers', icon: '📊' },
+    { type: 'marketplace', label: 'Marketplace Providers', icon: '🛒' },
   ];
 
   return (

@@ -35,6 +35,10 @@ export interface FeatureFlags {
   // Future Features (disabled by default)
   productReviews: boolean;
   checkout: boolean;
+
+  // Provider Management
+  providerManagement: boolean;
+  mockProviders: boolean;
 }
 
 /**
