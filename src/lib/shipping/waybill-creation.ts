@@ -1,14 +1,18 @@
 /**
  * Waybill creation on order confirmation
  * Automatically creates waybills when orders are confirmed
+ * Now uses the unified provider system
  */
 
-import { createWaybill, isCourierGuyConfigured, type WaybillRequest } from './courier-guy';
+import { createWaybill } from './service';
+import { WaybillRequest } from './types';
 import prisma from '../prisma';
 
 export interface OrderForWaybill {
   id: number;
   order_number: string;
+  shipping_provider?: string; // Optional: preferred provider (e.g., 'courier-guy', 'pargo')
+  collection_point_id?: string; // Optional: for Pargo collection points
   shipping_address: {
     street_address: string;
     city: string;
@@ -34,15 +38,9 @@ export async function createWaybillForOrder(order: OrderForWaybill): Promise<{
   success: boolean;
   waybillNumber?: string;
   trackingUrl?: string;
+  provider?: string;
   error?: string;
 }> {
-  if (!isCourierGuyConfigured()) {
-    return {
-      success: false,
-      error: 'The Courier Guy is not configured',
-    };
-  }
-
   if (!order.shipping_address) {
     return {
       success: false,
@@ -92,10 +90,12 @@ export async function createWaybillForOrder(order: OrderForWaybill): Promise<{
     })),
     serviceType: 'standard', // Can be made configurable per order
     reference: order.order_number,
+    collectionPointId: order.collection_point_id,
   };
 
   try {
-    const waybill = await createWaybill(waybillRequest);
+    // Use preferred provider if specified, otherwise auto-select
+    const waybill = await createWaybill(waybillRequest, order.shipping_provider);
 
     if (!waybill) {
       return {
@@ -104,17 +104,18 @@ export async function createWaybillForOrder(order: OrderForWaybill): Promise<{
       };
     }
 
-    // Update order with tracking number
+    // Update order with tracking number and provider
     await prisma.order.update({
       where: { id: order.id },
       data: {
         tracking_number: waybill.waybillNumber,
+        tracking_url: waybill.trackingUrl,
         status: 'SHIPPED',
         shipped_at: new Date(),
         status_history: {
           create: {
             status: 'SHIPPED',
-            notes: `Waybill created: ${waybill.waybillNumber}`,
+            notes: `Waybill created: ${waybill.waybillNumber} (Provider: ${waybill.provider})`,
           },
         },
       },
@@ -124,6 +125,7 @@ export async function createWaybillForOrder(order: OrderForWaybill): Promise<{
       success: true,
       waybillNumber: waybill.waybillNumber,
       trackingUrl: waybill.trackingUrl,
+      provider: waybill.provider,
     };
   } catch (error) {
     console.error('Error creating waybill:', error);
@@ -133,4 +135,3 @@ export async function createWaybillForOrder(order: OrderForWaybill): Promise<{
     };
   }
 }
-

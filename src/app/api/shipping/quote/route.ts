@@ -1,9 +1,10 @@
 /**
- * API endpoint for getting shipping quotes
+ * API endpoint for getting shipping quotes from all providers
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getShippingQuote, type ShippingQuoteRequest } from '@/lib/shipping/courier-guy';
+import { getShippingQuotes, getBestShippingQuote } from '@/lib/shipping/service';
+import { ShippingQuoteRequest } from '@/lib/shipping/types';
 import { z } from 'zod';
 
 const quoteRequestSchema = z.object({
@@ -24,6 +25,9 @@ const quoteRequestSchema = z.object({
     height: z.number().positive().optional(),
   }).optional(),
   serviceType: z.enum(['standard', 'express', 'overnight']).optional(),
+  collectionPointId: z.string().optional(),
+  provider: z.enum(['auto', 'all', 'courier-guy', 'pargo']).optional(),
+  preference: z.enum(['cheapest', 'fastest']).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -38,25 +42,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const quote = await getShippingQuote(validation.data as ShippingQuoteRequest);
+    const { provider = 'auto', preference = 'cheapest', ...quoteRequest } = validation.data;
 
-    if (!quote) {
-      return NextResponse.json(
-        { error: 'Unable to calculate shipping quote' },
-        { status: 500 }
+    let quotes;
+
+    if (provider === 'all') {
+      // Get quotes from all providers
+      quotes = await getShippingQuotes(quoteRequest as ShippingQuoteRequest);
+      
+      if (quotes.length === 0) {
+        return NextResponse.json(
+          { error: 'No shipping quotes available' },
+          { status: 503 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        quotes,
+        count: quotes.length,
+      });
+    } else {
+      // Get best quote (auto-select provider)
+      const quote = await getBestShippingQuote(
+        quoteRequest as ShippingQuoteRequest,
+        preference
       );
-    }
 
-    return NextResponse.json({
-      success: true,
-      quote,
-    });
+      if (!quote) {
+        return NextResponse.json(
+          { error: 'Unable to calculate shipping quote' },
+          { status: 503 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        quote,
+      });
+    }
   } catch (error) {
     console.error('Shipping quote error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
 }
-
