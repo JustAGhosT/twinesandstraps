@@ -3,7 +3,7 @@
  * Handles OAuth flow for Xero API integration
  */
 
-import { env } from '@/lib/env';
+import { getSiteUrl } from '@/lib/env';
 
 export interface XeroConfig {
   clientId: string;
@@ -34,7 +34,7 @@ export function getXeroConfig(): XeroConfig {
   return {
     clientId: process.env.XERO_CLIENT_ID || '',
     clientSecret: process.env.XERO_CLIENT_SECRET || '',
-    redirectUri: `${env.NEXT_PUBLIC_SITE_URL}/api/xero/callback`,
+    redirectUri: `${getSiteUrl()}/api/xero/callback`,
     scopes: [
       'accounting.transactions',
       'accounting.contacts',

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useUserAuth } from '@/contexts/UserAuthContext';
 
-import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+// Logging removed from client component - use console in client
 
 interface ViewHistoryItem {
   id: number;
@@ -42,7 +42,7 @@ export default function RecentlyViewed({ excludeProductId, limit = 4 }: Recently
         setItems(filtered.slice(0, limit));
       }
     } catch (error) {
-      logError('Error fetching view history:', error);
+      console.error('Error fetching view history:', error);
     } finally {
       setLoading(false);
     }

@@ -5,22 +5,30 @@
 
 import { ILoggingProvider, LogLevel, LogContext } from './provider.interface';
 import { ConsoleLoggingProvider } from './providers/console.provider';
-import { AppInsightsLoggingProvider } from './providers/app-insights.provider';
 
 class Logger {
   private providers: ILoggingProvider[] = [];
   private defaultLevel: LogLevel = process.env.NODE_ENV === 'production' 
     ? LogLevel.INFO 
     : LogLevel.DEBUG;
+  private appInsightsProvider: ILoggingProvider | null = null;
 
   constructor() {
     // Register default providers
     this.registerProvider(new ConsoleLoggingProvider());
     
-    // Register Application Insights if configured
-    const appInsightsProvider = new AppInsightsLoggingProvider();
-    if (appInsightsProvider.isConfigured()) {
-      this.registerProvider(appInsightsProvider);
+    // Register Application Insights if configured (server-side only)
+    if (typeof window === 'undefined') {
+      // Dynamic import to avoid bundling in client
+      import('./providers/app-insights.provider').then(({ AppInsightsLoggingProvider }) => {
+        const appInsightsProvider = new AppInsightsLoggingProvider();
+        if (appInsightsProvider.isConfigured()) {
+          this.appInsightsProvider = appInsightsProvider;
+          this.registerProvider(appInsightsProvider);
+        }
+      }).catch(() => {
+        // Application Insights not available, continue with console only
+      });
     }
 
     // Set default level for all providers

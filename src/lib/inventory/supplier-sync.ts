@@ -4,7 +4,7 @@
  */
 
 import prisma from '@/lib/prisma';
-import { trackInventoryMovement } from './tracking';
+import { createInventoryEvent, InventoryEventType, ReferenceType } from './tracking';
 import { logError, logInfo, logWarning } from '@/lib/monitoring/error-tracker';
 
 export interface SupplierSyncResult {
@@ -100,14 +100,14 @@ export async function syncSupplierProducts(
           // Track stock change if quantity changed
           if (productData.stock_quantity !== oldStock) {
             const quantityChange = productData.stock_quantity - oldStock;
-            await trackInventoryMovement(
-              existingProduct.id,
-              quantityChange > 0 ? 'STOCK_ADDED' : 'STOCK_REMOVED',
-              Math.abs(quantityChange),
-              'SUPPLIER_DELIVERY',
-              supplierId,
-              'Automatic sync from supplier API'
-            );
+            await createInventoryEvent({
+              productId: existingProduct.id,
+              eventType: quantityChange > 0 ? InventoryEventType.SUPPLIER_DELIVERY : InventoryEventType.STOCK_REMOVED,
+              quantityChange: quantityChange,
+              referenceType: ReferenceType.SUPPLIER_DELIVERY,
+              referenceId: supplierId,
+              notes: 'Automatic sync from supplier API',
+            });
           }
 
           result.productsUpdated++;

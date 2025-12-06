@@ -5,7 +5,7 @@
 
 import { trackException, trackTrace, trackEvent } from './app-insights';
 
-import { logInfo, logError, logWarn, logDebug } from '@/lib/logging/logger';
+import { logInfo as loggerInfo, logError as loggerError, logWarn, logDebug } from '@/lib/logging/logger';
 
 export interface ErrorContext {
   userId?: number;
@@ -29,9 +29,9 @@ export function logError(error: Error | unknown, context?: ErrorContext) {
 
   // Also log to console for development
   if (process.env.NODE_ENV === 'development') {
-    logError('Error:', errorObj.message, context);
+    loggerError('Error:', errorObj, context);
     if (errorObj.stack) {
-      logError('Stack:', errorObj.stack);
+      loggerError('Stack:', new Error(errorObj.stack), context);
     }
   }
 }
@@ -43,7 +43,7 @@ export function logWarning(message: string, context?: ErrorContext) {
   trackTrace(`WARNING: ${message}`, 2, context as any);
   
   if (process.env.NODE_ENV === 'development') {
-    logWarn('Warning:', message, context);
+    logWarn('Warning:', new Error(message), context);
   }
 }
 
@@ -54,7 +54,7 @@ export function logInfo(message: string, context?: Record<string, any>) {
   trackTrace(message, 1, context);
   
   if (process.env.NODE_ENV === 'development') {
-    logInfo('Info:', message, context);
+    loggerInfo('Info:', message, context);
   }
 }
 

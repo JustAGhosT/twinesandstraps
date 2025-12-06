@@ -56,6 +56,7 @@ model Product {
   order_items      OrderItem[]
   view_history     ViewHistory[]
   reviews          Review[]
+  integrations     ProductIntegration[]
   quote_items      QuoteItem[]
   inventory_events InventoryEvent[]
 
@@ -335,7 +336,7 @@ model ProductIntegration {
   id                    Int      @id @default(autoincrement())
   product_id            Int
   integration_type      String   // 'supplier' or 'marketplace'
-  integration_id         Int      // Supplier ID or Marketplace Provider ID
+  integration_id         Int?     // Supplier ID or Marketplace Provider ID (nullable for marketplaces)
   integration_name      String   // Supplier name or marketplace provider name
   
   // Integration settings
@@ -373,6 +374,7 @@ model ProductIntegration {
   updated_at            DateTime @updatedAt
 
   product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  supplier Supplier? @relation(fields: [integration_id], references: [id], onDelete: SetNull)
 
   @@unique([product_id, integration_type, integration_id])
   @@index([product_id])

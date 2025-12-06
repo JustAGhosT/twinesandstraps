@@ -32,6 +32,8 @@ interface FormData {
   payment_terms: string;
   lead_time_days: string;
   min_order_value: string;
+  provider_type: string;
+  provider_config?: string; // JSON string
 }
 
 const initialFormData: FormData = {
@@ -47,6 +49,7 @@ const initialFormData: FormData = {
   payment_terms: '',
   lead_time_days: '',
   min_order_value: '',
+  provider_type: 'manual',
 };
 
 export default function SuppliersPage() {
@@ -92,6 +95,52 @@ export default function SuppliersPage() {
       name,
       code: editingId ? prev.code : generateCode(name),
     }));
+  };
+
+  const handleFileUpload = async (file: File, type: 'csv' | 'edi') => {
+    setFileUploading(true);
+    setError(null);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', type);
+      
+      const res = await fetch('/api/admin/suppliers/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to upload file');
+      }
+      
+      const data = await res.json();
+      
+      // Store file data in provider_config
+      const config = {
+        csvData: type === 'csv' ? data.csvData : undefined,
+        ediData: type === 'edi' ? data.ediData : undefined,
+        format: type === 'edi' ? data.format : undefined,
+        ...(data.columnMapping && { columnMapping: data.columnMapping }),
+      };
+      
+      setForm(prev => ({
+        ...prev,
+        provider_type: type,
+        provider_config: JSON.stringify(config),
+      }));
+      
+      if (type === 'csv') setCsvFile(null);
+      if (type === 'edi') setEdiFile(null);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to upload file';
+      setError(errorMessage);
+      logError('Error uploading file:', err);
+    } finally {
+      setFileUploading(false);
+    }
   };
 
   const startEdit = async (supplier: Supplier) => {
@@ -155,6 +204,8 @@ export default function SuppliersPage() {
       payment_terms: form.payment_terms || null,
       lead_time_days: form.lead_time_days ? parseInt(form.lead_time_days) : null,
       min_order_value: form.min_order_value ? parseFloat(form.min_order_value) : null,
+      provider_type: form.provider_type || 'manual',
+      provider_config: form.provider_config ? JSON.parse(form.provider_config) : null,
     };
 
     try {
