@@ -1,90 +1,170 @@
 /**
  * Abandoned cart detection and recovery automation
- * Tracks carts and sends recovery emails via Brevo
+ * Now uses database storage instead of in-memory Map
  */
 
-import { sendEmail, isBrevoConfigured } from './email/brevo';
+import { isBrevoConfigured, sendEmail } from './email/brevo';
 import { getSiteUrl } from './env';
+import prisma from './prisma';
 
-export interface AbandonedCart {
-  email: string;
-  items: Array<{
-    productId: number;
-    productName: string;
-    price: number;
-    quantity: number;
-  }>;
-  total: number;
-  lastUpdated: Date;
-  reminderSent: number; // 0 = none, 1 = 24h, 2 = 48h, 3 = 72h
+export interface AbandonedCartItem {
+  productId: number;
+  productName: string;
+  price: number;
+  quantity: number;
 }
 
-/**
- * Store abandoned carts (in production, use database)
- */
-const abandonedCarts = new Map<string, AbandonedCart>();
+export interface AbandonedCart {
+  id: number;
+  email: string;
+  items: AbandonedCartItem[];
+  total: number;
+  reminderSent: number; // 0 = none, 1 = 24h, 2 = 48h, 3 = 72h
+  recovered: boolean;
+  recoveredAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 /**
  * Track cart abandonment
  */
-export function trackAbandonedCart(email: string, items: AbandonedCart['items'], total: number) {
+export async function trackAbandonedCart(
+  email: string,
+  items: AbandonedCartItem[],
+  total: number
+): Promise<void> {
   if (!email || items.length === 0) return;
 
-  const cart: AbandonedCart = {
-    email,
-    items,
-    total,
-    lastUpdated: new Date(),
-    reminderSent: 0,
-  };
+  try {
+    // Check if cart already exists for this email
+    const existingCart = await prisma.abandonedCart.findFirst({
+      where: {
+        email,
+        recovered: false,
+      },
+      orderBy: {
+        updated_at: 'desc',
+      },
+    });
 
-  abandonedCarts.set(email, cart);
+    if (existingCart) {
+      // Update existing cart
+      await prisma.abandonedCart.update({
+        where: { id: existingCart.id },
+        data: {
+          items: items as any, // Prisma JSON type
+          total,
+          updated_at: new Date(),
+        },
+      });
+    } else {
+      // Create new abandoned cart
+      await prisma.abandonedCart.create({
+        data: {
+          email,
+          items: items as any, // Prisma JSON type
+          total,
+          reminder_sent: 0,
+          recovered: false,
+        },
+      });
+    }
+  } catch (error) {
+    console.error('Error tracking abandoned cart:', error);
+    // Don't throw - cart tracking shouldn't break the application
+  }
 }
 
 /**
  * Mark cart as recovered (user completed purchase)
  */
-export function markCartRecovered(email: string) {
-  abandonedCarts.delete(email);
+export async function markCartRecovered(email: string): Promise<void> {
+  try {
+    await prisma.abandonedCart.updateMany({
+      where: {
+        email,
+        recovered: false,
+      },
+      data: {
+        recovered: true,
+        recovered_at: new Date(),
+      },
+    });
+  } catch (error) {
+    console.error('Error marking cart as recovered:', error);
+  }
 }
 
 /**
  * Get abandoned carts that need reminders
  */
-export function getCartsNeedingReminder(hoursSinceAbandonment: number): AbandonedCart[] {
-  const now = Date.now();
-  const threshold = hoursSinceAbandonment * 60 * 60 * 1000;
+export async function getCartsNeedingReminder(
+  hoursSinceAbandonment: number
+): Promise<AbandonedCart[]> {
+  try {
+    const threshold = new Date(Date.now() - hoursSinceAbandonment * 60 * 60 * 1000);
 
-  return Array.from(abandonedCarts.values()).filter((cart) => {
-    const timeSinceAbandonment = now - cart.lastUpdated.getTime();
-    const needsReminder = timeSinceAbandonment >= threshold;
-    
-    // Check if we've already sent this reminder
-    if (hoursSinceAbandonment === 24 && cart.reminderSent >= 1) return false;
-    if (hoursSinceAbandonment === 48 && cart.reminderSent >= 2) return false;
-    if (hoursSinceAbandonment === 72 && cart.reminderSent >= 3) return false;
+    // Determine which reminder level we're checking
+    let reminderLevel = 0;
+    if (hoursSinceAbandonment === 24) reminderLevel = 0; // Need to send first reminder
+    else if (hoursSinceAbandonment === 48) reminderLevel = 1; // Need to send second reminder
+    else if (hoursSinceAbandonment === 72) reminderLevel = 2; // Need to send third reminder
 
-    return needsReminder;
-  });
+    const carts = await prisma.abandonedCart.findMany({
+      where: {
+        recovered: false,
+        updated_at: {
+          lte: threshold, // Updated before threshold
+        },
+        reminder_sent: reminderLevel, // Haven't sent this level of reminder yet
+      },
+      orderBy: {
+        updated_at: 'asc',
+      },
+    });
+
+    // Map to our interface format
+    return carts.map((cart) => ({
+      id: cart.id,
+      email: cart.email,
+      items: cart.items as AbandonedCartItem[],
+      total: cart.total,
+      reminderSent: cart.reminder_sent,
+      recovered: cart.recovered,
+      recoveredAt: cart.recovered_at,
+      createdAt: cart.created_at,
+      updatedAt: cart.updated_at,
+    }));
+  } catch (error) {
+    console.error('Error getting carts needing reminder:', error);
+    return [];
+  }
 }
 
 /**
  * Send abandoned cart recovery email
  */
-export async function sendAbandonedCartEmail(cart: AbandonedCart, hoursSinceAbandonment: number): Promise<boolean> {
+export async function sendAbandonedCartEmail(
+  cart: AbandonedCart,
+  hoursSinceAbandonment: number
+): Promise<boolean> {
   if (!isBrevoConfigured()) {
     console.warn('Brevo not configured. Abandoned cart email not sent.');
     return false;
   }
 
   const siteUrl = getSiteUrl();
-  const urgencyText = hoursSinceAbandonment >= 72 
-    ? 'Last chance!' 
-    : hoursSinceAbandonment >= 48 
-    ? 'Don\'t miss out!' 
-    : 'Complete your purchase';
+  const urgencyText =
+    hoursSinceAbandonment >= 72
+      ? 'Last chance!'
+      : hoursSinceAbandonment >= 48
+      ? "Don't miss out!"
+      : 'Complete your purchase';
 
-  const itemsHtml = cart.items.map((item, index) => `
+  const itemsHtml = cart.items
+    .map(
+      (item, index) => `
     <tr>
       <td style="padding: 10px; border-bottom: 1px solid #eee;">${index + 1}</td>
       <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.productName}</td>
@@ -92,7 +172,9 @@ export async function sendAbandonedCartEmail(cart: AbandonedCart, hoursSinceAban
       <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">R${item.price.toFixed(2)}</td>
       <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">R${(item.price * item.quantity).toFixed(2)}</td>
     </tr>
-  `).join('');
+  `
+    )
+    .join('');
 
   const htmlContent = `
     <!DOCTYPE html>
@@ -163,10 +245,21 @@ export async function sendAbandonedCartEmail(cart: AbandonedCart, hoursSinceAban
   });
 
   if (result.success) {
-    // Update reminder sent status
-    if (hoursSinceAbandonment === 24) cart.reminderSent = 1;
-    else if (hoursSinceAbandonment === 48) cart.reminderSent = 2;
-    else if (hoursSinceAbandonment === 72) cart.reminderSent = 3;
+    // Update reminder sent status in database
+    const newReminderLevel =
+      hoursSinceAbandonment === 24 ? 1 : hoursSinceAbandonment === 48 ? 2 : 3;
+
+    try {
+      await prisma.abandonedCart.update({
+        where: { id: cart.id },
+        data: {
+          reminder_sent: newReminderLevel,
+          updated_at: new Date(),
+        },
+      });
+    } catch (error) {
+      console.error('Error updating reminder status:', error);
+    }
   }
 
   return result.success;
@@ -176,9 +269,9 @@ export async function sendAbandonedCartEmail(cart: AbandonedCart, hoursSinceAban
  * Process abandoned cart reminders (should be called by a scheduled job)
  */
 export async function processAbandonedCartReminders() {
-  const reminders24h = getCartsNeedingReminder(24);
-  const reminders48h = getCartsNeedingReminder(48);
-  const reminders72h = getCartsNeedingReminder(72);
+  const reminders24h = await getCartsNeedingReminder(24);
+  const reminders48h = await getCartsNeedingReminder(48);
+  const reminders72h = await getCartsNeedingReminder(72);
 
   const results = {
     sent24h: 0,
@@ -225,4 +318,3 @@ export async function processAbandonedCartReminders() {
 
   return results;
 }
-

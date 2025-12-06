@@ -469,3 +469,21 @@ model XeroInvoiceMapping {
   @@index([xero_invoice_id])
   @@index([order_id])
 }
+
+// Abandoned Cart Tracking - Database storage for abandoned carts
+model AbandonedCart {
+  id            Int      @id @default(autoincrement())
+  email         String
+  items         Json     // Array of cart items: [{productId, productName, price, quantity}]
+  total         Float
+  reminder_sent Int      @default(0) // 0 = none, 1 = 24h, 2 = 48h, 3 = 72h
+  recovered     Boolean  @default(false) // True if user completed purchase
+  recovered_at  DateTime?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@index([email])
+  @@index([recovered])
+  @@index([updated_at])
+  @@index([reminder_sent, updated_at])
+}

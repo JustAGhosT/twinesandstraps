@@ -6,9 +6,10 @@
 import { IShippingProvider } from './provider.interface';
 import { CourierGuyProvider } from './providers/courier-guy.provider';
 import { PargoProvider } from './providers/pargo.provider';
+import { MockShippingProvider } from './providers/mock.provider';
 import { ShippingQuoteRequest, ShippingQuote } from './types';
 
-type ProviderName = 'courier-guy' | 'pargo' | 'auto';
+type ProviderName = 'courier-guy' | 'pargo' | 'auto' | 'mock';
 
 class ShippingProviderFactory {
   private providers: Map<string, IShippingProvider> = new Map();
@@ -18,6 +19,11 @@ class ShippingProviderFactory {
     // Register all available providers
     this.registerProvider(new CourierGuyProvider());
     this.registerProvider(new PargoProvider());
+    
+    // Register mock provider only in development/test environments
+    if (process.env.NODE_ENV === 'development' || process.env.ENABLE_MOCK_PROVIDERS === 'true') {
+      this.registerProvider(new MockShippingProvider());
+    }
   }
 
   /**
@@ -169,4 +175,3 @@ export async function getBestShippingQuote(
 ): Promise<ShippingQuote | null> {
   return shippingProviderFactory.getBestQuote(request, preference);
 }
-
