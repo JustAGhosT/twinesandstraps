@@ -139,6 +139,7 @@ model Order {
   billing_address  Address?             @relation("BillingAddress", fields: [billing_address_id], references: [id])
   items            OrderItem[]
   status_history   OrderStatusHistory[]
+  xero_invoice     XeroInvoiceMapping?
 
   @@index([user_id])
   @@index([status])
@@ -434,4 +435,37 @@ model UserConsent {
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
+}
+
+// Xero Integration - OAuth Token Storage
+model XeroToken {
+  id                  Int       @id @default(autoincrement())
+  access_token        String    @db.Text // Encrypted in production
+  refresh_token       String    @db.Text // Encrypted in production
+  expires_at          DateTime
+  scope               String
+  tenant_id           String?
+  tenant_name         String?
+  is_active           Boolean   @default(true)
+  last_refreshed_at   DateTime?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+
+  @@index([expires_at])
+  @@index([is_active])
+}
+
+// Xero Invoice Mapping - Track synced invoices
+model XeroInvoiceMapping {
+  id              Int       @id @default(autoincrement())
+  order_id        Int       @unique
+  xero_invoice_id String
+  xero_invoice_number String?
+  synced_at       DateTime  @default(now())
+  last_updated_at DateTime  @updatedAt
+
+  order Order @relation(fields: [order_id], references: [id], onDelete: Cascade)
+
+  @@index([xero_invoice_id])
+  @@index([order_id])
 }

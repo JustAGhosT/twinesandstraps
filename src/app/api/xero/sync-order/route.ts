@@ -2,21 +2,15 @@
  * API endpoint to sync an order to Xero as an invoice
  */
 
-import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/admin-auth';
-import { requireCsrfToken } from '@/lib/security/csrf';
-import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
 import prisma from '@/lib/prisma';
+import { requireCsrfToken } from '@/lib/security/csrf';
+import { getRateLimitConfig, withRateLimit } from '@/lib/security/rate-limit-wrapper';
 import { syncOrderToXero } from '@/lib/xero/invoices';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-// TODO: Get Xero token from database
-// For now, this is a placeholder - you'll need to implement token storage
-async function getXeroToken() {
-  // This should fetch from database
-  // For now, return null to indicate Xero is not connected
-  return null;
-}
+import { getActiveXeroToken } from '@/lib/xero/token-storage';
 
 const syncOrderSchema = z.object({
   orderId: z.number().int().positive(),
@@ -61,8 +55,8 @@ async function handlePOST(request: NextRequest) {
       );
     }
 
-    // Get Xero token
-    const xeroToken = await getXeroToken();
+    // Get Xero token from database
+    const xeroToken = await getActiveXeroToken();
     if (!xeroToken) {
       return NextResponse.json(
         { error: 'Xero is not connected. Please connect your Xero account first.' },

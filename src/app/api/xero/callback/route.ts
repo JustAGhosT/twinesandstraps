@@ -3,10 +3,10 @@
  * Handles OAuth callback and stores tokens
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { exchangeXeroCode, storeXeroToken } from '@/lib/xero/auth';
-import prisma from '@/lib/prisma';
 import { requireAdminAuth } from '@/lib/admin-auth';
+import { exchangeXeroCode } from '@/lib/xero/auth';
+import { storeXeroTokenInDb } from '@/lib/xero/token-storage';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   // Verify admin authentication
@@ -42,11 +42,9 @@ export async function GET(request: NextRequest) {
   try {
     // Exchange code for tokens
     const tokenResponse = await exchangeXeroCode(code);
-    const token = await storeXeroToken(tokenResponse);
-
-    // Store token in database (you may want to create a XeroToken model)
-    // For now, we'll store it in environment or a secure storage
-    // TODO: Create XeroToken model in Prisma schema
+    
+    // Store token in database
+    await storeXeroTokenInDb(tokenResponse);
 
     // Clear state cookie
     const response = NextResponse.redirect('/admin/settings?xero_success=true');
