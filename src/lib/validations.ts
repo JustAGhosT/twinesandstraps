@@ -101,6 +101,21 @@ export const siteSettingsSchema = z.object({
   socialLinkedIn: z.string().url().or(z.literal('')).optional(),
   socialTwitter: z.string().url().or(z.literal('')).optional(),
   socialYoutube: z.string().url().or(z.literal('')).optional(),
+  // Company registration and legal details
+  companyRegistrationNumber: z.string().max(50).optional(),
+  taxNumber: z.string().max(50).optional(),
+  vatNumber: z.string().max(50).optional(),
+  bbbeeLevel: z.string().max(20).optional(),
+  physicalAddress: z.string().max(500).optional(),
+  postalAddress: z.string().max(500).optional(),
+  postalCode: z.string().max(10).optional(),
+  city: z.string().max(100).optional(),
+  province: z.string().max(100).optional(),
+  country: z.string().max(100).optional(),
+  bankName: z.string().max(100).optional(),
+  bankAccountNumber: z.string().max(50).optional(),
+  bankAccountType: z.string().max(50).optional(),
+  branchCode: z.string().max(20).optional(),
 });
 
 export type SiteSettingsInput = z.infer<typeof siteSettingsSchema>;

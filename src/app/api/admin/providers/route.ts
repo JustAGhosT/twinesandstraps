@@ -115,9 +115,10 @@ async function handleGET(request: NextRequest) {
           } : null,
         };
       }),
-      marketplace: marketplaceProviders.map(provider => {
+      marketplace: marketplaceProviders.map((provider, index) => {
         const config = marketplaceConfigs.find(c => c.providerName === provider.name);
         return {
+          id: index + 1, // Use index as ID for marketplace providers
           name: provider.name,
           displayName: provider.displayName,
           isConfigured: provider.isConfigured(),

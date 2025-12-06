@@ -261,7 +261,23 @@ model SiteSetting {
   social_linkedin  String   @default("")
   social_twitter   String   @default("")
   social_youtube   String   @default("")
-  updated_at       DateTime @updatedAt
+  
+  // Company registration and legal details
+  company_registration_number String? // e.g., "2023/123456/07"
+  tax_number                  String? // SARS tax number
+  vat_number                  String? // VAT registration number
+  bbbee_level                 String? // B-BBEE level (e.g., "Level 4")
+  physical_address            String? // Full physical address
+  postal_address              String? // Postal address if different
+  postal_code                 String?
+  city                        String?
+  province                    String?
+  country                     String  @default("South Africa")
+  bank_name                   String?
+  bank_account_number         String?
+  bank_account_type           String? // "Cheque", "Savings", "Current"
+  branch_code                 String?
+  updated_at                  DateTime @updatedAt
 }
 
 // Admin setup checklist - tracks onboarding tasks for store setup
@@ -300,13 +316,71 @@ model Supplier {
   payment_terms   String? // e.g., "NET30", "COD"
   lead_time_days  Int? // Average days for delivery
   min_order_value Float? // Minimum order value
+  provider_type   String? // 'manual', 'api', 'csv', 'edi' - how we sync with them
+  provider_config Json? // Provider-specific configuration
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
 
   products Product[]
+  product_integrations ProductIntegration[]
 
   @@index([is_active])
   @@index([code])
+  @@index([provider_type])
+}
+
+// Product Integration Configuration
+// Defines per-product settings for suppliers and marketplaces
+model ProductIntegration {
+  id                    Int      @id @default(autoincrement())
+  product_id            Int
+  integration_type      String   // 'supplier' or 'marketplace'
+  integration_id         Int      // Supplier ID or Marketplace Provider ID
+  integration_name      String   // Supplier name or marketplace provider name
+  
+  // Integration settings
+  is_enabled            Boolean  @default(false)
+  is_active             Boolean  @default(false) // Active means configured and syncing
+  
+  // Pricing settings
+  price_override         Float?   // Override product price for this integration
+  margin_percentage     Float?   // Margin to apply (overrides supplier default)
+  min_price             Float?   // Minimum price to list at
+  max_price             Float?   // Maximum price to list at
+  
+  // Quantity settings
+  quantity_override     Int?     // Override available quantity
+  min_quantity          Int?     // Minimum quantity to list
+  max_quantity          Int?     // Maximum quantity to list
+  reserve_quantity     Int      @default(0) // Quantity to reserve (not list)
+  
+  // Timing settings
+  lead_time_days        Int?     // Override lead time for this integration
+  sync_schedule         String?  // 'daily', 'hourly', 'manual', 'realtime'
+  last_synced_at        DateTime?
+  next_sync_at          DateTime?
+  
+  // Status and control
+  auto_sync             Boolean  @default(true) // Auto-sync when product changes
+  sync_on_price_change  Boolean  @default(true)
+  sync_on_stock_change  Boolean  @default(true)
+  
+  // Additional configuration
+  custom_config         Json?    // Integration-specific settings
+  error_message         String?  // Last error if sync failed
+  
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@unique([product_id, integration_type, integration_id])
+  @@index([product_id])
+  @@index([integration_type])
+  @@index([integration_id])
+  @@index([is_enabled])
+  @@index([is_active])
+  @@index([next_sync_at])
 }
 
 // Product import batch - tracks bulk imports from suppliers

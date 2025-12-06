@@ -20,6 +20,21 @@ interface SiteSettings {
   socialLinkedIn: string;
   socialTwitter: string;
   socialYoutube: string;
+  // Company registration and legal details
+  companyRegistrationNumber: string;
+  taxNumber: string;
+  vatNumber: string;
+  bbbeeLevel: string;
+  physicalAddress: string;
+  postalAddress: string;
+  postalCode: string;
+  city: string;
+  province: string;
+  country: string;
+  bankName: string;
+  bankAccountNumber: string;
+  bankAccountType: string;
+  branchCode: string;
 }
 
 const defaultSettings: SiteSettings = {
@@ -37,6 +52,21 @@ const defaultSettings: SiteSettings = {
   socialLinkedIn: '',
   socialTwitter: '',
   socialYoutube: '',
+  // Company registration and legal details
+  companyRegistrationNumber: '',
+  taxNumber: '',
+  vatNumber: '',
+  bbbeeLevel: '',
+  physicalAddress: '',
+  postalAddress: '',
+  postalCode: '',
+  city: '',
+  province: '',
+  country: 'South Africa',
+  bankName: '',
+  bankAccountNumber: '',
+  bankAccountType: '',
+  branchCode: '',
 };
 
 // Save result interface for detailed feedback

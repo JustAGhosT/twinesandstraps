@@ -44,7 +44,8 @@ export async function GET(request: NextRequest) {
     ]);
 
     return NextResponse.json({
-      suppliers,
+      data: suppliers,
+      suppliers, // Keep for backward compatibility
       pagination: {
         page,
         limit,

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import AIAssistantPanel from '@/components/AIAssistantPanel';
 import UseAIButton from '@/components/UseAIButton';
+import ProductIntegrationManager from '@/components/admin/ProductIntegrationManager';
 import { STOCK_STATUS, STOCK_STATUS_LABELS } from '@/constants';
 
 interface Category {
@@ -86,6 +87,7 @@ export default function ProductEditPage() {
           image_url: product.image_url || '',
           category_id: product.category_id?.toString() || '',
         });
+        setProductPrice(product.price || 0);
         if (product.image_url) {
           setImagePreview(product.image_url);
         }
@@ -466,6 +468,17 @@ export default function ProductEditPage() {
         {error && (
           <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400">
             {error}
+          </div>
+        )}
+
+        {/* Product Integrations - Only show for existing products */}
+        {!isNew && (
+          <div className="bg-white dark:bg-secondary-800 rounded-xl shadow-sm p-6">
+            <ProductIntegrationManager
+              productId={parseInt(params.id as string)}
+              productPrice={parseFloat(form.price) || 0}
+              productStockStatus={form.stock_status}
+            />
           </div>
         )}
 

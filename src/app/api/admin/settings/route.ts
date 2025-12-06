@@ -39,25 +39,25 @@ interface DbSettingsUpdate {
   social_linkedin?: string;
   social_twitter?: string;
   social_youtube?: string;
+  // Company registration and legal details
+  company_registration_number?: string;
+  tax_number?: string;
+  vat_number?: string;
+  bbbee_level?: string;
+  physical_address?: string;
+  postal_address?: string;
+  postal_code?: string;
+  city?: string;
+  province?: string;
+  country?: string;
+  bank_name?: string;
+  bank_account_number?: string;
+  bank_account_type?: string;
+  branch_code?: string;
 }
 
 // Helper to convert database fields to API format
-function dbToApiFormat(dbSettings: {
-  company_name: string;
-  tagline: string;
-  email: string;
-  phone: string;
-  whatsapp_number: string;
-  address: string;
-  business_hours: string;
-  vat_rate: string;
-  logo_url: string;
-  social_facebook: string;
-  social_instagram: string;
-  social_linkedin: string;
-  social_twitter: string;
-  social_youtube: string;
-}) {
+function dbToApiFormat(dbSettings: any) {
   return {
     companyName: dbSettings.company_name,
     tagline: dbSettings.tagline,
@@ -73,26 +73,26 @@ function dbToApiFormat(dbSettings: {
     socialLinkedIn: dbSettings.social_linkedin,
     socialTwitter: dbSettings.social_twitter,
     socialYoutube: dbSettings.social_youtube,
+    // Company registration and legal details
+    companyRegistrationNumber: dbSettings.company_registration_number || '',
+    taxNumber: dbSettings.tax_number || '',
+    vatNumber: dbSettings.vat_number || '',
+    bbbeeLevel: dbSettings.bbbee_level || '',
+    physicalAddress: dbSettings.physical_address || '',
+    postalAddress: dbSettings.postal_address || '',
+    postalCode: dbSettings.postal_code || '',
+    city: dbSettings.city || '',
+    province: dbSettings.province || '',
+    country: dbSettings.country || 'South Africa',
+    bankName: dbSettings.bank_name || '',
+    bankAccountNumber: dbSettings.bank_account_number || '',
+    bankAccountType: dbSettings.bank_account_type || '',
+    branchCode: dbSettings.branch_code || '',
   };
 }
 
 // Helper to convert API format to database fields
-function apiToDbFormat(apiSettings: {
-  companyName?: string;
-  tagline?: string;
-  email?: string;
-  phone?: string;
-  whatsappNumber?: string;
-  address?: string;
-  businessHours?: string;
-  vatRate?: string;
-  logoUrl?: string;
-  socialFacebook?: string;
-  socialInstagram?: string;
-  socialLinkedIn?: string;
-  socialTwitter?: string;
-  socialYoutube?: string;
-}): DbSettingsUpdate {
+function apiToDbFormat(apiSettings: any): DbSettingsUpdate {
   const dbData: DbSettingsUpdate = {};
   if (apiSettings.companyName !== undefined) dbData.company_name = apiSettings.companyName;
   if (apiSettings.tagline !== undefined) dbData.tagline = apiSettings.tagline;
@@ -108,6 +108,21 @@ function apiToDbFormat(apiSettings: {
   if (apiSettings.socialLinkedIn !== undefined) dbData.social_linkedin = apiSettings.socialLinkedIn;
   if (apiSettings.socialTwitter !== undefined) dbData.social_twitter = apiSettings.socialTwitter;
   if (apiSettings.socialYoutube !== undefined) dbData.social_youtube = apiSettings.socialYoutube;
+  // Company registration and legal details
+  if (apiSettings.companyRegistrationNumber !== undefined) dbData.company_registration_number = apiSettings.companyRegistrationNumber;
+  if (apiSettings.taxNumber !== undefined) dbData.tax_number = apiSettings.taxNumber;
+  if (apiSettings.vatNumber !== undefined) dbData.vat_number = apiSettings.vatNumber;
+  if (apiSettings.bbbeeLevel !== undefined) dbData.bbbee_level = apiSettings.bbbeeLevel;
+  if (apiSettings.physicalAddress !== undefined) dbData.physical_address = apiSettings.physicalAddress;
+  if (apiSettings.postalAddress !== undefined) dbData.postal_address = apiSettings.postalAddress;
+  if (apiSettings.postalCode !== undefined) dbData.postal_code = apiSettings.postalCode;
+  if (apiSettings.city !== undefined) dbData.city = apiSettings.city;
+  if (apiSettings.province !== undefined) dbData.province = apiSettings.province;
+  if (apiSettings.country !== undefined) dbData.country = apiSettings.country;
+  if (apiSettings.bankName !== undefined) dbData.bank_name = apiSettings.bankName;
+  if (apiSettings.bankAccountNumber !== undefined) dbData.bank_account_number = apiSettings.bankAccountNumber;
+  if (apiSettings.bankAccountType !== undefined) dbData.bank_account_type = apiSettings.bankAccountType;
+  if (apiSettings.branchCode !== undefined) dbData.branch_code = apiSettings.branchCode;
   return dbData;
 }
 
