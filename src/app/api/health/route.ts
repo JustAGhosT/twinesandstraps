@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { initializeAppInsights } from '@/lib/monitoring/app-insights';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +29,9 @@ interface HealthStatus {
  * Health check endpoint for Azure App Service and monitoring
  */
 export async function GET(): Promise<NextResponse<HealthStatus>> {
+  // Initialize Application Insights if configured
+  initializeAppInsights();
+
   const healthStatus: HealthStatus = {
     status: 'healthy',
     timestamp: new Date().toISOString(),

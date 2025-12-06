@@ -8,6 +8,7 @@ import { getPayFastConfig, isPayFastConfigured } from '@/lib/payfast/config';
 import { validateSignature, parseITNData } from '@/lib/payfast/signature';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 import { sendOrderConfirmation } from '@/lib/email/brevo';
+import { syncPaymentToXero } from '@/lib/xero/payments';
 import prisma from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
@@ -119,41 +120,76 @@ async function handlePaymentSuccess(
   itnData: Record<string, string>
 ) {
   try {
-    // Find order by payment ID
-    // Note: You'll need to create an Order model in Prisma if it doesn't exist
-    // For now, this is a placeholder implementation
-    
-    // TODO: Update order status in database
-    // const order = await prisma.order.update({
-    //   where: { payment_id: paymentId },
-    //   data: {
-    //     status: 'PAID',
-    //     payment_status: 'COMPLETE',
-    //     payment_id: pfPaymentId,
-    //     paid_at: new Date(),
-    //   },
-    //   include: {
-    //     items: {
-    //       include: {
-    //         product: true,
-    //       },
-    //     },
-    //   },
-    // });
+    // Find order by order_number (which is used as m_payment_id in PayFast)
+    const order = await prisma.order.findUnique({
+      where: { order_number: paymentId },
+      include: {
+        user: true,
+        items: {
+          include: {
+            product: true,
+          },
+        },
+        shipping_address: true,
+        xero_invoice: true,
+      },
+    });
+
+    if (!order) {
+      console.error(`Order not found for payment ID: ${paymentId}`);
+      return;
+    }
+
+    // Update order payment status
+    await prisma.order.update({
+      where: { id: order.id },
+      data: {
+        payment_status: 'PAID',
+        status: 'CONFIRMED',
+        payment_method: `PayFast - ${itnData.payment_method || 'Unknown'}`,
+        status_history: {
+          create: {
+            status: 'CONFIRMED',
+            notes: `Payment received via PayFast (${pfPaymentId})`,
+          },
+        },
+      },
+    });
+
+    // Sync payment to Xero if invoice exists
+    if (order.xero_invoice) {
+      try {
+        await syncPaymentToXero(
+          order.id,
+          amount,
+          new Date(),
+          pfPaymentId
+        );
+        console.log(`Payment synced to Xero for order ${order.order_number}`);
+      } catch (xeroError: any) {
+        console.error('Failed to sync payment to Xero:', xeroError);
+        // Don't fail the whole webhook if Xero sync fails
+      }
+    }
 
     // Send confirmation email
-    const customerEmail = itnData.email_address || '';
+    const customerEmail = order.user.email || itnData.email_address || '';
     if (customerEmail) {
-      // TODO: Replace with actual order data when Order model is implemented
       await sendOrderConfirmation(customerEmail, {
-        orderId: paymentId,
-        items: [], // order.items.map(item => ({ ... }))
-        total: amount,
-        shippingAddress: '', // order.shipping_address
+        orderId: order.order_number,
+        items: order.items.map(item => ({
+          name: item.product_name,
+          quantity: item.quantity,
+          price: item.unit_price,
+        })),
+        total: order.total,
+        shippingAddress: order.shipping_address
+          ? `${order.shipping_address.street_address}, ${order.shipping_address.city}, ${order.shipping_address.province} ${order.shipping_address.postal_code}`
+          : undefined,
       });
     }
 
-    console.log('Payment successful:', { paymentId, pfPaymentId, amount });
+    console.log('Payment successful:', { paymentId, pfPaymentId, amount, orderId: order.id });
   } catch (error) {
     console.error('Error handling payment success:', error);
     throw error;
@@ -165,14 +201,24 @@ async function handlePaymentSuccess(
  */
 async function handlePaymentFailure(paymentId: string, status: string) {
   try {
-    // TODO: Update order status
-    // await prisma.order.update({
-    //   where: { payment_id: paymentId },
-    //   data: {
-    //     status: 'FAILED',
-    //     payment_status: status,
-    //   },
-    // });
+    const order = await prisma.order.findUnique({
+      where: { order_number: paymentId },
+    });
+
+    if (order) {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          payment_status: 'FAILED',
+          status_history: {
+            create: {
+              status: order.status,
+              notes: `Payment ${status} via PayFast`,
+            },
+          },
+        },
+      });
+    }
 
     console.log('Payment failed:', { paymentId, status });
   } catch (error) {
@@ -185,15 +231,24 @@ async function handlePaymentFailure(paymentId: string, status: string) {
  */
 async function handlePaymentPending(paymentId: string, pfPaymentId: string) {
   try {
-    // TODO: Update order status
-    // await prisma.order.update({
-    //   where: { payment_id: paymentId },
-    //   data: {
-    //     status: 'PENDING',
-    //     payment_status: 'PENDING',
-    //     payment_id: pfPaymentId,
-    //   },
-    // });
+    const order = await prisma.order.findUnique({
+      where: { order_number: paymentId },
+    });
+
+    if (order) {
+      await prisma.order.update({
+        where: { id: order.id },
+        data: {
+          payment_status: 'PENDING',
+          status_history: {
+            create: {
+              status: 'PENDING',
+              notes: `Payment pending via PayFast (${pfPaymentId})`,
+            },
+          },
+        },
+      });
+    }
 
     console.log('Payment pending:', { paymentId, pfPaymentId });
   } catch (error) {

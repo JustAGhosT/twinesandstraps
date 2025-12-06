@@ -90,11 +90,18 @@ async function handlePOST(request: NextRequest) {
       date: order.created_at,
     });
 
-    // Store Xero invoice ID in order (you may want to add a xero_invoice_id field)
-    // await prisma.order.update({
-    //   where: { id: orderId },
-    //   data: { xero_invoice_id: invoiceId },
-    // });
+    // Store Xero invoice mapping
+    await prisma.xeroInvoiceMapping.upsert({
+      where: { order_id: orderId },
+      create: {
+        order_id: orderId,
+        xero_invoice_id: invoiceId,
+      },
+      update: {
+        xero_invoice_id: invoiceId,
+        last_updated_at: new Date(),
+      },
+    });
 
     return NextResponse.json({
       success: true,
