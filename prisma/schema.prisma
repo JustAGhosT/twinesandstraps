@@ -93,6 +93,7 @@ model User {
   view_history          ViewHistory[]
   password_reset_tokens PasswordResetToken[]
   reviews               Review[]
+  consent               UserConsent?
 }
 
 model Address {
@@ -420,4 +421,17 @@ model InventoryEvent {
   @@index([created_at])
 }
 
-// Add relation to Product model
+// POPIA Compliance - User Consent Management
+model UserConsent {
+  id                Int      @id @default(autoincrement())
+  user_id           Int      @unique
+  marketing_consent Boolean  @default(false)
+  analytics_consent Boolean  @default(false)
+  functional_consent Boolean @default(false)
+  consent_date      DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}

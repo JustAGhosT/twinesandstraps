@@ -10,6 +10,7 @@ import { ToastProvider } from '@/components/Toast';
 import { ConfirmProvider } from '@/components/ConfirmModal';
 import { Analytics } from '@/components/Analytics';
 import { CsrfProvider } from '@/components/CsrfProvider';
+import CookieConsentBanner from '@/components/CookieConsentBanner';
 import { ReactNode } from 'react';
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -25,6 +26,7 @@ export function Providers({ children }: { children: ReactNode }) {
                     <CsrfProvider>
                       <Analytics />
                       {children}
+                      <CookieConsentBanner />
                     </CsrfProvider>
                   </ConfirmProvider>
                 </ToastProvider>
