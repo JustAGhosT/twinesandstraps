@@ -5,6 +5,7 @@
 
 import { IEmailProvider } from './provider.interface';
 import { MockEmailProvider } from './providers/mock.provider';
+import { SendGridProvider } from './providers/sendgrid.provider';
 // Import Brevo provider when it's refactored
 // import { BrevoProvider } from './providers/brevo.provider';
 
@@ -13,6 +14,9 @@ class EmailProviderFactory {
   private defaultProvider: string = 'brevo'; // Will be updated when Brevo is refactored
 
   constructor() {
+    // Register all available providers
+    this.registerProvider(new SendGridProvider());
+    
     // Register mock provider only in development/test environments
     if (process.env.NODE_ENV === 'development' || process.env.ENABLE_MOCK_PROVIDERS === 'true') {
       this.registerProvider(new MockEmailProvider());

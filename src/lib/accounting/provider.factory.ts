@@ -5,6 +5,7 @@
 
 import { IAccountingProvider } from './provider.interface';
 import { XeroProvider } from './providers/xero.provider';
+import { QuickBooksProvider } from './providers/quickbooks.provider';
 import { MockAccountingProvider } from './providers/mock.provider';
 
 class AccountingProviderFactory {
@@ -14,6 +15,7 @@ class AccountingProviderFactory {
   constructor() {
     // Register all available providers
     this.registerProvider(new XeroProvider());
+    this.registerProvider(new QuickBooksProvider());
     
     // Register mock provider only in development/test environments
     if (process.env.NODE_ENV === 'development' || process.env.ENABLE_MOCK_PROVIDERS === 'true') {

@@ -487,3 +487,25 @@ model AbandonedCart {
   @@index([updated_at])
   @@index([reminder_sent, updated_at])
 }
+
+// Provider Configuration - Store provider settings and credentials
+model ProviderConfig {
+  id              Int      @id @default(autoincrement())
+  provider_type   String   // 'shipping', 'payment', 'email', 'accounting'
+  provider_name   String   // 'payfast', 'xero', 'courier-guy', etc.
+  is_enabled      Boolean  @default(false)
+  is_active       Boolean  @default(false) // Active means configured and ready to use
+  config_data     Json     // Provider-specific configuration (API keys, settings, etc.)
+  credentials     Json?    @db.JsonB // Encrypted credentials (sensitive data)
+  feature_flags   Json?    // Provider-specific feature flags
+  last_synced_at  DateTime?
+  error_message   String?  // Last error if provider failed
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@unique([provider_type, provider_name])
+  @@index([provider_type])
+  @@index([provider_name])
+  @@index([is_enabled])
+  @@index([is_active])
+}

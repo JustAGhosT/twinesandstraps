@@ -79,6 +79,10 @@ export const featureFlags: FeatureFlags = {
   // Future Features - disabled by default
   productReviews: envBool(process.env.NEXT_PUBLIC_FEATURE_PRODUCT_REVIEWS, false),
   checkout: envBool(process.env.NEXT_PUBLIC_FEATURE_CHECKOUT, false),
+
+  // Provider Management - enabled by default
+  providerManagement: envBool(process.env.NEXT_PUBLIC_FEATURE_PROVIDER_MANAGEMENT, true),
+  mockProviders: envBool(process.env.NEXT_PUBLIC_FEATURE_MOCK_PROVIDERS, process.env.NODE_ENV === 'development'),
 };
 
 /**

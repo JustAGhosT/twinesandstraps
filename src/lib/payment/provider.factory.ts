@@ -5,6 +5,7 @@
 
 import { IPaymentProvider } from './provider.interface';
 import { PayFastProvider } from './providers/payfast.provider';
+import { PayStackProvider } from './providers/paystack.provider';
 import { MockPaymentProvider } from './providers/mock.provider';
 
 class PaymentProviderFactory {
@@ -14,6 +15,7 @@ class PaymentProviderFactory {
   constructor() {
     // Register all available providers
     this.registerProvider(new PayFastProvider());
+    this.registerProvider(new PayStackProvider());
     
     // Register mock provider only in development/test environments
     if (process.env.NODE_ENV === 'development' || process.env.ENABLE_MOCK_PROVIDERS === 'true') {
