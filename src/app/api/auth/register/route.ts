@@ -4,6 +4,7 @@ import { hashPassword, createUserSession } from '@/lib/user-auth';
 import { userRegistrationSchema, validateBody, formatZodErrors } from '@/lib/validations';
 import { requireCsrfToken } from '@/lib/security/csrf';
 import { withRateLimit, getRateLimitConfig } from '@/lib/security/rate-limit-wrapper';
+import { addToWelcomeSeries } from '@/lib/email/welcome-series';
 
 async function handlePOST(request: NextRequest) {
   // Verify CSRF token
@@ -48,6 +49,21 @@ async function handlePOST(request: NextRequest) {
         marketing_consent: marketingConsent,
       },
     });
+
+    // Add to welcome email series (if marketing consent given)
+    if (marketingConsent) {
+      try {
+        const nameParts = name.split(' ');
+        addToWelcomeSeries(
+          user.email,
+          nameParts[0],
+          nameParts.slice(1).join(' ') || undefined
+        );
+      } catch (emailError) {
+        // Log but don't fail registration if email series fails
+        console.error('Failed to add user to welcome series:', emailError);
+      }
+    }
 
     // Create session
     const session = createUserSession({

@@ -1,0 +1,13 @@
+{
+  "bindings": [
+    {
+      "name": "myTimer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "0 0 12 * * *",
+      "runOnStartup": false
+    }
+  ],
+  "scriptFile": "../dist/abandoned-cart/index.js"
+}
+

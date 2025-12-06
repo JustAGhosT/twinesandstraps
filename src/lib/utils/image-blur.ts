@@ -29,18 +29,41 @@ export function getProductImageBlur(color?: string): string {
 
 /**
  * Generate blur placeholder from an image URL
- * In production, you might want to use a service like Cloudinary or Imgix
- * that provides blur placeholders automatically
+ * Creates a proper blur data URL from the actual image
  */
 export async function generateBlurFromImage(imageUrl: string): Promise<string> {
-  // For now, return a generic blur placeholder
-  // In production, you could:
-  // 1. Fetch the image
-  // 2. Resize it to 10x10px
-  // 3. Convert to base64
-  // 4. Return as data URL
-  
-  return getProductImageBlur();
+  try {
+    // For server-side: fetch and process image
+    if (typeof window === 'undefined') {
+      // In production, consider using a service like Cloudinary or Imgix
+      // For now, return a generic blur placeholder
+      return getProductImageBlur();
+    }
+    
+    // Client-side: create canvas and generate blur
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 10;
+        canvas.height = 10;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, 10, 10);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.1);
+          resolve(dataUrl);
+        } else {
+          resolve(getProductImageBlur());
+        }
+      };
+      img.onerror = () => resolve(getProductImageBlur());
+      img.src = imageUrl;
+    });
+  } catch (error) {
+    console.error('Error generating blur from image:', error);
+    return getProductImageBlur();
+  }
 }
 
 /**

@@ -1,8 +1,23 @@
 # Azure Functions Cron Job Setup
 
-## Low Stock Alert Cron Job
+**Last Updated:** December 2025
 
-This document explains how to set up the daily low stock alert cron job using Azure Functions.
+This document explains how to set up Azure Functions for all cron jobs in the application.
+
+## Available Cron Jobs
+
+1. **Low Stock Alert** - Daily at 9:00 AM UTC
+2. **Welcome Email Series** - Daily at 10:00 AM UTC
+3. **Post-Purchase Email Series** - Daily at 11:00 AM UTC
+4. **Abandoned Cart Automation** - Daily at 12:00 PM UTC
+5. **Inventory Sync** - Daily at 8:00 AM UTC
+6. **Cache Warming** - Daily at 7:00 AM UTC
+
+**See:** [EMAIL_AUTOMATION_CRON_SETUP.md](../guides/deployment/EMAIL_AUTOMATION_CRON_SETUP.md) for email automation setup
+
+---
+
+## Low Stock Alert Cron Job
 
 ---
 

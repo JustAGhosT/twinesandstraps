@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
+    "applicationinsights": "^3.12.1",
     "ioredis": "^5.8.2",
     "next": "14.2.32",
     "react": "^18",

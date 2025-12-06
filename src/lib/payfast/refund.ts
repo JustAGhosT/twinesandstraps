@@ -16,6 +16,7 @@ export interface RefundResult {
   success: boolean;
   refundId?: string;
   error?: string;
+  message?: string;
 }
 
 /**

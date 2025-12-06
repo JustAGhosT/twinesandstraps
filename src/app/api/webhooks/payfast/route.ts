@@ -8,6 +8,7 @@ import { getPayFastConfig, isPayFastConfigured } from '@/lib/payfast/config';
 import { validateSignature, parseITNData } from '@/lib/payfast/signature';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rate-limit';
 import { sendOrderConfirmation } from '@/lib/email/brevo';
+import { sendPostPurchaseEmailDay1 } from '@/lib/email/post-purchase';
 import { syncPaymentToXero } from '@/lib/xero/payments';
 import prisma from '@/lib/prisma';
 
@@ -173,20 +174,42 @@ async function handlePaymentSuccess(
     }
 
     // Send confirmation email
-    const customerEmail = order.user.email || itnData.email_address || '';
-    if (customerEmail) {
-      await sendOrderConfirmation(customerEmail, {
-        orderId: order.order_number,
-        items: order.items.map(item => ({
-          name: item.product_name,
-          quantity: item.quantity,
-          price: item.unit_price,
-        })),
-        total: order.total,
-        shippingAddress: order.shipping_address
-          ? `${order.shipping_address.street_address}, ${order.shipping_address.city}, ${order.shipping_address.province} ${order.shipping_address.postal_code}`
-          : undefined,
-      });
+    const customerEmail = order.user?.email || itnData.email_address || '';
+    if (customerEmail && order.user) {
+      try {
+        await sendOrderConfirmation(customerEmail, {
+          orderId: order.order_number,
+          items: order.items.map(item => ({
+            name: item.product_name,
+            quantity: item.quantity,
+            price: item.unit_price,
+          })),
+          total: order.total,
+          shippingAddress: order.shipping_address
+            ? `${order.shipping_address.street_address}, ${order.shipping_address.city}, ${order.shipping_address.province} ${order.shipping_address.postal_code}`
+            : undefined,
+        });
+
+        // Also send post-purchase follow-up (Day 1)
+        const nameParts = order.user.name.split(' ');
+        await sendPostPurchaseEmailDay1({
+          orderId: order.order_number,
+          email: customerEmail,
+          firstName: nameParts[0],
+          lastName: nameParts.slice(1).join(' ') || undefined,
+          items: order.items.map(item => ({
+            name: item.product_name,
+            quantity: item.quantity,
+            price: item.unit_price,
+          })),
+          total: order.total,
+          orderDate: order.created_at,
+          trackingNumber: order.tracking_number || undefined,
+        });
+      } catch (emailError) {
+        // Log but don't fail payment processing if email fails
+        console.error('Failed to send order confirmation email:', emailError);
+      }
     }
 
     console.log('Payment successful:', { paymentId, pfPaymentId, amount, orderId: order.id });

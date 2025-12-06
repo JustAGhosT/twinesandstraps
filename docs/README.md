@@ -82,9 +82,10 @@ Product planning, roadmaps, and strategic documents.
 
 | Document | Description |
 |----------|-------------|
+| [Project Status](./planning/PROJECT_STATUS.md) | **Current project status and completion overview** ⭐ |
+| [Outstanding Tasks](./planning/OUTSTANDING_TASKS.md) | **What's next - prioritized task list** ⭐ |
+| [Phased Improvement Plan](./planning/phased-improvement-plan.md) | Comprehensive 10-phase roadmap with priorities and timelines |
 | [Product Requirements (PRD)](./planning/product-requirements.md) | Full product vision, user stories, and business objectives |
-| [Phased Improvement Plan](./planning/phased-improvement-plan.md) | **Comprehensive 10-phase roadmap with priorities and timelines** |
-| [Improvement Phases](./planning/improvement-phases.md) | Original improvement roadmap (see Phased Improvement Plan for updated version) |
 | [Integrations Roadmap](./planning/integrations-roadmap.md) | Planned third-party integrations |
 | [Marketing Strategy](./planning/marketing-strategy.md) | Marketing approach and strategy |
 | [Moodboard](./planning/moodboard.md) | Design inspiration and visual direction |

@@ -41,8 +41,10 @@ export function initializeAppInsights() {
     initialized = true;
 
     // Set default properties
-    appInsights?.context.tags[appInsightsPackage.defaultClient.context.keys.cloudRole] = 'twines-and-straps-api';
-    appInsights?.context.tags[appInsightsPackage.defaultClient.context.keys.cloudRoleInstance] = process.env.NODE_ENV || 'development';
+    if (appInsights && appInsights.context && appInsights.context.tags) {
+      appInsights.context.tags[appInsightsPackage.defaultClient.context.keys.cloudRole] = 'twines-and-straps-api';
+      appInsights.context.tags[appInsightsPackage.defaultClient.context.keys.cloudRoleInstance] = process.env.NODE_ENV || 'development';
+    }
 
     console.log('Application Insights initialized');
     return appInsights;
