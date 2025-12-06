@@ -167,7 +167,7 @@ async function callOpenAI(
 /**
  * Call the configured AI provider
  */
-async function callAI(
+export async function callAI(
   messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
   temperature: number = 0.7
 ): Promise<string> {

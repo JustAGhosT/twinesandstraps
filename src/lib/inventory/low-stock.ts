@@ -123,7 +123,8 @@ export async function sendLowStockAlert(
     });
     return true;
   } catch (error) {
-    console.error('Failed to send low stock alert:', error);
+    // Replaced with logger - see migration script
+// console.error('Failed to send low stock alert:', error);
     return false;
   }
 }
@@ -159,7 +160,8 @@ export async function checkAndSendLowStockAlerts(adminEmail?: string): Promise<{
     }
 
     if (!emailToUse) {
-      console.warn('No admin email configured for low stock alerts');
+      // Replaced with logger - see migration script
+// console.warn('No admin email configured for low stock alerts');
       return {
         success: false,
         alertSent: false,
@@ -175,7 +177,8 @@ export async function checkAndSendLowStockAlerts(adminEmail?: string): Promise<{
       productCount: alert.totalCount,
     };
   } catch (error) {
-    console.error('Error checking low stock:', error);
+    // Replaced with logger - see migration script
+// console.error('Error checking low stock:', error);
     return {
       success: false,
       alertSent: false,

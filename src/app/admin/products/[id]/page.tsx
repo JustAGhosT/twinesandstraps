@@ -39,6 +39,7 @@ export default function ProductEditPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [productPrice, setProductPrice] = useState(0);
 
   const [form, setForm] = useState<ProductForm>({
     name: '',
