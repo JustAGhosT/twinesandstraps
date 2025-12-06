@@ -56,5 +56,43 @@ async function handlePOST(request: NextRequest) {
   }
 }
 
+async function handleGET(request: NextRequest) {
+  const authError = await requireAdminAuth(request);
+  if (authError) return authError;
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const productId = searchParams.get('productId');
+    const currentStock = searchParams.get('currentStock');
+    const averageMonthlySales = searchParams.get('averageMonthlySales');
+
+    if (!productId || !currentStock) {
+      return NextResponse.json(
+        { error: 'productId and currentStock are required' },
+        { status: 400 }
+      );
+    }
+
+    const methods = await findOffsetMethodsForExcessStock(
+      parseInt(productId),
+      parseInt(currentStock),
+      averageMonthlySales ? parseInt(averageMonthlySales) : undefined
+    );
+
+    return NextResponse.json({
+      success: true,
+      productId: parseInt(productId),
+      methods,
+      count: methods.length,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export const GET = withRateLimit(handleGET, getRateLimitConfig('admin'));
 export const POST = withRateLimit(handlePOST, getRateLimitConfig('admin'));
 

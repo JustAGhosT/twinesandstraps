@@ -6,6 +6,8 @@
 import { ISupplierProvider } from './provider.interface';
 import { ManualSupplierProvider } from './providers/manual.provider';
 import { ApiSupplierProvider } from './providers/api.provider';
+import { CsvSupplierProvider, CsvSupplierConfig } from './providers/csv.provider';
+import { EdiSupplierProvider, EdiSupplierConfig } from './providers/edi.provider';
 
 class SupplierProviderFactory {
   private providers: Map<string, ISupplierProvider> = new Map();
@@ -25,9 +27,15 @@ class SupplierProviderFactory {
   /**
    * Get a provider by name
    */
-  getProvider(name: string, config?: { apiUrl?: string; apiKey?: string }): ISupplierProvider | null {
+  getProvider(name: string, config?: any): ISupplierProvider | null {
     if (name === 'api' && config) {
       return new ApiSupplierProvider(config.apiUrl, config.apiKey);
+    }
+    if (name === 'csv') {
+      return new CsvSupplierProvider(config);
+    }
+    if (name === 'edi') {
+      return new EdiSupplierProvider(config);
     }
     return this.providers.get(name) || null;
   }
@@ -42,9 +50,15 @@ class SupplierProviderFactory {
   /**
    * Get recommended provider for a supplier based on configuration
    */
-  getRecommendedProvider(providerType?: string | null): ISupplierProvider {
+  getRecommendedProvider(providerType?: string | null, config?: any): ISupplierProvider {
     if (providerType === 'api') {
       return new ApiSupplierProvider();
+    }
+    if (providerType === 'csv') {
+      return new CsvSupplierProvider(config);
+    }
+    if (providerType === 'edi') {
+      return new EdiSupplierProvider(config);
     }
     return new ManualSupplierProvider();
   }
@@ -54,7 +68,7 @@ class SupplierProviderFactory {
 export const supplierProviderFactory = new SupplierProviderFactory();
 
 // Export convenience functions
-export function getSupplierProvider(name: string, config?: { apiUrl?: string; apiKey?: string }): ISupplierProvider | null {
+export function getSupplierProvider(name: string, config?: any): ISupplierProvider | null {
   return supplierProviderFactory.getProvider(name, config);
 }
 

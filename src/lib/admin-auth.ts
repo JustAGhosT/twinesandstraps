@@ -89,7 +89,17 @@ export async function createSession(): Promise<{ token: string; expiry: number }
   });
 
   // Cleanup old sessions periodically (non-blocking)
-  cleanupSessions().catch(console.error);
+  cleanupSessions().catch((error) => {
+    // Use logger if available, otherwise silent fail for background task
+    if (typeof window === 'undefined') {
+      // Server-side: import logger dynamically to avoid circular dependencies
+      import('@/lib/logging/logger').then(({ logError }) => {
+        logError('Failed to cleanup admin sessions', error);
+      }).catch(() => {
+        // Logger not available, fail silently for background cleanup
+      });
+    }
+  });
 
   return { token, expiry: expiryDate.getTime() };
 }

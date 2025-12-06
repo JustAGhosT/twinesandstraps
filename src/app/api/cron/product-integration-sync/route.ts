@@ -144,7 +144,7 @@ async function syncIntegration(integration: any): Promise<void> {
     // Calculate available quantity
     const availableQuantity = integration.quantity_override !== null && integration.quantity_override !== undefined
       ? integration.quantity_override
-      : getProductQuantity(product);
+      : await getProductQuantity(product);
 
     const availableQty = Math.max(0, availableQuantity - (integration.reserve_quantity || 0));
 
@@ -244,12 +244,41 @@ function calculateNextSyncTime(schedule: string | null): Date | null {
 }
 
 /**
- * Get product available quantity (simplified - would check actual inventory)
+ * Get product available quantity from inventory events
  */
-function getProductQuantity(product: any): number {
-  // Simplified - would check InventoryMovement, stock levels, etc.
-  if (product.stock_status === 'OUT_OF_STOCK') return 0;
-  if (product.stock_status === 'LOW_STOCK') return 10;
-  return 100; // IN_STOCK
+async function getProductQuantity(product: any): Promise<number> {
+  try {
+    // Try to get actual quantity from inventory events
+    const inventoryEvents = await prisma.inventoryEvent.aggregate({
+      where: {
+        product_id: product.id,
+      },
+      _sum: {
+        quantity_change: true,
+      },
+    });
+
+    // Calculate current stock from events (sum of all quantity changes)
+    const calculatedQuantity = inventoryEvents._sum.quantity_change || 0;
+    
+    // Use calculated quantity if available and positive, otherwise fall back to stock_status
+    if (calculatedQuantity > 0) {
+      return Math.max(0, calculatedQuantity);
+    }
+
+    // Fallback to stock_status-based estimation
+    if (product.stock_status === 'OUT_OF_STOCK') return 0;
+    if (product.stock_status === 'LOW_STOCK') return 10;
+    return product.stock_quantity || 100; // Use product.stock_quantity if available
+  } catch (error) {
+    // If inventory tracking not available, fall back to stock_status
+    logWarn('Failed to calculate product quantity from inventory events', error, {
+      productId: product.id,
+    });
+    
+    if (product.stock_status === 'OUT_OF_STOCK') return 0;
+    if (product.stock_status === 'LOW_STOCK') return 10;
+    return product.stock_quantity || 100;
+  }
 }
 
