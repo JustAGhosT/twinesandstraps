@@ -125,16 +125,61 @@ This script will:
 
 If not using the setup script, manually add these secrets in GitHub:
 
-**Settings → Secrets and variables → Actions**
+**Settings → Secrets and variables → Actions → Environments**
 
-| Secret                    | Description                          |
-| ------------------------- | ------------------------------------ |
-| `AZURE_CREDENTIALS`       | Service principal credentials (JSON) |
-| `AZURE_SUBSCRIPTION_ID`   | Your Azure subscription ID           |
-| `POSTGRES_ADMIN_LOGIN`    | PostgreSQL admin username            |
-| `POSTGRES_ADMIN_PASSWORD` | PostgreSQL admin password (strong!)  |
-| `ADMIN_PASSWORD`          | Application admin password           |
-| `DATABASE_URL`            | PostgreSQL connection string (required for migrations) |
+> **Note:** Secrets should be configured for each environment (dev, staging, prod) individually.
+
+| Secret                           | Description                                          |
+| -------------------------------- | ---------------------------------------------------- |
+| `AZURE_CREDENTIALS`              | Service principal credentials (JSON)                 |
+| `AZURE_SUBSCRIPTION_ID`          | Your Azure subscription ID                           |
+| `AZURE_WEBAPP_PUBLISH_PROFILE`   | Publish profile for App Service deployment           |
+| `POSTGRES_ADMIN_LOGIN`           | PostgreSQL admin username                            |
+| `POSTGRES_ADMIN_PASSWORD`        | PostgreSQL admin password (strong!)                  |
+| `ADMIN_PASSWORD`                 | Application admin password                           |
+| `DATABASE_URL`                   | PostgreSQL connection string (required for migrations) |
+
+#### How to Get the Publish Profile
+
+For each environment (dev, staging, prod), you need to download the publish profile from Azure:
+
+**Option 1: Azure Portal**
+1. Go to the [Azure Portal](https://portal.azure.com)
+2. Navigate to your App Service (e.g., `dev-app-san-tassa`)
+3. Click **Get publish profile** in the top toolbar
+4. Save the downloaded `.PublishSettings` file
+5. Copy the entire contents of the file
+
+**Option 2: Azure CLI**
+```bash
+# For dev environment
+az webapp deployment list-publishing-profiles \
+  --name dev-app-san-tassa \
+  --resource-group dev-rg-san-tassa \
+  --xml
+
+# For staging environment
+az webapp deployment list-publishing-profiles \
+  --name staging-app-san-tassa \
+  --resource-group staging-rg-san-tassa \
+  --xml
+
+# For production environment  
+az webapp deployment list-publishing-profiles \
+  --name prod-app-san-tassa \
+  --resource-group prod-rg-san-tassa \
+  --xml
+```
+
+**Adding to GitHub:**
+1. Go to your GitHub repository
+2. Navigate to **Settings → Secrets and variables → Actions → Environments**
+3. Select the environment (dev, staging, or prod)
+4. Add a new secret named `AZURE_WEBAPP_PUBLISH_PROFILE`
+5. Paste the entire XML content from the publish profile
+6. Click **Add secret**
+
+> **Important:** The publish profile contains sensitive credentials. Keep it secure and rotate it regularly.
 
 ---
 
@@ -323,6 +368,41 @@ The `azure-health-check.yml` workflow runs every 15 minutes to verify:
 ## Troubleshooting
 
 ### Common Issues
+
+#### "Failed to deploy web package to App Service. Forbidden (CODE: 403)"
+
+This error occurs during deployment when the `azure/webapps-deploy@v3` action cannot access the App Service's SCM (Kudu) endpoint.
+
+**Causes:**
+1. Missing or invalid `AZURE_WEBAPP_PUBLISH_PROFILE` secret
+2. The publish profile has expired or been rotated
+3. IP restrictions on the App Service blocking GitHub Actions runners
+4. Service Principal lacking necessary permissions (if using service principal authentication)
+
+**Solution:**
+
+1. **Ensure publish profile is configured** (recommended approach):
+   ```bash
+   # Download the publish profile
+   az webapp deployment list-publishing-profiles \
+     --name dev-app-san-tassa \
+     --resource-group dev-rg-san-tassa \
+     --xml
+   ```
+
+2. **Add/Update the GitHub secret**:
+   - Go to **Settings → Secrets and variables → Actions → Environments**
+   - Select the environment (dev, staging, or prod)
+   - Add or update `AZURE_WEBAPP_PUBLISH_PROFILE` with the XML content
+   - See [How to Get the Publish Profile](#how-to-get-the-publish-profile) for detailed instructions
+
+3. **Re-run the deployment** workflow
+
+**Why publish profile is preferred:**
+- Works reliably with IP restrictions and networking features
+- No complex permission setup required
+- Bypasses SCM endpoint access issues
+- Official recommendation from Microsoft for GitHub Actions deployments
 
 #### "P1000: Authentication failed against database server"
 
