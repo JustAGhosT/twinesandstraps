@@ -57,11 +57,13 @@ export async function GET(): Promise<NextResponse<HealthStatus>> {
     const dbStart = Date.now();
     
     // Add a timeout to prevent hanging connections
+    const timeoutMs = 5000;
     const timeoutPromise = new Promise<never>((_, reject) => 
-      setTimeout(() => reject(new Error('Database check timeout after 5s')), 5000)
+      setTimeout(() => reject(new Error(`Database check timeout after ${timeoutMs}ms`)), timeoutMs)
     );
     const dbQuery = prisma.$queryRaw`SELECT 1`;
     
+    // Wait for either the query to complete or timeout
     await Promise.race([dbQuery, timeoutPromise]);
     healthStatus.checks.database.status = 'ok';
     healthStatus.checks.database.latency = Date.now() - dbStart;
