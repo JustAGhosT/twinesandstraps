@@ -141,6 +141,8 @@ jobs:
           cp scripts/migrate-production.js deploy-package/scripts/
           # Copy deployment config to skip Oryx build
           cp .deployment deploy-package/
+          # Copy startup wrapper script for better Azure diagnostics
+          cp start-server.js deploy-package/
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -193,11 +195,11 @@ jobs:
               WEBSITES_PORT=8080 \
               DATABASE_URL="${{ secrets.DATABASE_URL }}"
           
-          # Configure startup command for standalone Next.js server
+          # Configure startup command for standalone Next.js server with diagnostic wrapper
           az webapp config set \
             --name "dev-app-san-tassa" \
             --resource-group "dev-rg-san-tassa" \
-            --startup-file "node server.js"
+            --startup-file "node start-server.js"
           
           # Wait for SCM container to stabilize after settings change
           echo "Waiting 30 seconds for SCM container to stabilize..."
@@ -211,7 +213,7 @@ jobs:
           package: deploy.zip
           type: zip
           clean: true
-          startup-command: "node server.js"
+          startup-command: "node start-server.js"
 
       - name: Verify DATABASE_URL
         shell: bash
@@ -342,11 +344,11 @@ jobs:
               WEBSITES_PORT=8080 \
               DATABASE_URL="${{ secrets.DATABASE_URL }}"
           
-          # Configure startup command for standalone Next.js server
+          # Configure startup command for standalone Next.js server with diagnostic wrapper
           az webapp config set \
             --name "staging-app-san-tassa" \
             --resource-group "staging-rg-san-tassa" \
-            --startup-file "node server.js"
+            --startup-file "node start-server.js"
           
           # Wait for SCM container to stabilize after settings change
           echo "Waiting 30 seconds for SCM container to stabilize..."
@@ -360,7 +362,7 @@ jobs:
           package: deploy.zip
           type: zip
           clean: true
-          startup-command: "node server.js"
+          startup-command: "node start-server.js"
 
       - name: Verify DATABASE_URL
         shell: bash
@@ -491,11 +493,11 @@ jobs:
               WEBSITES_PORT=8080 \
               DATABASE_URL="${{ secrets.DATABASE_URL }}"
           
-          # Configure startup command for production slot
+          # Configure startup command for production slot with diagnostic wrapper
           az webapp config set \
             --name "prod-app-san-tassa" \
             --resource-group "prod-rg-san-tassa" \
-            --startup-file "node server.js"
+            --startup-file "node start-server.js"
           
           # Configure settings for staging slot (used for blue/green deployment)
           az webapp config appsettings set \
@@ -511,12 +513,12 @@ jobs:
               WEBSITES_PORT=8080 \
               DATABASE_URL="${{ secrets.DATABASE_URL }}"
           
-          # Configure startup command for staging slot
+          # Configure startup command for staging slot with diagnostic wrapper
           az webapp config set \
             --name "prod-app-san-tassa" \
             --resource-group "prod-rg-san-tassa" \
             --slot "staging" \
-            --startup-file "node server.js"
+            --startup-file "node start-server.js"
           
           # Wait for SCM container to stabilize after settings change
           echo "Waiting 30 seconds for SCM container to stabilize..."
@@ -531,7 +533,7 @@ jobs:
           package: deploy.zip
           type: zip
           clean: true
-          startup-command: "node server.js"
+          startup-command: "node start-server.js"
 
       - name: Verify DATABASE_URL
         shell: bash
