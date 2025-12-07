@@ -27,12 +27,7 @@ const WhatsAppButton: React.FC = () => {
 
     const message = 'Hi! I would like to inquire about your products.';
     const link = messagingService.getChatLink(whatsappNumber, message);
-
-    if (link.startsWith('javascript:')) {
-        window.location.href = link;
-    } else {
-        window.open(link, '_blank', 'noopener,noreferrer');
-    }
+    window.open(link, '_blank', 'noopener,noreferrer');
   };
 
   return (
