@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import { useToast } from '@/components/Toast';
+import { WhatsAppService, MockMessagingService } from '@/lib/messaging/WhatsAppService';
 
 const WhatsAppButton: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -10,14 +11,28 @@ const WhatsAppButton: React.FC = () => {
   const { warning } = useToast();
   const whatsappNumber = settings.whatsappNumber || '27639690773';
 
+  // Instantiate the service (in a real app, this could be provided via Context/DI)
+  // Using MockMessagingService in development if needed, but the requirement is "abstract behind interfaces with a mock"
+  // For production, we'd use WhatsAppService.
+  const messagingService = process.env.NODE_ENV === 'test'
+    ? new MockMessagingService()
+    : new WhatsAppService();
+
   const handleClick = () => {
     // Show warning only if using placeholder value
     if (whatsappNumber === '27XXXXXXXXX' || !whatsappNumber) {
       warning(`WhatsApp not configured. Please contact us at ${settings.email}`);
       return;
     }
-    const message = encodeURIComponent('Hi! I would like to inquire about your products.');
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank', 'noopener,noreferrer');
+
+    const message = 'Hi! I would like to inquire about your products.';
+    const link = messagingService.getChatLink(whatsappNumber, message);
+
+    if (link.startsWith('javascript:')) {
+        window.location.href = link;
+    } else {
+        window.open(link, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (

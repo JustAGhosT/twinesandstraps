@@ -32,7 +32,7 @@ Twines and Straps SA will launch a combined **B2C/B2B e-commerce platform** with
 
 ### In Scope (MVP + Phased)
 - Catalog browsing, advanced filtering, product detail pages.
-- Cart and checkout with **PayFast** payment integration.
+- Cart and checkout with **PayFast** payment integration (Partially Implemented - Interface Ready).
 - Basic customer accounts with order history.
 - Admin portal for product, price, and media management.
 - VAT display and calculation; transactional emails; **GA4 analytics**.
@@ -47,7 +47,22 @@ Twines and Straps SA will launch a combined **B2C/B2B e-commerce platform** with
 
 ---
 
-## 4. Stakeholders
+## 4. Architectural Overview
+
+The application follows a layered architecture to ensure maintainability and testability:
+
+- **Presentation Layer**: Next.js App Router (React Server Components).
+- **Service/Logic Layer**: Dedicated services for business logic (e.g., `PayFastService`, `WhatsAppService`).
+- **Data Access Layer**: Repository Pattern (`IProductRepository`, `PrismaProductRepository`) abstracting the ORM (Prisma).
+
+### Key Integrations
+- **Database**: PostgreSQL (via Prisma ORM).
+- **Payments**: PayFast (Abstracted via `IPaymentGateway`).
+- **Messaging**: WhatsApp (Abstracted via `IMessagingService`).
+
+---
+
+## 5. Stakeholders
 
 - **Directors:** Strategy, approvals, budget.
 - **Marketing:** Content, campaigns, analytics.
@@ -58,7 +73,7 @@ Twines and Straps SA will launch a combined **B2C/B2B e-commerce platform** with
 
 ---
 
-## 5. Personas
+## 6. Personas
 
 ### Retail Customer (Consumer)
 - **Needs:** Clear specs, transparent VAT/shipping, trusted payments, mobile-friendly flow.
@@ -74,13 +89,13 @@ Twines and Straps SA will launch a combined **B2C/B2B e-commerce platform** with
 
 ---
 
-## 6. User Stories & Acceptance Criteria
+## 7. User Stories & Acceptance Criteria
 
 *(High-level stories, detailed requirements in Section 8)*
 
 ---
 
-## 7. Key User Flows
+## 8. Key User Flows
 
 ### Retail Checkout Flow
 1.  **Home Page:** User arrives, sees featured products/categories.
@@ -110,41 +125,6 @@ Twines and Straps SA will launch a combined **B2C/B2B e-commerce platform** with
 5.  **Preview:** Admin previews the changes as they would appear on the live site.
 6.  **Publish:** Admin saves and publishes the changes. The system validates the data.
 7.  **Propagation:** Changes are reflected on the storefront within the defined SLA (<15 minutes). An audit log entry is created.
-
----
-
-## 8. Functional Requirements
-
-### Catalog & Search
--   **Categories:** Multi-level category hierarchy.
--   **Filters:** Faceted filtering by material, diameter, length, strength, price.
--   **Sorting:** Sort by price (low/high), name, popularity.
--   **Search:** Autocomplete suggestions, typo tolerance, and recent search history.
--   **SEO:** Clean, SEO-friendly URLs (e.g., `/products/category/product-name`).
-
-### Product Details
--   **Media:** Image gallery with zoom, support for multiple images per product.
--   **Specs:** Downloadable PDF spec sheets (optional).
--   **Cross-sells:** Display related or alternative products.
--   **Stock:** Real-time stock status (In Stock, Out of Stock, Low Stock).
-
-### Cart & Checkout
--   **Persistence:** Cart persists for 7 days for logged-in users.
--   **Validation:** Address capture with basic validation.
--   **Totals:** Clear breakdown of subtotal, VAT, shipping, and final total.
--   **Payment:** Secure integration with PayFast.
-
-### B2B Quote
--   **Form:** Multi-line item support, file attachments (up to 5MB).
--   **Admin Management:** Dashboard to view and manage quotes (Draft, Sent, Accepted, Expired).
--   **PDF Generation:** Auto-generate branded PDF quotes with expiry dates.
--   **Audit Trail:** Log all changes made to a quote.
-
-### Admin Portal (CMS)
--   **Product CRUD:** Full create, read, update, delete functionality for products.
--   **Bulk Import:** CSV-based bulk product upload with data validation and error logs.
--   **Versioning:** Track and rollback price and content changes.
--   **Access Control:** Role-based access (see Section 19).
 
 ---
 
